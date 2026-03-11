@@ -1,12 +1,12 @@
 # Q&A
 
-`docs/qna/` contains resolved implementation questions and clarified decisions.
+This directory groups clarifications, decisions, and implementation notes that complement the main architecture, product, and data documents.
 
-Canonical product, architecture, and schema baselines remain in the root docs and `docs/palio/`. The files here keep the question-and-answer material grouped by topic so implementation work is easier to search.
+Use the subdirectories as follows:
 
-## Areas
+- [`architecture/`](architecture/README.md): system boundaries, stack responsibilities, authorization, module boundaries, consistency rules, realtime behavior, API contracts, and operations.
+- [`data/`](data/README.md): official result model, invariants, schema design, and migration-related decisions.
+- [`product/`](product/README.md): competition rules, season setup, lifecycle semantics, scoring, visibility, scope, and future-facing product clarifications.
+- [`ui/`](ui/README.md): frontend architecture and operator-facing flows for judges and admins.
 
-- [`product/`](product/)
-- [`architecture/`](architecture/)
-- [`data/`](data/)
-- [`ui/`](ui/)
+When looking for a specific clarification, start from the most relevant subdirectory README rather than scanning all Q&A files.
