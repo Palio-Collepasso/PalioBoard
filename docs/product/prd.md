@@ -1,9 +1,9 @@
 # Product concept
 
-**Palio Control** is an operations-first web app for running the Palio, optimized for admins and judges on laptops, with a separate public read-only experience and a separate maxi-screen mode.
+**PalioBoard** is an operations-first web app for running the Palio, optimized for admins and judges on laptops, with a separate public read-only experience and a separate maxi-screen mode.
 
 It is **not** a generic sports platform.
-It is a **rules-aware event control system** for a 4-rione competition with:
+It is a **rules-aware event control system** for a 4-team competition with:
 
 * automatic leaderboard calculation
 * Jolly handling
@@ -12,7 +12,7 @@ It is a **rules-aware event control system** for a 4-rione competition with:
 * live public visibility for appeals
 * full auditability for post-result edits
 
-This fits the actual structure of the event: 4 fixed rioni, `4-3-2-1` scoring with ex aequo, one Jolly per rione declared before the relevant game, Giocasport tracked separately, Prepalio made of subgames whose combined ranking yields points for the main Palio, and written appeals allowed within 15 minutes after each game.     
+This fits the actual structure of the event: 4 fixed teams, `4-3-2-1` scoring with ex aequo, one Jolly per team declared before the relevant game, Giocasport tracked separately, Prepalio made of subgames whose combined ranking yields points for the main Palio, and written appeals allowed within 15 minutes after each game.     
 
 # Problem
 
@@ -64,8 +64,8 @@ First, optimize for **backoffice reliability**, not feature breadth.
 Second, avoid a generic form-builder.
 Use only **two competition templates**:
 
-* ranking template with optional fields
-* fixed 4-rione 1v1 tournament template
+* ranking format with optional fields
+* fixed 4-team 1v1 tournament format
 
 Third, keep every important correction **visible and auditable**.
 
@@ -83,7 +83,7 @@ Giocasport has its own leaderboard and does not assign points to the main Palio 
 
 ## Teams
 
-* Exactly 4 rioni per season
+* Exactly 4 teams per season
 * Created each year with default values, but editable before results exist
 
 ## Season scope
@@ -93,32 +93,30 @@ Giocasport has its own leaderboard and does not assign points to the main Palio 
 
 # Templates
 
-## 1. Ranking template
+## 1. Ranking format
 
 Used for all non-1v1 games.
 
 Always records:
 
-* rione
+* team
 * placement
 
-Optional per game:
-
+Optional per game catalog fields:
 * time
-* quantity / score / points / other game-specific label
+* quantity / score / points / etc.
 * penalties
 * public notes
 
-Important: the UI must show the **specific configured label**, never a generic "score value”.
+Important: the UI must show the **seeded field-catalog label**, never a generic internal field name.
 
 Judges can save partial data while the game is in progress. Final placements are entered manually. Leaderboard changes only when the game is completed.
 
-## 2. Fixed 1v1 tournament template
+## 2. Fixed 1v1 tournament format
 
 Always modeled as:
 
-* semifinal 1
-* semifinal 2
+* semifinal
 * final 3rd/4th
 * final 1st/2nd
 
@@ -132,9 +130,8 @@ Admins can:
 
 * create/edit/delete games
 * choose competition: Palio / Prepalio / Giocasport
-* choose template: ranking / 1v1
-* configure enabled optional fields
-* configure the custom label for quantity-like fields
+* choose format: ranking / 1v1
+* choose which catalog fields the game uses
 * configure points tables per game / competition item, with default `4,3,2,1`
 * manage teams
 * create manual leaderboard adjustments
@@ -144,11 +141,12 @@ Rules:
 * competition contribution is implicit from competition type
 * no active/visible toggle in v1
 * a game with any recorded result cannot be deleted
-* a game definition can only be edited until results exist
+* once a game has any official result data, every game property and relationship becomes immutable in v1
+* the field catalog is seeded/static in v1; admins only choose which catalog fields a game uses
 
 # Result-entry workflow
 
-## Ranking-template flow
+## Ranking-format flow
 
 1. Judge/admin opens the game
 2. Clicks **Start game**
@@ -160,7 +158,7 @@ Rules:
 
 Completion is blocked unless:
 
-* all 4 rioni are present
+* all 4 teams are present
 * placements are valid, including ties such as `1,2,2,4`
 * all enabled required fields are filled
 
@@ -169,9 +167,10 @@ Completion is blocked unless:
 1. Pairings are set before start
 2. Judge/admin starts tournament
 3. Winners are entered for each match
-4. Final ranking is computed automatically
-5. Admin may override if needed
-6. Tournament is completed and standings update
+4. Bracket progression becomes visible immediately
+5. Final ranking is computed automatically
+6. Admin may override if needed
+7. Tournament is completed and only then does it affect the leaderboard
 
 # Scoring and standings
 
@@ -193,15 +192,15 @@ The system validates placement structure and applies points accordingly.
 
 Model:
 
-* each rione can use Jolly once
+* each team can use Jolly once
 * only in Palio
 * declared before the game
-* recorded at result-entry time as a per-rione flag
-* blocked if that rione has already used Jolly in another Palio game
+* recorded at result-entry time as a per-team flag
+* blocked if that team has already used Jolly in another Palio game
 
 The regulation requires that Jolly be presented before the relevant game and doubles the points obtained in that discipline. 
 
-The app must also provide a **Jolly summary page** by rione and game.
+The app must also provide a **Jolly summary page** by team and game.
 
 ## Prepalio
 
@@ -254,8 +253,9 @@ Transitions:
 
 * `draft -> in progress` via explicit **Start game**
 * `in progress -> completed` via **Complete game**
+* `in progress -> under examination` is allowed when the latest in-progress data must be frozen for review
 * `completed -> pending admin review` automatically when a judge edits a completed result
-* `any relevant state -> under examination` by judge/admin
+* `any relevant non-draft state -> under examination` by judge/admin
 * `under examination -> completed` by judge/admin
 * `pending admin review -> completed` by admin after review
 
@@ -263,7 +263,7 @@ Behavior:
 
 * **completed**: counted in leaderboard
 * **pending admin review**: still counted, latest edit is public, admin should verify or revert using audit history
-* **under examination**: latest result remains visible publicly, but the game is excluded from leaderboard calculation
+* **under examination**: latest materialized result remains visible publicly, but the game is excluded from leaderboard calculation
 
 This state model supports the 15-minute appeal window while keeping public visibility. The regulation allows written appeals within 15 minutes after each game and recognizes post-game rulings that may affect placements. 
 
@@ -287,9 +287,15 @@ Authorization is capability-based. Roles are only bundles.
 
 ## Default bundles
 
+**Superadmin**
+
+* admin capabilities
+* user creation capability
+* future app-management capabilities
+
 **Admin**
 
-* all capabilities
+* all operational/admin capabilities except superadmin-only user management
 
 **Judge**
 
@@ -305,6 +311,18 @@ Authorization is capability-based. Roles are only bundles.
 
 * no login
 * read-only
+
+# User management and authentication
+
+v1 keeps user management intentionally minimal.
+
+* no self-registration
+* no in-app password reset/change flow
+* a **superadmin** can create a user with **email + password + one seeded role**
+* created users are active immediately
+* role/capability catalogs are seeded/static in v1
+
+This keeps the private operational shell controlled without expanding v1 into a full identity-management product.
 
 # Public experience
 
@@ -361,7 +379,7 @@ Audit is essential because:
 v1 succeeds if:
 
 * an admin can configure a season fully in the UI
-* judges can record a ranking-template game team by team during play
+* judges can record a raning game team by team during play
 * judges can complete a game only when the result is structurally valid
 * the system computes standings automatically
 * Jolly is validated and applied correctly
@@ -369,8 +387,10 @@ v1 succeeds if:
 * Giocasport remains separate
 * 1v1 tournament rankings derive automatically from four match winners
 * public users see updates immediately
+* 1v1 bracket progression is visible while the tournament is in progress, but standings change only after tournament completion
 * edits after completion are auditable and flagged
 * under-examination games are visible but excluded from standings
+* once a game has official result data, its setup becomes immutable
 
 # Biggest risks
 * **Scope creep**: trying to support too many custom game behaviors could turn v1 into a generic sports engine

@@ -1,6 +1,6 @@
-# Palio webapp — discovery Q&A summary
+# PalioBoard — discovery Q&A summary
 
-This document consolidates the interview into a structured Q&A, using the **final clarified decisions** rather than earlier intermediate answers. It is aligned with the Palio regulation and description, especially around the 4-rione structure, `4-3-2-1` scoring, Jolly, Prepalio, Giocasport, and the 15-minute appeal window.
+This document consolidates the interview into a structured Q&A, using the **final clarified decisions** rather than earlier intermediate answers. It is aligned with the Palio regulation and description, especially around the 4-team structure, `4-3-2-1` scoring, Jolly, Prepalio, Giocasport, and the 15-minute appeal window.
 
 ---
 
@@ -22,8 +22,8 @@ This document consolidates the interview into a structured Q&A, using the **fina
 
 ### 4) How should games be modeled?
 **Answer:** v1 uses only **two templates**:
-1. **Ranking template** with optional fields (placement plus any needed time / quantity / penalties / notes)
-2. **1v1 tournament template**
+1. **Ranking format** with optional fields (placement plus any needed time / quantity / penalties / notes)
+2. **1v1 tournament format**
 
 This avoids building a generic form builder.
 
@@ -41,7 +41,7 @@ Configuration should live in the **web app / database**, not in hardcoded values
 
 ### 7) Who can change data after publication?
 **Answer:** Distinguish between **game definition changes** and **result changes**:
-- **Game definition** (name, template, enabled fields, etc.) can be changed **only by admins**, and only until results exist.
+- **Game definition** (name, format, enabled fields, etc.) can be changed **only by admins**, and only until results exist.
 - **Results** can be entered and edited by judges.
 - Every result change must be **fully audited**.
 
@@ -53,8 +53,7 @@ Configuration should live in the **web app / database**, not in hardcoded values
 
 ### 10) Can we assume a fixed 1v1 tournament structure?
 **Answer:** Yes. A 1v1 tournament is always:
-- semifinal 1
-- semifinal 2
+- semifinal
 - final for 3rd/4th
 - final for 1st/2nd
 
@@ -67,13 +66,13 @@ This is not only a v1 assumption, but a general modeling rule.
 **Answer:** **Admins only.**
 
 ### 13) How should Jolly work?
-**Answer:** Jolly is **not pre-assigned** during season setup. Each rione decides **shortly before a Palio game** whether to use it and communicates that choice to the judges. Then the judge/admin records it inside the game result flow.
+**Answer:** Jolly is **not pre-assigned** during season setup. Each team decides **shortly before a Palio game** whether to use it and communicates that choice to the judges. Then the judge/admin records it inside the game result flow.
 
 The system must:
-- allow a **per-rione Jolly flag** on Palio games
-- ensure a rione **cannot use Jolly more than once**
+- allow a **per-team Jolly flag** on Palio games
+- ensure a team **cannot use Jolly more than once**
 - block invalid reuse and show an error
-- provide a **Jolly summary page** by rione and game
+- provide a **Jolly summary page** by team and game
 
 ### 14) What counts as the moment a game starts?
 **Answer:** A game starts only when a judge/admin explicitly clicks **Start game**.
@@ -128,7 +127,7 @@ That game must be **excluded from leaderboard calculation** until it returns to 
 **Answer:** For each game, admins can configure:
 - game name
 - competition type: Palio / Prepalio / Giocasport
-- template type: ranking or 1v1
+- game format: ranking or 1v1
 - enabled optional result fields: time / quantity / penalties / notes
 - custom UI label for the quantity-like field
 
@@ -168,14 +167,14 @@ No separate “contributes to leaderboard” flag is needed, because contributio
 **Answer:** Yes. For **every automatically computed ranking**, admins must be able to apply a **manual override**. The system should retain both the computed version and the official overridden one, with audit history.
 
 ### 36) How should teams be created?
-**Answer:** Each year, admins can **create/edit the 4 rioni**, but the system should prefill them with default values.
+**Answer:** Each year, admins can **create/edit the 4 teams**, but the system should prefill them with default values.
 
-### 37) Do normal games always involve all 4 rioni?
-**Answer:** Yes. In v1, normal games always include **all four rioni**.
+### 37) Do normal games always involve all 4 teams?
+**Answer:** Yes. In v1, normal games always include **all four teams**.
 
 ### 38) When is a game allowed to be completed?
 **Answer:** The system must block **Complete game** until the result is structurally valid, meaning:
-- all 4 rioni have placements
+- all 4 teams have placements
 - placements form a valid ranking pattern
 - all enabled required fields are filled
 
@@ -199,8 +198,8 @@ No separate “contributes to leaderboard” flag is needed, because contributio
 ### 41) Who can mark a game under examination and resolve it?
 **Answer:** **Judges and admins** can do both.
 
-### 42) What is the result-entry style for ranking-template games?
-**Answer:** Ranking-template games need **live, team-by-team entry** while the game is running. Judges save partial values as each rione performs, then assign final placements at the end.
+### 42) What is the result-entry style for ranking games?
+**Answer:** Ranking-format games need **live, team-by-team entry** while the game is running. Judges save partial values as each team performs, then assign final placements at the end.
 
 ### 43) Are notes internal or public?
 **Answer:** Notes are **public**.
@@ -231,7 +230,7 @@ No separate “contributes to leaderboard” flag is needed, because contributio
 **Answer:** Yes, but **after v1**. Eligibility checks are currently manual and are important, but not the first priority.
 
 ### 3) Should tournament handling become more advanced than simple winner tracking?
-**Answer:** Yes, but **after v1**. v1 handles the fixed 4-rione tournament flow and derives rankings automatically. Later versions can support more advanced tournament reasoning.
+**Answer:** Yes, but **after v1**. v1 handles the fixed 4-team tournament flow and derives rankings automatically. Later versions can support more advanced tournament reasoning.
 
 ### 4) Should there be a review mode that suspends leaderboard impact during result discussion?
 **Answer:** Yes. In a later version, judges should be able to mark a game as being in a **review mode / disputed mode**, where the whole game is effectively suspended from the leaderboard while a decision is pending.
@@ -248,7 +247,7 @@ No separate “contributes to leaderboard” flag is needed, because contributio
 ### 8) Should season data be importable/exportable between years?
 **Answer:** Yes, but **after v1**. Import/export would let the organizer reuse last year’s games and adjust what changed.
 
-### 9) Should ranking-template games support more advanced live/public display logic on the maxi-screen?
+### 9) Should ranking games support more advanced live/public display logic on the maxi-screen?
 **Answer:** Yes, but **after v1**. During a live game, the desired future behavior is to show the team currently playing with its current score/penalties/other metrics, plus a small provisional ranking. When no game is running, the maxi-screen should rotate between leaderboard, current game, and recent results.
 
 ### 10) Should 1v1 matches support live score entry?
