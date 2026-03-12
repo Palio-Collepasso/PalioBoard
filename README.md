@@ -17,11 +17,10 @@ What is not in the repo yet:
 - backend application code
 - frontend application code
 - Docker Compose or local bootstrap files
-- `Makefile` targets
 - `.env.example` files
 - runnable local URLs
 
-That means there is no real quick start yet. The repository currently documents what must be built, how it should behave, and in which order it should be delivered.
+That means there is not a runnable application stack yet. The repository now has the canonical monorepo layout and a stable top-level `Makefile`, but the application and infrastructure internals still land in later M0 tasks.
 
 
 ## Overview
@@ -80,14 +79,23 @@ The repository currently contains planning and implementation guidance rather th
 ```text
 palio/
 ├─ AGENTS.md
+├─ Makefile
 ├─ README.md
+├─ .github/
+│  └─ workflows/
+├─ apps/
+│  ├─ backend/
+│  └─ web/
 ├─ docs/
 │  ├─ architecture/
 │  ├─ domain/
+│  ├─ ops/
 │  ├─ product/
 │  ├─ qna/
 │  ├─ testing/
 │  └─ milestones.md
+├─ infra/
+├─ tools/
 ├─ evals/
 └─ note.md
 ```
@@ -110,20 +118,22 @@ Additional high-signal references:
 
 ## Working in this repo today
 
-Because the implementation skeleton has not landed yet, there is no runnable local environment to start.
+The canonical top-level implementation skeleton has landed, but the repo is still mid-bootstrap and not runnable end to end yet.
 
 Today, useful work in this repository is:
+- using `make help` to discover the stable top-level command surface
 - refining product, domain, and architecture decisions
 - validating missing requirements and edge cases in Q&A
 - planning thin slices for Milestone 1
 - reviewing ADRs and test expectations before implementation
+- populating the scaffolded `apps/backend/`, `apps/web/`, and `infra/` directories through their dedicated M0 tasks
 
 The first implementation milestone is documented in [docs/milestones.md](docs/milestones.md): stand up the monorepo skeleton, schema/migrations, auth plumbing, seeded catalogs, and season-setup flows.
 
 
 ## Quick start
 
-> Replace these commands with the exact ones once the repository bootstrap is in place.
+The repository now exposes the canonical top-level command names, but only the discovery command is runnable today.
 
 ### Prerequisites
 
@@ -132,53 +142,29 @@ The first implementation milestone is documented in [docs/milestones.md](docs/mi
 * Docker + Docker Compose
 * Make
 * uv
-* PostgreSQL (or Dockerized PostgreSQL for local development)
 
-### Clone the repository
-
-```bash
-git clone <your-repo-url>
-cd palio-board
-```
-
-### Configure environment
-
-Create local environment files as needed:
+### Discover the command surface
 
 ```bash
-cp backend/.env.example backend/.env
-cp web/.env.example web/.env
+make help
 ```
 
-Fill in the required values for:
+### Reserved targets
 
-* database connection
-* auth configuration
-* local URLs / ports
+These target names are intentionally stable now so later M0 tasks can fill them in without changing developer workflows:
 
-### Start local dependencies
+- `make up`
+- `make down`
+- `make backend-dev`
+- `make web-dev`
+- `make test`
+- `make test-backend`
+- `make test-web`
+- `make test-e2e`
 
-```bash
-make up
-```
+Until the dependent tasks land, those commands fail fast with a message that explains which part of the scaffold is still missing.
 
-### Run the backend
-
-```bash
-make backend-dev
-```
-
-### Run the frontend
-
-```bash
-make web-dev
-```
-
-### Open the app
-
-* Admin UI: `http://localhost:...`
-* Public UI: `http://localhost:...`
-* Maxi-screen UI: `http://localhost:...`
+For the current local-development baseline, see [docs/ops/local-dev.md](docs/ops/local-dev.md).
 
 ## Usage
 
@@ -272,18 +258,20 @@ TO BE DONE. As an example:
 
 ### Run tests
 
-TO BE DONE. As an example:
+The stable top-level test entrypoint is:
 ```bash
 make test
 ```
 
-Or run them per area:
+Reserved per-area targets:
 
 ```bash
 make test-backend
 make test-web
 make test-e2e
 ```
+
+These targets become runnable in later M0 tasks once the backend, frontend, and Playwright harnesses are added.
 
 ## Contributing
 
