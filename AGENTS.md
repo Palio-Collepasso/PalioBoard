@@ -1,3 +1,41 @@
+
+<!-- BACKLOG.MD MCP GUIDELINES START -->
+
+<CRITICAL_INSTRUCTION>
+
+## BACKLOG WORKFLOW INSTRUCTIONS
+
+This project uses Backlog.md MCP for all task and project management activities.
+
+**CRITICAL GUIDANCE**
+
+- If your client supports MCP resources, read `backlog://workflow/overview` to understand when and how to use Backlog for this project.
+- If your client only supports tools or the above request fails, call `backlog.get_workflow_overview()` tool to load the tool-oriented overview (it lists the matching guide tools).
+
+- **First time working here?** Read the overview resource IMMEDIATELY to learn the workflow
+- **Already familiar?** You should have the overview cached ("## Backlog.md Overview (MCP)")
+- **When to read it**: BEFORE creating tasks, or when you're unsure whether to track work
+
+These guides cover:
+- Decision framework for when to create tasks
+- Search-first workflow to avoid duplicates
+- Links to detailed guides for task creation, execution, and finalization
+- MCP tools reference
+
+You MUST read the overview resource to understand the complete workflow. The information is NOT summarized here.
+
+</CRITICAL_INSTRUCTION>
+
+<!-- BACKLOG.MD MCP GUIDELINES END -->
+
+When you're working on a task, you should assign it yourself: -a @{your-name}
+
+In addition to the rules above, please consider the following: At the end of every task implementation, try to take a moment to see if you can simplify it. When you are done implementing, you know much more about a task than when you started. At this point you can better judge retrospectively what can be the simplest architecture to solve the problem. If you can simplify the code, do it.
+
+## Simplicity-first implementation rules
+- Prefer a single implementation for similar concerns. Reuse or refactor to a shared helper instead of duplicating.
+
+
 ## Planning and information gathering
 
 Before planning or implementing any non-trivial task, gather enough information to execute safely.
@@ -101,10 +139,17 @@ Heuristics to watch for:
 
 ## Done criteria
 
-A task is not fully complete if:
-- the plan was made without gathering the needed information first
-- a material doubt was left unresolved without asking the user
-- a relevant Q&A clarification was discovered but not recorded
-- an affected document was left stale
-- a material conflict was found but not flagged
-- a document or folder became unmanageably large and this was not flagged
+A task is fully complete if:
+- the plan is made after gathering the needed information first
+- all material doubts are resolved by asking the user
+- any relevant Q&A clarification is recorded
+- all affected documents are kept up to date
+- `README.md` is up to date
+- any material conflict is flagged
+- any document or folder that became unmanageably large is flagged
+
+## Git Workflow
+- **Branching**: Use feature branches when working on tasks (e.g. tasks/task-123-feature-name)
+- **Committing**: Use the following format: TASK-123 - Title of the task
+- **PR titles**: Use {taskId} - {taskTitle} (e.g. TASK-123 - Title of the task)
+- **Github CLI**: Use gh whenever possible for PRs and issues

@@ -1,0 +1,26 @@
+project_name: "PalioBoard"
+default_status: "To Do"
+statuses: ["To Do", "In Progress", "Done"]
+labels: []
+definition_of_done:
+  [
+    "the plan is made after gathering the needed information first",
+    "all material doubts are resolved by asking the user",
+    "any relevant Q&A clarification is recorded",
+    "all affected documents are kept up to date",
+    "`README.md` is up to date",
+    "any material conflict is flagged",
+    "any document or folder that became unmanageably large is flagged",
+  ]
+date_format: yyyy-mm-dd
+max_column_width: 20
+default_editor: "code --wait"
+auto_open_browser: true
+default_port: 6420
+remote_operations: true
+auto_commit: false
+zero_padded_ids: 0
+bypass_git_hooks: false
+check_active_branches: true
+active_branch_days: 30
+task_prefix: "task"
