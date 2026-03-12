@@ -39,34 +39,6 @@ The product context that matters architecturally is small and stable:
 - automatic standings
 - auditability for meaningful official changes
 
-
-### 1.1 Relationship to ADRs
-
-This document is the **baseline architecture map**. It explains the stable shape of the system and is intended to stay readable by product, engineering, and future maintainers.
-
-The **ADR set** is the decision history. Each ADR captures:
-- the context that made a decision necessary
-- the decision itself
-- consequences and follow-ups
-
-Use the two artifacts like this:
-
-- **Read this document first** to understand the system shape.
-- **Read the ADRs second** to understand why key choices were made.
-- If a future accepted ADR conflicts with this document, **the ADR wins temporarily** until this baseline is refreshed.
-- Do **not** turn this document into a chronological changelog. New significant architecture changes should be recorded as new ADRs, then periodically folded back into this baseline.
-
-Current ADR set:
-- ADR-0001 — System Boundary and Core Stack
-- ADR-0002 — Backend Style: Modular Monolith with Strict Module Boundaries
-- ADR-0003 — Synchronous Write Model and Current-State Projections
-- ADR-0004 — Official Result Model and Canonical Game Entries
-- ADR-0005 — Live Collaboration Model for Ranking Games
-- ADR-0006 — Identity, Application Users, and Capability-Based Authorization
-- ADR-0007 — API Surfaces and OpenAPI Contract Strategy
-- ADR-0008 — Deployment and Operational Model
-- ADR-0009 — Testing and Quality Gates
-
 ## 2. Architectural drivers and non-goals
 
 ### 2.1 Primary architectural concerns
