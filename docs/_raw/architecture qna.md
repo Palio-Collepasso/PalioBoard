@@ -357,7 +357,7 @@ Angular translates error codes and data into user-friendly messages.
 **Decision:** Standardize on **FastAPI + Pydantic DTOs + SQLAlchemy 2.x + Alembic**. Keep API DTOs and persistence models separate so transport contracts do not leak into ORM internals.
 
 ### 96. What project structure should the monorepo use?
-**Decision:** Use a single monorepo with `apps/backend`, `apps/web`, `infra`, `docs`, and a top-level `Makefile`. The backend keeps bounded modules with `facade/application/domain/infrastructure`; the frontend keeps three lazy shells, `features/`, and one `shared/` root with subfolders.
+**Decision:** Use a single monorepo with `apps/backend`, `apps/web`, `infra`, `docs`, `tools`, and a top-level `Makefile` plus `.github/workflows`. The backend keeps bounded modules with `facade/application/domain/infrastructure`; the frontend keeps three lazy shells, `features/`, and one `shared/` root with subfolders.
 
 ### 97. Should `event_operations` and `results` remain separate backend modules?
 **Decision:** Yes. `event_operations` should own lifecycle/state transitions, while `results` owns canonical official result persistence. That boundary will stay useful as live draft and review flows grow.
