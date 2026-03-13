@@ -571,8 +571,9 @@ Examples:
 palio-board/
 ├─ Makefile
 ├─ docs/
-├─ backend/
-├─ web/
+├─ apps/
+│  ├─ backend/
+│  └─ web/
 ├─ infra/
 ├─ tools/
 └─ .github/workflows/
@@ -581,7 +582,7 @@ palio-board/
 ### 14.2 Backend
 
 ```text
-backend/
+apps/backend/
 ├─ pyproject.toml
 ├─ alembic.ini
 ├─ migrations/
@@ -617,7 +618,7 @@ Each module follows:
 ### 14.3 Frontend
 
 ```text
-web/
+apps/web/
 ├─ package.json
 ├─ src/app/
 │  ├─ core/
@@ -725,4 +726,3 @@ If there is a mismatch between this baseline and a newer **accepted** ADR:
 | ADR-0007 | API surfaces and OpenAPI contract strategy | 4, 11, 13 |
 | ADR-0008 | Deployment and operational model | 4, 12 |
 | ADR-0009 | Testing and quality gates | 4, 13 |
-
