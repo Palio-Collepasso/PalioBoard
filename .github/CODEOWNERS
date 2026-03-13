@@ -1,0 +1,40 @@
+# Broad fallback for ordinary changes
+*                                           @Palio-Collepasso/palio-approvers
+
+# Protect repo governance itself
+/.github/                                   @Palio-Collepasso/palio-maintainers
+/.github/workflows/                         @Palio-Collepasso/palio-release
+/infra/                                     @Palio-Collepasso/palio-release
+
+# Architecture / API contract
+/docs/_raw/                                 @Palio-Collepasso/palio-doc
+/docs/architecture/                         @Palio-Collepasso/palio-doc
+/docs/domain/                               @Palio-Collepasso/palio-domain-owners
+/docs/product/                              @Palio-Collepasso/palio-doc
+/docs/qna/                                  @Palio-Collepasso/palio-doc
+/docs/testing/                              @Palio-Collepasso/palio-doc
+/docs/ui/                                   @Palio-Collepasso/palio-doc
+
+# Frontend
+/apps/web/                                  @Palio-Collepasso/palio-frontend
+
+# Backend general
+/apps/api/                                  @Palio-Collepasso/palio-backend
+
+# Backend critical domain paths
+/apps/api/src/palio/modules/season_setup/            @Palio-Collepasso/palio-domain-owners
+/apps/api/src/palio/modules/event_operations/        @Palio-Collepasso/palio-domain-owners
+/apps/api/src/palio/modules/results/                 @Palio-Collepasso/palio-domain-owners
+/apps/api/src/palio/modules/tournaments/             @Palio-Collepasso/palio-domain-owners
+/apps/api/src/palio/modules/live_games/              @Palio-Collepasso/palio-domain-owners
+/apps/api/src/palio/modules/leaderboard_projection/  @Palio-Collepasso/palio-domain-owners
+/apps/api/src/palio/modules/public_read/             @Palio-Collepasso/palio-domain-owners
+/apps/api/src/palio/modules/audit/                   @Palio-Collepasso/palio-domain-owners
+
+# Identity / authorization
+/apps/api/src/palio/modules/identity/         @Palio-Collepasso/palio-security
+/apps/api/src/palio/modules/authorization/    @Palio-Collepasso/palio-security
+/apps/api/src/palio/modules/users/            @Palio-Collepasso/palio-security
+
+# Schema / migrations
+/apps/api/migrations/                         @Palio-Collepasso/palio-domain-owners
