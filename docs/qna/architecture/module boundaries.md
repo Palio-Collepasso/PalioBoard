@@ -31,7 +31,7 @@
 **Decision:** Standardize on **FastAPI + Pydantic DTOs + SQLAlchemy 2.x + Alembic**. Keep API DTOs and persistence models separate so transport contracts do not leak into ORM internals.
 
 ### 96. What project structure should the monorepo use?
-**Decision:** Use a single monorepo with `apps/backend`, `apps/web`, `infra`, `docs`, `tools`, and a top-level `Makefile` plus `.github/workflows`. The backend keeps bounded modules with `facade/application/domain/infrastructure`; the frontend keeps three lazy shells, `features/`, and one `shared/` root with subfolders.
+**Decision:** Use a single monorepo with `apps/api`, `apps/web`, `infra`, `docs`, `tools`, and a top-level `Makefile` plus `.github/workflows`. The backend keeps bounded modules with `facade/application/domain/infrastructure`; the frontend keeps three lazy shells, `features/`, and one `shared/` root with subfolders.
 
 ### 97. Should `event_operations` and `results` remain separate backend modules?
 **Decision:** Yes. `event_operations` should own lifecycle/state transitions, while `results` owns canonical official result persistence. That boundary will stay useful as live draft and review flows grow.
@@ -41,6 +41,9 @@
 
 ### 104. Should frontend architectural boundaries also be enforced automatically?
 **Decision:** Yes. Add CI checks so shells do not depend on each other casually, `shared/` stays generic, and feature imports respect the intended layering.
+
+### 105. What initial backend boundary-check mechanism should be used before CI wiring lands?
+**Decision:** Use a lightweight Python import scan in `apps/api/src/palio/shared/module_boundaries.py`. Run it locally with `uv run python -m palio.shared.module_boundaries`; it fails when code under `palio.modules` imports another module anywhere except that module’s `facade.py`.
 
 ## 13. Runtime consistency, persistence conventions, and contracts
 ### 112. How is dependency wiring handled inside the backend?

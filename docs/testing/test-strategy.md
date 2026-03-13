@@ -72,6 +72,12 @@ Do not use large snapshot suites as a substitute for behavior tests. The fronten
 
 CI should also enforce architectural boundaries and contract hygiene using the repo’s agreed tooling. Ruff, Pyright, pytest, frontend lint/test/build, OpenAPI export/type generation checks, and import-boundary checks are part of the quality baseline.
 
+Current backend baseline note: the scaffold introduced in TASK-2 ships a local import-boundary command at `cd apps/api && uv run python -m palio.shared.module_boundaries`. Later CI wiring should execute the same rule automatically.
+
+Current frontend baseline:
+- TASK-3 introduces `cd apps/web && npm run check-boundaries`, backed by dependency-cruiser, as the initial CI-friendly import-boundary rule for shell isolation and generic `shared/` code.
+- TASK-9 will add the broader frontend and Playwright behavioral harnesses that complement this static guardrail.
+
 ## Test pyramid / test-layer overview
 
 The recommended v1 testing pyramid is intentionally backend-heavy.

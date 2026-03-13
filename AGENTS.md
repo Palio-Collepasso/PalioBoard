@@ -28,7 +28,16 @@ You MUST read the overview resource to understand the complete workflow. The inf
 
 <!-- BACKLOG.MD MCP GUIDELINES END -->
 
-In addition to the rules above, please consider the following: At the end of every task implementation, try to take a moment to see if you can simplify it. When you are done implementing, you know much more about a task than when you started. At this point you can better judge retrospectively what can be the simplest architecture to solve the problem. If you can simplify the code, do it.
+- For changes under `apps/api/`, follow `apps/api/AGENTS.md`.
+- For changes under `apps/web/`, follow `apps/web/AGENTS.md`.
+- **NEVER** mix conventions under `apps/api/` with conventions under `apps/web/`.
+
+## Workflow
+When working on a task:
+1. Assign it to yourself: : -a @{your-name}
+2. Create a git worktree under `../palio-trees/agent/<task>`
+3. At the end of every task implementation, try to take a moment to see if you can simplify it. When you are done implementing, you know much more about a task than when you started. At this point you can better judge retrospectively what can be the simplest architecture to solve the problem. If you can simplify the code, do it. 
+4. At the end of the task, 
 
 ## Simplicity-first implementation rules
 - Prefer a single implementation for similar concerns. Reuse or refactor to a shared helper instead of duplicating.
@@ -49,31 +58,31 @@ A plan is valid only if it is based on enough documented information or on expli
 
 ## Documentation (Where to find information)
 
-**For product scope, goals, and non-goals**: See [docs/product/prd.md](docs/product/prd.md)
-**For user-visible behavior and required flows**: See [docs/product/functional-requirements.md](docs/product/functional-requirements.md)
-**For acceptance criteria and Given/When/Then scenarios**: See [docs/product/acceptance-scenarios.md](docs/product/acceptance-scenarios.md)
+**Product scope, goals, and non-goals**: See [docs/product/prd.md](docs/product/prd.md)
+**User-visible behavior and required flows**: See [docs/product/functional-requirements.md](docs/product/functional-requirements.md)
+**Acceptance criteria and Given/When/Then scenarios**: See [docs/product/acceptance-scenarios.md](docs/product/acceptance-scenarios.md)
 
-**For architecture, boundaries, ownership, and implementation rules**: See [docs/architecture/architecture.md](docs/architecture/architecture.md)
-**For the rationale behind architectural decisions**: See [docs/architecture/adr/](docs/architecture/adr/)
+**Architecture, boundaries, ownership, and implementation rules**: See [docs/architecture/architecture.md](docs/architecture/architecture.md)
+**Rationale behind architectural decisions**: See [docs/architecture/adr/](docs/architecture/adr/)
 
-**For the data model, entities, and relationships**: See [docs/domain/er-schema.md](docs/domain/er-schema.md)
-**For domain rules, invariants, and business semantics**: See [docs/domain/business-rules.md](docs/domain/business-rules.md)
-**For per-game configuration, formats, fields, and scoring setup**: See [docs/domain/game-catalog.md](docs/domain/game-catalog.md)
-**For official source rules from the real-world event**: See [docs/domain/palio-rules.md](docs/domain/palio-rules.md)
+**Data model, entities, and relationships**: See [docs/domain/er-schema.md](docs/domain/er-schema.md)
+**Domain rules, invariants, and business semantics**: See [docs/domain/business-rules.md](docs/domain/business-rules.md)
+**Per-game configuration, formats, fields, and scoring setup**: See [docs/domain/game-catalog.md](docs/domain/game-catalog.md)
+**Official source rules from the real-world event**: See [docs/domain/palio-rules.md](docs/domain/palio-rules.md)
 
-**For clarifications, decisions and implementation notes**: See [docs/qna/README.md](docs/qna/README.md)
+**Clarifications, decisions and implementation notes**: See [docs/qna/README.md](docs/qna/README.md)
 
-**For API endpoints and payloads**: See [docs/api/openapi.yaml](docs/api/openapi.yaml)
-**For error codes and error semantics**: See [docs/api/error-contract.md](docs/api/error-contract.md)
+**API endpoints and payloads**: See [docs/api/openapi.yaml](docs/api/openapi.yaml)
+**Error codes and error semantics**: See [docs/api/error-contract.md](docs/api/error-contract.md)
 
-**For test strategy and required test depth**: See [docs/testing/test-strategy.md](docs/testing/test-strategy.md)
-**For critical end-to-end flows**: See [docs/testing/critical-e2e-flows.md](docs/testing/critical-e2e-flows.md)
-**For fixtures, seed data, and test datasets**: See [docs/testing/fixtures.md](docs/testing/fixtures.md)
+**Test strategy and required test depth**: See [docs/testing/test-strategy.md](docs/testing/test-strategy.md)
+**Critical end-to-end flows**: See [docs/testing/critical-e2e-flows.md](docs/testing/critical-e2e-flows.md)
+**Fixtures, seed data, and test datasets**: See [docs/testing/fixtures.md](docs/testing/fixtures.md)
 
-**For local setup and daily development commands**: See [docs/ops/local-dev.md](docs/ops/local-dev.md)
-**For deployment and operational procedures**: See [docs/ops/deploy.md](docs/ops/deploy.md) and [docs/ops/runbook.md](docs/ops/runbook.md)
+**Local setup and daily development commands**: See [docs/ops/local-dev.md](docs/ops/local-dev.md)
+**Deployment and operational procedures**: See [docs/ops/deploy.md](docs/ops/deploy.md) and [docs/ops/runbook.md](docs/ops/runbook.md)
 
-**For tracked changes**: See [REDLINING.md](REDLINING.md)
+**Tracked changes**: See [REDLINING.md](REDLINING.md)
 
 ## Conflict and contradiction handling
 
@@ -97,7 +106,7 @@ Required behavior:
 
 ## Documentation maintenance
 
-Whenever a task changes behavior, rules, structure, setup, operations, or shared understanding, update every affected document in the same change. Do not update code without updating the corresponding docs when the previous text would become stale or misleading.
+The agent must update the relevant docs whenever a task changes their truth. Do not update code without updating the corresponding docs when the previous text would become stale or misleading.
 
 This applies to all affected documentation, including but not limited to:
 - product docs

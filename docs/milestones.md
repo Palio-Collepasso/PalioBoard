@@ -10,7 +10,7 @@ Establish the project skeleton, delivery rails, and architectural guardrails so 
 
 **Scope**
 
-- Monorepo structure for `apps/backend/`, `apps/web/`, `infra/`, `docs/`, and top-level tooling.
+- Monorepo structure for `apps/api/`, `apps/web/`, `infra/`, `docs/`, and top-level tooling.
 - FastAPI app skeleton with modular-monolith boundaries and per-module facades.
 - Angular SPA skeleton with three shells: admin, public, maxi-screen.
 - PostgreSQL, Alembic, and baseline migrations.

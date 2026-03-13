@@ -25,7 +25,7 @@ Create the initial repository skeleton for the documented monorepo and establish
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [x] #1 Root layout matches the approved monorepo structure for `apps/backend/`, `apps/web/`, `infra/`, `docs/`, `tools/`, and `.github/workflows/`.
+- [x] #1 Root layout matches the approved monorepo structure for `apps/api/`, `apps/web/`, `infra/`, `docs/`, `tools/`, and `.github/workflows/`.
 - [x] #2 A top-level `Makefile` exposes the baseline developer entrypoints needed by later M1 tasks without hiding implementation details inside ad hoc scripts.
 <!-- AC:END -->
 
@@ -34,7 +34,7 @@ Create the initial repository skeleton for the documented monorepo and establish
 <!-- SECTION:PLAN:BEGIN -->
 ## Research Summary
 - Canonical architecture section 14.1 and TASK-1 acceptance criteria both describe a top-level layout rooted at `backend/`, `web/`, `infra/`, `docs/`, `tools/`, and `.github/workflows/`.
-- `docs/qna/architecture/module boundaries.md` still says `apps/backend` and `apps/web`, so the repository-shape documentation is inconsistent and must be reconciled as part of implementation.
+- `docs/qna/architecture/module boundaries.md` still says `apps/api` and `apps/web`, so the repository-shape documentation is inconsistent and must be reconciled as part of implementation.
 - `README.md` already assumes a future `backend/` and `web/` layout plus a top-level `Makefile`, but those files/directories do not exist yet.
 - `docs/ops/local-dev.md` is referenced by repo instructions but does not exist yet; TASK-10 appears to own the full local bootstrap guide, so TASK-1 should avoid overreaching beyond layout and the top-level command surface.
 
@@ -65,7 +65,7 @@ Create the initial repository skeleton for the documented monorepo and establish
 - Do not add the full CI/bootstrap workflow documentation; that belongs to TASK-10.
 
 ## Risks / Decisions Needed Before Coding
-- Repository-path conflict: `backend/` + `web/` versus `apps/backend` + `apps/web`.
+- Repository-path conflict: `backend/` + `web/` versus `apps/api` + `apps/web`.
 - Documentation ownership boundary: whether TASK-1 should create a minimal `docs/ops/local-dev.md` placeholder or simply remove/update references until TASK-10 lands.
 
 ## Planned Validation
@@ -73,13 +73,13 @@ Create the initial repository skeleton for the documented monorepo and establish
 - `make help` (and any other bootstrap-safe target added in this task).
 - Manual review that docs and task dependencies point to the same top-level paths.
 
-User-directed revision after initial completion: switch the canonical app paths from top-level `backend/` and `web/` to `apps/backend/` and `apps/web/`. Update the scaffold, `Makefile`, and every affected repo/documentation reference in one change so M0 tasks build against the new layout consistently.
+User-directed revision after initial completion: switch the canonical app paths from top-level `backend/` and `web/` to `apps/api/` and `apps/web/`. Update the scaffold, `Makefile`, and every affected repo/documentation reference in one change so M0 tasks build against the new layout consistently.
 <!-- SECTION:PLAN:END -->
 
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
-Researched TASK-1 against the architecture baseline, milestone M0, sibling tasks TASK-2/TASK-3/TASK-6/TASK-10, README, and testing guidance. Found a material docs conflict on repo layout (`backend`/`web` vs `apps/backend`/`apps/web`) plus a missing `docs/ops/local-dev.md` reference to resolve before implementation.
+Researched TASK-1 against the architecture baseline, milestone M0, sibling tasks TASK-2/TASK-3/TASK-6/TASK-10, README, and testing guidance. Found a material docs conflict on repo layout (`backend`/`web` vs `apps/api`/`apps/web`) plus a missing `docs/ops/local-dev.md` reference to resolve before implementation.
 
 Implemented the canonical top-level layout with tracked placeholders for `backend/`, `web/`, `infra/`, `tools/`, and `.github/workflows`, plus a minimal `docs/ops/local-dev.md` so repo guidance no longer points to a missing file.
 
@@ -87,9 +87,9 @@ Added a top-level `Makefile` that exposes the stable command names already refer
 
 Reconciled the repository-shape documentation to the canonical `backend/` + `web/` layout in README and architecture Q&A documents. Verification run: `make help`, `make up` (expected fast failure because TASK-6 has not created `infra/compose/docker-compose.yml` yet), `git diff --check`.
 
-User changed the repo-layout decision after the first TASK-1 pass. Reopening the task to migrate the canonical scaffold and documentation from `backend`/`web` to `apps/backend`/`apps/web` rather than carrying two competing layouts.
+User changed the repo-layout decision after the first TASK-1 pass. Reopening the task to migrate the canonical scaffold and documentation from `backend`/`web` to `apps/api`/`apps/web` rather than carrying two competing layouts.
 
-Migrated the canonical scaffold from top-level `backend/` and `web/` into `apps/backend/` and `apps/web/` after the user changed the repo-layout decision. Updated the root `Makefile`, README, architecture docs, milestone docs, and local-dev note in the same pass so downstream tasks see one consistent app-root convention.
+Migrated the canonical scaffold from top-level `backend/` and `web/` into `apps/api/` and `apps/web/` after the user changed the repo-layout decision. Updated the root `Makefile`, README, architecture docs, milestone docs, and local-dev note in the same pass so downstream tasks see one consistent app-root convention.
 <!-- SECTION:NOTES:END -->
 
 ## Final Summary
@@ -98,11 +98,11 @@ Migrated the canonical scaffold from top-level `backend/` and `web/` into `apps/
 Implemented TASK-1 with the user-directed monorepo layout rooted under `apps/`.
 
 What changed:
-- Moved the runnable app placeholders from top-level `backend/` and `web/` into `apps/backend/` and `apps/web/`.
+- Moved the runnable app placeholders from top-level `backend/` and `web/` into `apps/api/` and `apps/web/`.
 - Added `apps/README.md` so the monorepo now makes the application grouping explicit at the top level.
-- Updated the root `Makefile` so its stable command surface still works, but now points to `apps/backend` and `apps/web` as the canonical app roots.
+- Updated the root `Makefile` so its stable command surface still works, but now points to `apps/api` and `apps/web` as the canonical app roots.
 - Kept the fail-fast behavior for commands whose downstream task has not landed yet, so the command surface remains stable without pretending the app scaffolds already exist.
-- Updated `README.md`, `docs/ops/local-dev.md`, `docs/architecture/architecture.md`, `docs/qna/architecture/module boundaries.md`, `docs/_raw/architecture qna.md`, and `docs/milestones.md` to use the same `apps/backend` and `apps/web` convention.
+- Updated `README.md`, `docs/ops/local-dev.md`, `docs/architecture/architecture.md`, `docs/qna/architecture/module boundaries.md`, `docs/_raw/architecture qna.md`, and `docs/milestones.md` to use the same `apps/api` and `apps/web` convention.
 
 Why:
 - The initial TASK-1 implementation used `backend/` and `web/` because that matched part of the documentation, but the user then chose the `apps/` layout instead.
@@ -114,6 +114,6 @@ Verification:
 - `git diff --check`
 
 Follow-up context:
-- TASK-2 should now scaffold the FastAPI app under `apps/backend/`.
+- TASK-2 should now scaffold the FastAPI app under `apps/api/`.
 - TASK-3 should now scaffold the Angular app under `apps/web/`.
 <!-- SECTION:FINAL_SUMMARY:END -->
