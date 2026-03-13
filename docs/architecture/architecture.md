@@ -582,7 +582,7 @@ palio-board/
 ### 14.2 Backend
 
 ```text
-apps/backend/
+apps/api/
 ├─ pyproject.toml
 ├─ alembic.ini
 ├─ migrations/

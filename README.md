@@ -4,7 +4,7 @@ Open-source web application for configuring, running, and publishing the Collepa
 
 ## Current status
 
-This repository is currently a documentation-first implementation baseline for v1.
+This repository is currently an implementation baseline for v1 with the first backend and frontend scaffolds in place.
 
 What is already in the repo:
 - approved product scope
@@ -12,15 +12,16 @@ What is already in the repo:
 - domain model and rules
 - testing strategy
 - milestone plan
+- backend FastAPI scaffold with explicit module facades and a minimal app factory
+- Angular 21 SPA scaffold under `apps/web/`
 
 What is not in the repo yet:
-- backend application code
-- frontend application code
 - Docker Compose or local bootstrap files
 - `.env.example` files
-- runnable local URLs
+- real backend business workflows and persistence
+- a runnable end-to-end local stack
 
-That means there is not a runnable application stack yet. The repository now has the canonical monorepo layout and a stable top-level `Makefile`, but the application and infrastructure internals still land in later M0 tasks.
+That means there is still not a runnable end-to-end application stack yet. The repository now has the canonical monorepo layout, a stable top-level `Makefile`, and initial backend/frontend scaffolds, but most application behavior and infrastructure internals still land in later M0 tasks.
 
 
 ## Overview
@@ -74,7 +75,7 @@ See [docs/architecture/architecture.md](docs/architecture/architecture.md) for t
 
 ## Repository structure
 
-The repository currently contains planning and implementation guidance rather than executable app code.
+The repository now mixes planning material with early executable app scaffolds.
 
 ```text
 palio/
@@ -118,22 +119,23 @@ Additional high-signal references:
 
 ## Working in this repo today
 
-The canonical top-level implementation skeleton has landed, but the repo is still mid-bootstrap and not runnable end to end yet.
+The canonical top-level implementation skeleton has landed, and `apps/api/` plus `apps/web/` now contain the first runnable app scaffolds. The repo is still mid-bootstrap and not runnable end to end yet.
 
 Today, useful work in this repository is:
 - using `make help` to discover the stable top-level command surface
+- iterating on the FastAPI and Angular scaffolds under `apps/api/` and `apps/web/`
 - refining product, domain, and architecture decisions
 - validating missing requirements and edge cases in Q&A
 - planning thin slices for Milestone 1
 - reviewing ADRs and test expectations before implementation
-- populating the scaffolded `apps/backend/`, `apps/web/`, and `infra/` directories through their dedicated M0 tasks
+- populating the remaining infrastructure and deeper app slices through their dedicated M0 tasks
 
 The first implementation milestone is documented in [docs/milestones.md](docs/milestones.md): stand up the monorepo skeleton, schema/migrations, auth plumbing, seeded catalogs, and season-setup flows.
 
 
 ## Quick start
 
-The repository now exposes the canonical top-level command names, but only the discovery command is runnable today.
+The repository now exposes the canonical top-level command names, and the backend/frontend scaffolds make a subset of them runnable today.
 
 ### Prerequisites
 
@@ -149,20 +151,36 @@ The repository now exposes the canonical top-level command names, but only the d
 make help
 ```
 
-### Reserved targets
+### Scaffold commands
+
+```bash
+make backend-dev
+make test-backend
+cd apps/api && uv run python -m palio.shared.module_boundaries
+
+cd apps/web
+npm install
+make web-dev
+```
+
+The Angular SPA currently exposes three lazy route areas:
+- `/admin`
+- `/public`
+- `/maxi`
+
+`make backend-dev` starts the placeholder FastAPI app. `make test-backend` currently runs only the scaffold smoke tests, not the full backend harness planned for later tasks.
+
+### Still-reserved targets
 
 These target names are intentionally stable now so later M0 tasks can fill them in without changing developer workflows:
 
 - `make up`
 - `make down`
-- `make backend-dev`
-- `make web-dev`
 - `make test`
-- `make test-backend`
 - `make test-web`
 - `make test-e2e`
 
-Until the dependent tasks land, those commands fail fast with a message that explains which part of the scaffold is still missing.
+`make test-web` and `make test-e2e` currently route to explicit TASK-9 placeholders. `make up` and `make down` remain reserved until the infra scaffold lands.
 
 For the current local-development baseline, see [docs/ops/local-dev.md](docs/ops/local-dev.md).
 
@@ -214,6 +232,7 @@ See [docs/domain/palio-context.md](docs/domain/palio-context.md), [docs/domain/p
 * `make` is the top-level command surface
 * `uv` for Python dependency management / execution
 * `npm` for frontend
+* `dependency-cruiser` for frontend import-boundary checks
 * pre-commit hooks before commit
 * automated CI
 * manual production deploy
@@ -237,6 +256,8 @@ Expected layers:
 - a very small Playwright suite for critical operational flows
 
 Read [docs/testing/test-strategy.md](docs/testing/test-strategy.md) before implementing backend, realtime, or UI flows.
+
+For the current scaffold details, see [apps/api/README.md](apps/api/README.md), [apps/web/README.md](apps/web/README.md), and [docs/ops/local-dev.md](docs/ops/local-dev.md).
 
 ### Test layers
 

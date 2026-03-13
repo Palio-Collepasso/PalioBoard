@@ -1,6 +1,6 @@
 SHELL := /bin/sh
 
-BACKEND_DIR := apps/backend
+API_DIR := apps/api
 WEB_DIR := apps/web
 COMPOSE_FILE := infra/compose/docker-compose.yml
 
@@ -27,8 +27,8 @@ down: ## Stop local infrastructure
 	docker compose -f $(COMPOSE_FILE) down
 
 backend-dev: ## Run the backend locally with uv
-	$(call require_file,$(BACKEND_DIR)/pyproject.toml,the backend app,TASK-2)
-	cd $(BACKEND_DIR) && uv run fastapi dev src/palio/app/main.py
+	$(call require_file,$(API_DIR)/pyproject.toml,the backend app,TASK-2)
+	cd $(API_DIR) && uv run fastapi dev src/palio/app/main.py
 
 web-dev: ## Run the Angular app locally with npm
 	$(call require_file,$(WEB_DIR)/package.json,the frontend app,TASK-3)
@@ -37,8 +37,8 @@ web-dev: ## Run the Angular app locally with npm
 test: test-backend test-web test-e2e ## Run all repository test suites
 
 test-backend: ## Run backend tests
-	$(call require_file,$(BACKEND_DIR)/pyproject.toml,the backend test harness,TASK-8)
-	cd $(BACKEND_DIR) && uv run pytest
+	$(call require_file,$(API_DIR)/pyproject.toml,the backend test harness,TASK-8)
+	cd $(API_DIR) && uv run pytest
 
 test-web: ## Run frontend tests
 	$(call require_file,$(WEB_DIR)/package.json,the frontend test harness,TASK-9)

@@ -2,7 +2,7 @@
 
 This directory groups the runnable application roots for the monorepo.
 
-- `apps/backend/` is reserved for the FastAPI backend and its tests
-- `apps/web/` is reserved for the Angular SPA and its frontend test harness
+- `apps/api/` is reserved for the FastAPI backend and its tests
+- `apps/web/` now contains the Angular SPA scaffold, lazy shell routing, and frontend boundary checks from TASK-3
 
-TASK-1 establishes only the layout. Later M0 tasks will populate each app subtree.
+The application subtrees are still mid-bootstrap: the frontend shell scaffold exists, while backend, infra, and full test harnesses land in their dedicated M0 tasks.
