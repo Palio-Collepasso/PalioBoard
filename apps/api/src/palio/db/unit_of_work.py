@@ -13,13 +13,17 @@ class UnitOfWork(Protocol):
 
     session: Session
 
-    def __enter__(self) -> Self: ...
+    def __enter__(self) -> Self:
+        pass
 
-    def __exit__(self, exc_type: object, exc: object, tb: object) -> None: ...
+    def __exit__(self, exc_type: object, exc: object, tb: object) -> None:
+        pass
 
-    def commit(self) -> None: ...
+    def commit(self) -> None:
+        pass
 
-    def rollback(self) -> None: ...
+    def rollback(self) -> None:
+        pass
 
 
 class SqlAlchemyUnitOfWork(UnitOfWork):
