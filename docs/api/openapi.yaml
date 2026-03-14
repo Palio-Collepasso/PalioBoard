@@ -3,6 +3,50 @@ info:
   title: PalioBoard API
   version: 0.1.0
 paths:
+  /healthz:
+    get:
+      tags:
+      - meta
+      summary: Healthcheck
+      operationId: healthcheck_healthz_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+                title: Response Healthcheck Healthz Get
+  /readyz:
+    get:
+      tags:
+      - meta
+      summary: Readiness
+      operationId: readiness_readyz_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '503':
+          description: Backend runtime is not ready
+  /version:
+    get:
+      tags:
+      - meta
+      summary: Version
+      operationId: version_version_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+                title: Response Version Version Get
   /api/admin/health:
     get:
       tags:
@@ -48,18 +92,3 @@ paths:
                 additionalProperties: true
                 type: object
                 title: Response Realtime Health Realtime Health Get
-  /healthz:
-    get:
-      tags:
-      - meta
-      summary: Healthcheck
-      operationId: healthcheck_healthz_get
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                additionalProperties: true
-                type: object
-                title: Response Healthcheck Healthz Get

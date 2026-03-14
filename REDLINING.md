@@ -6,6 +6,13 @@ Add new entries in reverse chronological order.
 
 ## 2026-03-14
 
+### TASK-5 - Runtime settings, JSON logging, and operational endpoints
+
+- Added a typed backend settings layer in `apps/api/src/palio/settings.py` so runtime behavior now comes from explicit env vars rather than scattered direct lookups.
+- Added Loguru-backed structured JSON HTTP request logging with propagated UUIDv7 request ids and disabled the default unstructured Uvicorn access log stream.
+- Added `/healthz`, `/readyz`, and `/version` to the backend operational surface; readiness now reports whether the runtime DB is actually usable.
+- Updated the backend smoke tests and committed OpenAPI artifact to cover the new settings/logging/endpoints baseline.
+
 ### TASK-4 - Postgres, SQLAlchemy, Alembic baseline
 
 - Added the backend persistence baseline under `apps/api/` with SQLAlchemy 2.x, Alembic, and psycopg dependencies.

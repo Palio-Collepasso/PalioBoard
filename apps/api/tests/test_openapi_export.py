@@ -16,5 +16,7 @@ def test_export_openapi_writes_current_contract(tmp_path: Path) -> None:
         "/api/admin/health",
         "/api/public/health",
         "/healthz",
+        "/readyz",
         "/realtime/health",
+        "/version",
     }

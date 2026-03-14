@@ -6,6 +6,7 @@ TASK-1 established the canonical top-level monorepo layout and the repository `M
 TASK-2 adds the first runnable backend scaffold under `apps/api/`.
 TASK-3 adds the Angular SPA scaffold under `apps/web/`.
 TASK-4 adds the PostgreSQL + SQLAlchemy + Alembic backend baseline with the empty `palio_board` schema migration.
+TASK-5 adds typed backend runtime settings, Loguru-based structured JSON request logging, and the operational `/healthz`, `/readyz`, and `/version` endpoints.
 
 At this stage:
 - `make help`, `make backend-dev`, `make test-backend`, `make web-dev`, `make openapi-export`, and `make openapi-types` are runnable
@@ -21,10 +22,21 @@ Backend commands currently available:
 - `cd apps/api && uv run python -m palio.shared.module_boundaries` runs the facade-only import check locally
 
 Database configuration currently available:
+- `PALIO_ENV` selects the typed runtime environment (`development`, `test`, or `production`)
+- `PALIO_LOG_LEVEL` controls backend JSON log verbosity
+- `PALIO_REQUEST_ID_HEADER` overrides the HTTP request-id header name (defaults to `X-Request-ID`)
+- `PALIO_BUILD_VERSION` overrides the `/version` payload version string
+- `PALIO_BUILD_COMMIT_SHA` adds optional build metadata to `/version`
 - `PALIO_DB_RUNTIME_URL` is the runtime connection string for normal app access
 - `PALIO_DB_MIGRATION_URL` is the Alembic/admin connection string for schema changes
 - application tables belong to the fixed Postgres schema `palio_board`
 - migrations remain an explicit command and are not run automatically on backend startup
+
+Operational backend behavior currently available:
+- `/healthz` is the liveness endpoint
+- `/readyz` reports DB readiness and returns `503` when the runtime DB is not configured or unavailable
+- `/version` returns build/runtime version metadata
+- every HTTP response includes a request id header, generated ids use UUIDv7, and backend request logs are emitted as structured JSON through Loguru
 
 Frontend commands currently available:
 - `cd apps/web && npm install` installs the Angular 21 scaffold dependencies
