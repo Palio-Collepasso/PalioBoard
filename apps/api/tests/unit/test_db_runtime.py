@@ -122,7 +122,7 @@ def test_migration_database_url_requires_explicit_configuration() -> None:
 
 def test_baseline_revision_creates_palio_board_schema() -> None:
     migration_path = (
-        Path(__file__).resolve().parents[1]
+        Path(__file__).resolve().parents[2]
         / "migrations"
         / "versions"
         / "20260314_0001_create_palio_board_schema.py"

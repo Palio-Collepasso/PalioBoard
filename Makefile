@@ -48,7 +48,8 @@ test: test-backend test-web test-e2e ## Run all repository test suites
 
 test-backend: ## Run backend tests
 	$(call require_file,$(API_DIR)/pyproject.toml,the backend test harness,TASK-8)
-	cd $(API_DIR) && uv run pytest
+	cd $(API_DIR) && uv run pytest tests/unit
+	cd $(API_DIR) && uv run pytest tests/integration
 
 test-web: ## Run frontend tests
 	$(call require_file,$(WEB_DIR)/package.json,the frontend test harness,TASK-9)
