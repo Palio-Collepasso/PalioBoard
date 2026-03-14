@@ -29,6 +29,7 @@ from palio.modules.tournaments.facade import (
     build_tournaments_facade,
 )
 from palio.modules.users.facade import UsersFacade, build_users_facade
+from palio.settings import ApplicationSettings, load_settings
 
 
 @dataclass(frozen=True, slots=True)
@@ -67,6 +68,7 @@ class ModuleFacades:
 class ApplicationRuntime:
     """Top-level runtime assembled without a DI framework."""
 
+    settings: ApplicationSettings
     database: DatabaseRuntime
     modules: ModuleFacades
 
@@ -92,7 +94,9 @@ def build_module_facades() -> ModuleFacades:
 def build_runtime() -> ApplicationRuntime:
     """Build the minimal backend runtime used by the scaffold."""
 
+    settings = load_settings()
     return ApplicationRuntime(
-        database=build_database_runtime(),
+        settings=settings,
+        database=build_database_runtime(dsn=settings.database.runtime_url),
         modules=build_module_facades(),
     )

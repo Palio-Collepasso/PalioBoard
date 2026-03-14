@@ -176,6 +176,11 @@ The Angular SPA currently exposes three lazy route areas:
 
 `make backend-dev` starts the placeholder FastAPI app. `make test-backend` currently runs only the narrow scaffold and persistence-baseline smoke tests, not the full backend harness planned for later tasks. Alembic uses `PALIO_DB_MIGRATION_URL`, while runtime DB access uses `PALIO_DB_RUNTIME_URL`.
 
+Current backend operational baseline:
+- typed env-based runtime settings via `PALIO_ENV`, `PALIO_LOG_LEVEL`, `PALIO_REQUEST_ID_HEADER`, `PALIO_BUILD_VERSION`, `PALIO_BUILD_COMMIT_SHA`, `PALIO_DB_RUNTIME_URL`, and `PALIO_DB_MIGRATION_URL`
+- Loguru-backed structured JSON HTTP request logs with propagated `X-Request-ID` response headers by default
+- `/healthz`, `/readyz`, and `/version` endpoints for local smoke checks and future infra wiring
+
 Contract workflow baseline:
 - `make openapi-export` commits the FastAPI-owned OpenAPI artifact to `docs/api/openapi.yaml`
 - `make openapi-types` regenerates ignored frontend TS declarations from that committed spec

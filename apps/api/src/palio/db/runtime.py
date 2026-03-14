@@ -2,11 +2,11 @@
 
 from dataclasses import dataclass
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, sessionmaker
 
-from palio.db.config import APPLICATION_SCHEMA, get_runtime_database_url
+from palio.db.config import APPLICATION_SCHEMA
 from palio.db.unit_of_work import SqlAlchemyUnitOfWork
 
 
@@ -15,6 +15,14 @@ class DatabaseNotConfiguredError(RuntimeError):
 
 
 type SessionFactory = sessionmaker[Session]
+
+
+@dataclass(frozen=True, slots=True)
+class ReadinessCheck:
+    """Represent the current backend readiness status."""
+
+    is_ready: bool
+    reason: str
 
 
 @dataclass(frozen=True, slots=True)
@@ -66,6 +74,30 @@ class DatabaseRuntime:
 
         return SqlAlchemyUnitOfWork(self.create_session)
 
+    def check_readiness(self) -> ReadinessCheck:
+        """Check whether the database runtime is ready for traffic.
+
+        Returns:
+            The current readiness result.
+        """
+
+        if not self.is_configured or self.engine is None:
+            return ReadinessCheck(
+                is_ready=False,
+                reason="database_not_configured",
+            )
+
+        try:
+            with self.engine.connect() as connection:
+                connection.execute(text("SELECT 1"))
+        except Exception as exc:
+            return ReadinessCheck(
+                is_ready=False,
+                reason=f"database_unavailable:{exc.__class__.__name__}",
+            )
+
+        return ReadinessCheck(is_ready=True, reason="ok")
+
 
 def build_database_runtime(*, dsn: str | None = None) -> DatabaseRuntime:
     """Build the DB runtime without forcing a startup connection.
@@ -78,12 +110,11 @@ def build_database_runtime(*, dsn: str | None = None) -> DatabaseRuntime:
         inert runtime descriptor that preserves the scaffold boot path.
     """
 
-    runtime_dsn = get_runtime_database_url(explicit_url=dsn)
-    if runtime_dsn is None:
+    if dsn is None:
         return DatabaseRuntime()
 
     engine = create_engine(
-        runtime_dsn,
+        dsn,
         pool_pre_ping=True,
     )
     session_factory = sessionmaker(
@@ -93,7 +124,7 @@ def build_database_runtime(*, dsn: str | None = None) -> DatabaseRuntime:
         expire_on_commit=False,
     )
     return DatabaseRuntime(
-        dsn=runtime_dsn,
+        dsn=dsn,
         engine=engine,
         session_factory=session_factory,
     )
