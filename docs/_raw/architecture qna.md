@@ -222,8 +222,8 @@ It captures the **current architecture direction** up to this point in the conve
 
 ### 61. Is the API split into multiple surfaces?
 **Decision:** Yes. The backend is explicitly split into:
-- `/admin/...` for authenticated command/query operations
-- `/public/...` for anonymous read models
+- `/api/admin/...` for authenticated command/query operations
+- `/api/public/...` for anonymous read models
 - `/realtime/...` for SSE and WebSocket endpoints
 
 ### 62. What do public endpoints read from?

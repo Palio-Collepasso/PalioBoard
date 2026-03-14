@@ -10,14 +10,15 @@ TASK-5 adds typed backend runtime settings, Loguru-based structured JSON request
 
 At this stage:
 - `make help`, `make backend-dev`, `make test-backend`, `make web-dev`, `make openapi-export`, and `make openapi-types` are runnable
+- `make up` and `make down` now boot and stop the baseline same-origin Docker Compose stack on `http://127.0.0.1:8080`
 - `make test-web` and `make test-e2e` now reach explicit frontend placeholder scripts for TASK-9
-- `make up` and `make down` are still reserved entrypoints
 - `make test` still fails overall until the web and e2e harnesses land
 
 Backend commands currently available:
 - `make backend-dev` starts the placeholder FastAPI app from `apps/api/src/palio/app/main.py`
 - `make test-backend` runs the narrow backend smoke suite currently in the scaffold
 - `cd apps/api && PALIO_DB_MIGRATION_URL=postgresql+psycopg://... uv run alembic upgrade head` applies the baseline empty-schema migration explicitly
+- `docker compose -f infra/compose/docker-compose.yml --profile ops run --rm migrate` applies that same migration inside the local stack
 - `make openapi-export` exports `docs/api/openapi.yaml` directly from the FastAPI app without starting a server
 - `cd apps/api && uv run python -m palio.shared.module_boundaries` runs the facade-only import check locally
 
@@ -45,6 +46,14 @@ Frontend commands currently available:
 - `cd apps/web && npm run generate:api-types` runs the app-local type-generation command
 - `cd apps/web && npm run check-boundaries` runs the dependency-cruiser import-boundary check
 
+Compose smoke-run behavior currently available:
+- `make up` builds and starts PostgreSQL, the FastAPI container, and the Nginx same-origin proxy
+- the same-origin stack is reachable at `http://127.0.0.1:8080`
+- `http://127.0.0.1:8080/healthz`, `/readyz`, and `/version` proxy to the backend operational endpoints
+- `http://127.0.0.1:8080/api/admin/health`, `/api/public/health`, and `/realtime/health` proxy to the placeholder backend surfaces
+- Nginx serves the built SPA and falls back to `index.html` for `/`, `/admin`, `/public`, and `/maxi`
+- `/realtime/...` is proxied with upgrade-friendly settings so the placeholder websocket route can stay under the same origin
+
 ## Stable top-level targets
 
 Use these target names going forward:
@@ -62,7 +71,6 @@ Use these target names going forward:
 
 ## Expected follow-up tasks
 
-- TASK-6 will add Docker Compose and Nginx assets under `infra/`
 - TASK-8 will expand `make test-backend` from scaffold smoke coverage into the full backend harness
 - TASK-9 will replace the frontend test/e2e placeholders with the real behavior and Playwright harnesses
 - TASK-10 will replace this baseline note with the full local bootstrap and verification guide

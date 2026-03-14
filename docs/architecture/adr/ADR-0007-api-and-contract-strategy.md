@@ -17,8 +17,8 @@ Frontend and backend live in one monorepo and evolve together.
 
 Use a REST API with explicit command/query endpoints and three backend surfaces:
 
-- `/admin/...`
-- `/public/...`
+- `/api/admin/...`
+- `/api/public/...`
 - `/realtime/...`
 
 Contract rules:
@@ -44,7 +44,7 @@ Public read rule:
 
 ### Negative
 
-- Requires discipline to keep `/public` strictly projection-backed.
+- Requires discipline to keep `/api/public` strictly projection-backed.
 - Realtime contracts remain hand-managed unless later formalized further.
 
 ## Follow-ups
