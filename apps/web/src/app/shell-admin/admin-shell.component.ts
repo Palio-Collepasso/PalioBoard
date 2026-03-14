@@ -1,13 +1,13 @@
 import { NgFor } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
 
-import { SHELL_LINKS } from '../core/navigation/shell-links';
+import { AdminNavigationService } from './admin-navigation.service';
 
 @Component({
   selector: 'palio-admin-shell',
   standalone: true,
-  imports: [NgFor, RouterLink, RouterOutlet],
+  imports: [NgFor, RouterOutlet],
   template: `
     <section class="shell shell-admin">
       <header class="shell__hero">
@@ -17,7 +17,7 @@ import { SHELL_LINKS } from '../core/navigation/shell-links';
           <p>Private judge and admin routes stay separate from the public and maxi-screen areas.</p>
         </div>
         <nav class="shell__nav" aria-label="Shell navigation">
-          <a *ngFor="let link of shellLinks" [routerLink]="link.path">{{ link.label }}</a>
+          <button type="button" *ngFor="let link of shellLinks" (click)="link.navigate()">{{ link.label }}</button>
         </nav>
       </header>
       <section class="shell__content">
@@ -28,5 +28,10 @@ import { SHELL_LINKS } from '../core/navigation/shell-links';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AdminShellComponent {
-  readonly shellLinks = SHELL_LINKS.filter((link) => link.surface !== 'admin');
+  readonly shellLinks = [
+    { label: 'Public', navigate: () => this.navigation.goToPublicShell() },
+    { label: 'Maxi-screen', navigate: () => this.navigation.goToMaxiShell() }
+  ] as const;
+
+  constructor(private readonly navigation: AdminNavigationService) {}
 }

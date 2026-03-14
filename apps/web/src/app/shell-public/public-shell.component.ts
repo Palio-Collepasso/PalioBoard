@@ -1,13 +1,13 @@
 import { NgFor } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
 
-import { SHELL_LINKS } from '../core/navigation/shell-links';
+import { PublicNavigationService } from './public-navigation.service';
 
 @Component({
   selector: 'palio-public-shell',
   standalone: true,
-  imports: [NgFor, RouterLink, RouterOutlet],
+  imports: [NgFor, RouterOutlet],
   template: `
     <section class="shell shell-public">
       <header class="shell__hero">
@@ -17,7 +17,7 @@ import { SHELL_LINKS } from '../core/navigation/shell-links';
           <p>Anonymous routes reserve space for Palio, Prepalio, and Giocasport views without pulling admin code.</p>
         </div>
         <nav class="shell__nav" aria-label="Shell navigation">
-          <a *ngFor="let link of shellLinks" [routerLink]="link.path">{{ link.label }}</a>
+          <button type="button" *ngFor="let link of shellLinks" (click)="link.navigate()">{{ link.label }}</button>
         </nav>
       </header>
       <section class="shell__content">
@@ -28,5 +28,10 @@ import { SHELL_LINKS } from '../core/navigation/shell-links';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PublicShellComponent {
-  readonly shellLinks = SHELL_LINKS.filter((link) => link.surface !== 'public');
+  readonly shellLinks = [
+    { label: 'Admin', navigate: () => this.navigation.goToAdminShell() },
+    { label: 'Maxi-screen', navigate: () => this.navigation.goToMaxiShell() }
+  ] as const;
+
+  constructor(private readonly navigation: PublicNavigationService) {}
 }
