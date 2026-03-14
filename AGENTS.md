@@ -1,3 +1,4 @@
+# Repository Guidelines
 
 <!-- BACKLOG.MD MCP GUIDELINES START -->
 
@@ -35,13 +36,11 @@ You MUST read the overview resource to understand the complete workflow. The inf
 ## Workflow
 When working on a task:
 1. Assign it to yourself: : -a @{your-name}
-2. Create a git worktree under `../palio-trees/agent/<task>`
-3. At the end of every task implementation, try to take a moment to see if you can simplify it. When you are done implementing, you know much more about a task than when you started. At this point you can better judge retrospectively what can be the simplest architecture to solve the problem. If you can simplify the code, do it. 
-4. At the end of the task, 
+2. Create a git worktree under `../palio-trees/tasks/task-taskId-taskTitle`
+3. At the end of every task implementation, try to take a moment to see if you can simplify it. When you are done implementing, you know much more about a task than when you started. At this point you can better judge retrospectively what can be the simplest architecture to solve the problem. If you can simplify the code, do it.
 
 ## Simplicity-first implementation rules
 - Prefer a single implementation for similar concerns. Reuse or refactor to a shared helper instead of duplicating.
-
 
 ## Planning and information gathering
 
@@ -158,5 +157,7 @@ A task is fully complete if:
 ## Git Workflow
 - **Branching**: Use feature branches when working on tasks (e.g. tasks/task-123-feature-name)
 - **Committing**: Use the following format: TASK-123 - Title of the task
-- **PR titles**: Use {taskId} - {taskTitle} (e.g. TASK-123 - Title of the task)
+- **PR**: 
+    - title: {taskId} - {taskTitle} (e.g. TASK-123 - Title of the task)
+    - template: `.github/pull_request_template.md`
 - **Github CLI**: Use gh whenever possible for PRs and issues
