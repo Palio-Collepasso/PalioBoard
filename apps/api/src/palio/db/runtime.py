@@ -6,8 +6,8 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, sessionmaker
 
-from palio.db.config import APPLICATION_SCHEMA
 from palio.db.unit_of_work import SqlAlchemyUnitOfWork
+from palio.settings import APPLICATION_SCHEMA
 
 
 class DatabaseNotConfiguredError(RuntimeError):

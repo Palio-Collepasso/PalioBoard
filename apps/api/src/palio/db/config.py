@@ -1,8 +1,6 @@
 """Database-specific configuration helpers."""
 
-from palio.settings import (
-    MIGRATION_DATABASE_URL_ENV_VAR,
-)
+from palio.settings import MIGRATION_DATABASE_URL_ENV_VAR
 
 
 class DatabaseConfigurationError(RuntimeError):
