@@ -154,6 +154,14 @@ The repository now exposes the canonical top-level command names, and the backen
 make help
 ```
 
+### Task worktree helper
+
+```bash
+./tools/task-worktree-codex.sh 6
+```
+
+This creates the standard task worktree under `~/codex-worktrees/palio-board/tasks/` and opens `codex` in that worktree, reusing the existing branch/worktree when present.
+
 ### Scaffold commands
 
 ```bash
