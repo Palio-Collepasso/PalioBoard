@@ -14,7 +14,13 @@ Current local commands from this directory:
 - `uv run fastapi dev src/palio/app/main.py`
 - `uv run pytest`
 - `PALIO_DB_MIGRATION_URL=postgresql+psycopg://... uv run alembic upgrade head`
+- `uv run python -m palio.app.export_openapi ../../docs/api/openapi.yaml`
 - `uv run python -m palio.shared.module_boundaries`
+
+Contract workflow baseline from TASK-7:
+- FastAPI owns the committed OpenAPI artifact at `docs/api/openapi.yaml`
+- the export command runs from application code and does not require a running backend
+- frontend TypeScript types are generated from that committed spec and are not committed
 
 Still deferred to later tasks:
 - real business workflows and API contracts

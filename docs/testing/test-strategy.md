@@ -73,9 +73,11 @@ Do not use large snapshot suites as a substitute for behavior tests. The fronten
 CI should also enforce architectural boundaries and contract hygiene using the repo’s agreed tooling. Ruff, Pyright, pytest, frontend lint/test/build, OpenAPI export/type generation checks, and import-boundary checks are part of the quality baseline.
 
 Current backend baseline note: the scaffold introduced in TASK-2 ships a local import-boundary command at `cd apps/api && uv run python -m palio.shared.module_boundaries`. Later CI wiring should execute the same rule automatically.
+TASK-7 adds `make openapi-export`, backed by `cd apps/api && uv run python -m palio.app.export_openapi ../../docs/api/openapi.yaml`, as the local contract-export command.
 
 Current frontend baseline:
 - TASK-3 introduces `cd apps/web && npm run check-boundaries`, backed by dependency-cruiser, as the initial CI-friendly import-boundary rule for shell isolation and generic `shared/` code.
+- TASK-7 introduces `make openapi-types` and `cd apps/web && npm run generate:api-types` so the frontend can regenerate ignored TS declarations from the committed OpenAPI artifact without a running backend.
 - TASK-9 will add the broader frontend and Playwright behavioral harnesses that complement this static guardrail.
 
 ## Test pyramid / test-layer overview
