@@ -49,7 +49,7 @@
 **Decision:** Backend integration tests use a real local Postgres test database, not SQLite.
 
 ### 94. What repository strategy is used?
-**Decision:** The whole project uses a monorepo containing frontend, backend, shared generated API types, migrations, and deployment configuration.
+**Decision:** The whole project uses a monorepo containing frontend, backend, committed API contract artifacts, frontend-generated API types, migrations, and deployment configuration.
 
 
 ## 12. Backend stack, project structure, and developer tooling

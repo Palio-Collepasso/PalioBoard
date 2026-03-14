@@ -12,7 +12,13 @@ Current TASK-2 scaffold:
 Current local commands from this directory:
 - `uv run fastapi dev src/palio/app/main.py`
 - `uv run pytest`
+- `uv run python -m palio.app.export_openapi ../../docs/api/openapi.yaml`
 - `uv run python -m palio.shared.module_boundaries`
+
+Contract workflow baseline from TASK-7:
+- FastAPI owns the committed OpenAPI artifact at `docs/api/openapi.yaml`
+- the export command runs from application code and does not require a running backend
+- frontend TypeScript types are generated from that committed spec and are not committed
 
 Still deferred to later tasks:
 - Alembic configuration and migrations
