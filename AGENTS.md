@@ -35,9 +35,8 @@ You MUST read the overview resource to understand the complete workflow. The inf
 
 ## Workflow
 When working on a task:
-1. Assign it to yourself: : -a @{your-name}
-2. Create a git worktree under `../palio-trees/tasks/task-taskId-taskTitle`
-3. At the end of every task implementation, try to take a moment to see if you can simplify it. When you are done implementing, you know much more about a task than when you started. At this point you can better judge retrospectively what can be the simplest architecture to solve the problem. If you can simplify the code, do it.
+1. Assign it to yourself.
+2. At the end of every task implementation, try to take a moment to see if you can simplify it. When you are done implementing, you know much more about a task than when you started. At this point you can better judge retrospectively what can be the simplest architecture to solve the problem. If you can simplify the code, do it.
 
 ## Simplicity-first implementation rules
 - Prefer a single implementation for similar concerns. Reuse or refactor to a shared helper instead of duplicating.
