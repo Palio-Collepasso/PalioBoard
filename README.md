@@ -14,6 +14,7 @@ What is already in the repo:
 - milestone plan
 - backend FastAPI scaffold with explicit module facades and a minimal app factory
 - Angular 21 SPA scaffold under `apps/web/`
+- a committed OpenAPI export artifact at `docs/api/openapi.yaml`
 
 What is not in the repo yet:
 - Docker Compose or local bootstrap files
@@ -85,9 +86,10 @@ palio/
 ├─ .github/
 │  └─ workflows/
 ├─ apps/
-│  ├─ backend/
+│  ├─ api/
 │  └─ web/
 ├─ docs/
+│  ├─ api/
 │  ├─ architecture/
 │  ├─ domain/
 │  ├─ ops/
@@ -156,11 +158,13 @@ make help
 ```bash
 make backend-dev
 make test-backend
+make openapi-export
 cd apps/api && uv run python -m palio.shared.module_boundaries
 
 cd apps/web
 npm install
 make web-dev
+make openapi-types
 ```
 
 The Angular SPA currently exposes three lazy route areas:
@@ -169,6 +173,11 @@ The Angular SPA currently exposes three lazy route areas:
 - `/maxi`
 
 `make backend-dev` starts the placeholder FastAPI app. `make test-backend` currently runs only the scaffold smoke tests, not the full backend harness planned for later tasks.
+
+Contract workflow baseline:
+- `make openapi-export` commits the FastAPI-owned OpenAPI artifact to `docs/api/openapi.yaml`
+- `make openapi-types` regenerates ignored frontend TS declarations from that committed spec
+- Angular services stay hand-written even when types are generated
 
 ### Still-reserved targets
 

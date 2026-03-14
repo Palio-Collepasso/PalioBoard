@@ -6,7 +6,7 @@ COMPOSE_FILE := infra/compose/docker-compose.yml
 
 .DEFAULT_GOAL := help
 
-.PHONY: help up down backend-dev web-dev test test-backend test-web test-e2e
+.PHONY: help up down backend-dev web-dev openapi-export openapi-types test test-backend test-web test-e2e
 
 define require_file
 	@if [ ! -f "$(1)" ]; then \
@@ -33,6 +33,16 @@ backend-dev: ## Run the backend locally with uv
 web-dev: ## Run the Angular app locally with npm
 	$(call require_file,$(WEB_DIR)/package.json,the frontend app,TASK-3)
 	cd $(WEB_DIR) && npm run start
+
+openapi-export: ## Export the committed OpenAPI spec from the backend app
+	$(call require_file,$(API_DIR)/pyproject.toml,the backend app,TASK-2)
+	mkdir -p docs/api
+	cd $(API_DIR) && uv run python -m palio.app.export_openapi ../../docs/api/openapi.yaml
+
+openapi-types: ## Generate frontend TS types from the committed OpenAPI spec
+	$(call require_file,$(WEB_DIR)/package.json,the frontend app,TASK-3)
+	$(call require_file,docs/api/openapi.yaml,the committed OpenAPI spec,TASK-7)
+	cd $(WEB_DIR) && npm run generate:api-types
 
 test: test-backend test-web test-e2e ## Run all repository test suites
 

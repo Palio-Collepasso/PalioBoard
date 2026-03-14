@@ -1,0 +1,65 @@
+openapi: 3.1.0
+info:
+  title: PalioBoard API
+  version: 0.1.0
+paths:
+  /api/admin/health:
+    get:
+      tags:
+      - admin
+      summary: Admin Health
+      operationId: admin_health_api_admin_health_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+                title: Response Admin Health Api Admin Health Get
+  /api/public/health:
+    get:
+      tags:
+      - public
+      summary: Public Health
+      operationId: public_health_api_public_health_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+                title: Response Public Health Api Public Health Get
+  /realtime/health:
+    get:
+      tags:
+      - realtime
+      summary: Realtime Health
+      operationId: realtime_health_realtime_health_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+                title: Response Realtime Health Realtime Health Get
+  /healthz:
+    get:
+      tags:
+      - meta
+      summary: Healthcheck
+      operationId: healthcheck_healthz_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+                title: Response Healthcheck Healthz Get

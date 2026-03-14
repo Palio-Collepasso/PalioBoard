@@ -5,6 +5,7 @@
   "scripts": {
     "start": "ng serve --host 0.0.0.0 --port 4200",
     "build": "ng build",
+    "generate:api-types": "openapi-typescript ../../docs/api/openapi.yaml -o src/app/shared/api/generated/openapi.d.ts",
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
     "check-boundaries": "depcruise --config dependency-cruiser.cjs src/app",
     "lint": "npm run check-boundaries",
@@ -27,6 +28,7 @@
     "@angular/cli": "^21.0.0",
     "@angular/compiler-cli": "^21.0.0",
     "dependency-cruiser": "^16.8.0",
+    "openapi-typescript": "^7.13.0",
     "typescript": "~5.9.0"
   }
 }

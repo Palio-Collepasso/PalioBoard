@@ -11,8 +11,14 @@ TASK-3 establishes the initial Angular 21 scaffold for M0 with:
 Current command surface:
 - `npm run start` starts the Angular dev server on port `4200`
 - `npm run build` builds the scaffolded SPA
+- `npm run generate:api-types` regenerates TS declarations from `../../docs/api/openapi.yaml`
 - `npm run typecheck` runs TypeScript-only validation
 - `npm run check-boundaries` enforces the initial frontend import rules
+
+Contract workflow baseline from TASK-7:
+- generated API types live under `src/app/shared/api/generated/`
+- generated API types are derived from the committed backend spec and are not committed
+- Angular services under `src/app/shared/api/` remain hand-written
 
 Still reserved for later M0 tasks:
 - frontend unit/integration harness wiring in TASK-9
