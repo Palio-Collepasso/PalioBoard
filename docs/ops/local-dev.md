@@ -7,6 +7,7 @@ TASK-2 adds the first runnable backend scaffold under `apps/api/`.
 TASK-3 adds the Angular SPA scaffold under `apps/web/`.
 TASK-4 adds the PostgreSQL + SQLAlchemy + Alembic backend baseline with the empty `palio_board` schema migration.
 TASK-5 adds typed backend runtime settings, Loguru-based structured JSON request logging, and the operational `/healthz`, `/readyz`, and `/version` endpoints.
+TASK-8 adds the split backend unit/integration harness and the real-Postgres smoke-test baseline.
 
 At this stage:
 - `make help`, `make backend-dev`, `make test-backend`, `make web-dev`, `make openapi-export`, and `make openapi-types` are runnable
@@ -16,7 +17,9 @@ At this stage:
 
 Backend commands currently available:
 - `make backend-dev` starts the placeholder FastAPI app from `apps/api/src/palio/app/main.py`
-- `make test-backend` runs the narrow backend smoke suite currently in the scaffold
+- `make test-backend` runs `apps/api/tests/unit/` first and then `apps/api/tests/integration/`
+- `cd apps/api && uv run pytest tests/unit` runs the fast backend unit/smoke layer directly
+- `cd apps/api && uv run pytest tests/integration` runs the Postgres-backed integration smoke layer directly
 - `cd apps/api && PALIO_DB_MIGRATION_URL=postgresql+psycopg://... uv run alembic upgrade head` applies the baseline empty-schema migration explicitly
 - `make openapi-export` exports `docs/api/openapi.yaml` directly from the FastAPI app without starting a server
 - `cd apps/api && uv run python -m palio.shared.module_boundaries` runs the facade-only import check locally
@@ -29,6 +32,8 @@ Database configuration currently available:
 - `PALIO_BUILD_COMMIT_SHA` adds optional build metadata to `/version`
 - `PALIO_DB_RUNTIME_URL` is the runtime connection string for normal app access
 - `PALIO_DB_MIGRATION_URL` is the Alembic/admin connection string for schema changes
+- `PALIO_TEST_POSTGRES_URL` optionally points backend integration tests at an existing local Postgres admin database; when unset, the suite starts a disposable Docker Postgres container
+- `PALIO_TEST_POSTGRES_IMAGE` optionally overrides the Docker image used by that disposable integration-test container
 - application tables belong to the fixed Postgres schema `palio_board`
 - migrations remain an explicit command and are not run automatically on backend startup
 
@@ -63,6 +68,5 @@ Use these target names going forward:
 ## Expected follow-up tasks
 
 - TASK-6 will add Docker Compose and Nginx assets under `infra/`
-- TASK-8 will expand `make test-backend` from scaffold smoke coverage into the full backend harness
 - TASK-9 will replace the frontend test/e2e placeholders with the real behavior and Playwright harnesses
 - TASK-10 will replace this baseline note with the full local bootstrap and verification guide

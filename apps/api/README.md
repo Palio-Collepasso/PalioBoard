@@ -2,18 +2,21 @@
 
 This directory is the canonical home for the FastAPI backend and backend test harness.
 
-Current TASK-5 baseline:
+Current TASK-8 baseline:
 - `pyproject.toml` with the FastAPI, SQLAlchemy, Alembic, psycopg, and pytest dependencies used by the repo `Makefile`
 - `alembic.ini` plus `migrations/` with the baseline revision that creates the empty `palio_board` application schema
 - `src/palio/app/` as the explicit composition root with Loguru JSON request logging, UUIDv7 request-id propagation, and the operational `/healthz`, `/readyz`, and `/version` endpoints
 - `src/palio/settings.py` for the typed env-based runtime settings used by the app/bootstrap and DB helpers
 - `src/palio/db/` for the runtime/migration DB configuration, SQLAlchemy runtime assembly, readiness probing, and the session-bound Unit of Work baseline
 - `src/palio/shared/` and `src/palio/modules/` for cross-cutting technical primitives and the documented modular-monolith package layout
-- `tests/` with narrow smoke coverage for app boot, settings parsing, boundary enforcement, request logging, and the DB runtime baseline
+- `tests/unit/` for fast backend smoke/configuration checks and `tests/integration/` for real-Postgres migration/readiness coverage
+- `tests/support/postgres.py` for the Postgres-backed integration harness, which can reuse an existing local server or start a disposable Docker `postgres:16-alpine` container automatically
 
 Current local commands from this directory:
 - `uv run fastapi dev src/palio/app/main.py`
 - `uv run pytest`
+- `uv run pytest tests/unit`
+- `uv run pytest tests/integration`
 - `PALIO_DB_MIGRATION_URL=postgresql+psycopg://... uv run alembic upgrade head`
 - `uv run python -m palio.app.export_openapi ../../docs/api/openapi.yaml`
 - `uv run python -m palio.shared.module_boundaries`
@@ -31,8 +34,10 @@ Runtime environment variables currently supported:
 - `PALIO_BUILD_COMMIT_SHA` adds commit/build metadata to `/version`
 - `PALIO_DB_RUNTIME_URL` configures normal runtime DB access and readiness checks
 - `PALIO_DB_MIGRATION_URL` configures Alembic/schema-change access
+- `PALIO_TEST_POSTGRES_URL` optionally points the integration suite at an existing local Postgres admin database instead of starting a disposable container
+- `PALIO_TEST_POSTGRES_IMAGE` optionally overrides the Docker image used when the integration suite starts its disposable local Postgres instance
 
 Still deferred to later tasks:
 - real business workflows and API contracts
 - domain tables beyond the empty-schema migration
-- Postgres-backed integration coverage beyond the current smoke checks
+- deeper Postgres-backed workflow coverage beyond the current migration/readiness smoke checks

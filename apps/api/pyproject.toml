@@ -27,3 +27,7 @@ packages = ["src/palio"]
 [tool.pytest.ini_options]
 addopts = "-q"
 testpaths = ["tests"]
+pythonpath = ["."]
+markers = [
+    "integration: tests that require a real local PostgreSQL database",
+]
