@@ -15,6 +15,13 @@ Add new entries in reverse chronological order.
 - Corrected the stale API-surface docs so they now match the implemented `/api/admin/...`, `/api/public/...`, and `/realtime/...` contract.
 - Follow-up hardening switched the Nginx runtime stage from `nginx:1.27-alpine` to `nginx:1.29.4-alpine3.23-slim` after the image was flagged for severe vulnerability findings, while preserving the same stack behavior.
 
+### TASK-8 - Backend unit and real-Postgres integration harness
+
+- Split the backend pytest suite into `apps/api/tests/unit/` and `apps/api/tests/integration/`, and changed `make test-backend` to run the two layers sequentially.
+- Added a Postgres-backed integration harness under `apps/api/tests/support/postgres.py` that applies the real Alembic migrations into isolated test databases.
+- Backend integration smoke tests now verify both the migrated `palio_board` schema bootstrap and FastAPI readiness against a real local Postgres database.
+- The integration suite can reuse an existing local Postgres server through `PALIO_TEST_POSTGRES_URL` or start a disposable Docker `postgres:16-alpine` container automatically.
+
 ### TASK-5 - Runtime settings, JSON logging, and operational endpoints
 
 - Added a typed backend settings layer in `apps/api/src/palio/settings.py` so runtime behavior now comes from explicit env vars rather than scattered direct lookups.

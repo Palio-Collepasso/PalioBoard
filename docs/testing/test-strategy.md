@@ -74,6 +74,7 @@ CI should also enforce architectural boundaries and contract hygiene using the r
 
 Current backend baseline note: the scaffold introduced in TASK-2 ships a local import-boundary command at `cd apps/api && uv run python -m palio.shared.module_boundaries`. Later CI wiring should execute the same rule automatically.
 TASK-7 adds `make openapi-export`, backed by `cd apps/api && uv run python -m palio.app.export_openapi ../../docs/api/openapi.yaml`, as the local contract-export command.
+TASK-8 splits the backend suite into `cd apps/api && uv run pytest tests/unit` and `cd apps/api && uv run pytest tests/integration`, while `make test-backend` runs those layers in sequence. The integration layer uses real Postgres only: it can target an existing local server via `PALIO_TEST_POSTGRES_URL` or start a disposable local Docker `postgres:16-alpine` instance automatically.
 
 Current frontend baseline:
 - TASK-3 introduces `cd apps/web && npm run check-boundaries`, backed by dependency-cruiser, as the initial CI-friendly import-boundary rule for shell isolation and generic `shared/` code.

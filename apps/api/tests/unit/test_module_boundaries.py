@@ -4,7 +4,7 @@ from palio.shared.module_boundaries import BoundaryViolation, check_module_bound
 
 
 def test_scaffold_respects_boundary_rules() -> None:
-    modules_root = Path(__file__).resolve().parents[1] / "src" / "palio" / "modules"
+    modules_root = Path(__file__).resolve().parents[2] / "src" / "palio" / "modules"
     assert check_module_boundaries(modules_root) == []
 
 

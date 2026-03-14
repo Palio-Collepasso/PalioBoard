@@ -14,6 +14,7 @@ What is already in the repo:
 - milestone plan
 - backend FastAPI scaffold with explicit module facades and a minimal app factory
 - backend PostgreSQL + SQLAlchemy + Alembic baseline with an empty `palio_board` schema migration
+- backend unit and real-Postgres integration smoke harnesses under `apps/api/tests/`
 - Angular 21 SPA scaffold under `apps/web/`
 - a committed OpenAPI export artifact at `docs/api/openapi.yaml`
 
@@ -153,6 +154,14 @@ The repository now exposes the canonical top-level command names, and the backen
 make help
 ```
 
+### Task worktree helper
+
+```bash
+./tools/task-worktree-codex.sh 6
+```
+
+This creates the standard task worktree under `~/codex-worktrees/palio-board/tasks/` and opens `codex` in that worktree, reusing the existing branch/worktree when present.
+
 ### Scaffold commands
 
 ```bash
@@ -192,7 +201,13 @@ The Angular SPA currently exposes three lazy route areas:
 - `/public`
 - `/maxi`
 
-`make backend-dev` starts the placeholder FastAPI app. `make test-backend` currently runs only the narrow scaffold and persistence-baseline smoke tests, not the full backend harness planned for later tasks. Alembic uses `PALIO_DB_MIGRATION_URL`, while runtime DB access uses `PALIO_DB_RUNTIME_URL`.
+`make backend-dev` starts the placeholder FastAPI app. `make test-backend` now runs the split backend harness: `apps/api/tests/unit/` first, then `apps/api/tests/integration/` against a real local Postgres database. By default the integration layer starts a disposable Docker `postgres:16-alpine` container; set `PALIO_TEST_POSTGRES_URL` to reuse an existing local Postgres admin database instead. Alembic uses `PALIO_DB_MIGRATION_URL`, while runtime DB access uses `PALIO_DB_RUNTIME_URL`.
+
+Current backend operational baseline:
+- typed env-based runtime settings via `PALIO_ENV`, `PALIO_LOG_LEVEL`, `PALIO_REQUEST_ID_HEADER`, `PALIO_BUILD_VERSION`, `PALIO_BUILD_COMMIT_SHA`, `PALIO_DB_RUNTIME_URL`, and `PALIO_DB_MIGRATION_URL`
+- backend integration-test settings via `PALIO_TEST_POSTGRES_URL` and `PALIO_TEST_POSTGRES_IMAGE`
+- Loguru-backed structured JSON HTTP request logs with propagated `X-Request-ID` response headers by default
+- `/healthz`, `/readyz`, and `/version` endpoints for local smoke checks and future infra wiring
 
 Current backend operational baseline:
 - typed env-based runtime settings via `PALIO_ENV`, `PALIO_LOG_LEVEL`, `PALIO_REQUEST_ID_HEADER`, `PALIO_BUILD_VERSION`, `PALIO_BUILD_COMMIT_SHA`, `PALIO_DB_RUNTIME_URL`, and `PALIO_DB_MIGRATION_URL`

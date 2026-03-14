@@ -6,7 +6,6 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
 from palio.db.config import (
-    APPLICATION_SCHEMA,
     DatabaseConfigurationError,
     require_migration_database_url,
 )
@@ -16,6 +15,7 @@ from palio.db.runtime import (
     SessionFactory,
     build_database_runtime,
 )
+from palio.settings import APPLICATION_SCHEMA
 
 
 def test_build_database_runtime_is_inert_without_runtime_url() -> None:
@@ -122,7 +122,7 @@ def test_migration_database_url_requires_explicit_configuration() -> None:
 
 def test_baseline_revision_creates_palio_board_schema() -> None:
     migration_path = (
-        Path(__file__).resolve().parents[1]
+        Path(__file__).resolve().parents[2]
         / "migrations"
         / "versions"
         / "20260314_0001_create_palio_board_schema.py"
