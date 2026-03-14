@@ -1,0 +1,58 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: palio
+      POSTGRES_USER: palio
+      POSTGRES_PASSWORD: palio
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    volumes:
+      - palio-postgres-data:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: ../..
+      dockerfile: infra/docker/api.Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PALIO_ENV: development
+      PALIO_LOG_LEVEL: INFO
+      PALIO_BUILD_VERSION: docker-dev
+      PALIO_BUILD_COMMIT_SHA: local
+      PALIO_DB_RUNTIME_URL: postgresql+psycopg://palio:palio@db:5432/palio
+      PALIO_DB_MIGRATION_URL: postgresql+psycopg://palio:palio@db:5432/palio
+
+  migrate:
+    build:
+      context: ../..
+      dockerfile: infra/docker/api.Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles: ["ops"]
+    environment:
+      PALIO_ENV: development
+      PALIO_DB_MIGRATION_URL: postgresql+psycopg://palio:palio@db:5432/palio
+    command: ["uv", "run", "alembic", "upgrade", "head"]
+
+  nginx:
+    build:
+      context: ../..
+      dockerfile: infra/docker/nginx.Dockerfile
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_started
+    ports:
+      - "127.0.0.1:8080:80"
+
+volumes:
+  palio-postgres-data:

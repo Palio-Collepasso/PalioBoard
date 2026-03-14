@@ -19,12 +19,11 @@ What is already in the repo:
 - a committed OpenAPI export artifact at `docs/api/openapi.yaml`
 
 What is not in the repo yet:
-- Docker Compose or local bootstrap files
 - `.env.example` files
 - real backend business workflows and domain tables
-- a runnable end-to-end local stack
+- a production-ready end-to-end application stack
 
-That means there is still not a runnable end-to-end application stack yet. The repository now has the canonical monorepo layout, a stable top-level `Makefile`, and initial backend/frontend scaffolds, but most application behavior and infrastructure internals still land in later M0 tasks.
+That means the repository now has a baseline same-origin local stack for smoke checks, but most application behavior and deeper infrastructure concerns still land in later M0 tasks.
 
 
 ## Overview
@@ -123,7 +122,7 @@ Additional high-signal references:
 
 ## Working in this repo today
 
-The canonical top-level implementation skeleton has landed, and `apps/api/` plus `apps/web/` now contain the first runnable app scaffolds. The repo is still mid-bootstrap and not runnable end to end yet.
+The canonical top-level implementation skeleton has landed, and `apps/api/` plus `apps/web/` now contain the first runnable app scaffolds. The repo is still mid-bootstrap, but it now includes a baseline same-origin local stack under `infra/` for M1 smoke verification.
 
 Today, useful work in this repository is:
 - using `make help` to discover the stable top-level command surface
@@ -178,6 +177,25 @@ make web-dev
 make openapi-types
 ```
 
+### Same-origin local stack
+
+```bash
+make up
+docker compose -f infra/compose/docker-compose.yml --profile ops run --rm migrate
+curl http://127.0.0.1:8080/healthz
+curl http://127.0.0.1:8080/api/admin/health
+curl http://127.0.0.1:8080/api/public/health
+curl http://127.0.0.1:8080/realtime/health
+make down
+```
+
+The Compose stack exposes one local origin at `http://127.0.0.1:8080`:
+- Nginx serves the built Angular SPA and falls back to `index.html` for `/`, `/admin`, `/public`, and `/maxi` client routes.
+- `/api/admin/...` and `/api/public/...` proxy to the backend through that same origin.
+- `/realtime/...` is routed through Nginx with upgrade-friendly proxy settings so the placeholder health route and websocket path can use the same prefix.
+
+Migrations remain explicit by architecture rule and are not run automatically when `make up` starts the stack. Use the one-shot `migrate` Compose service before verification work that depends on the schema.
+
 The Angular SPA currently exposes three lazy route areas:
 - `/admin`
 - `/public`
@@ -191,12 +209,17 @@ Current backend operational baseline:
 - Loguru-backed structured JSON HTTP request logs with propagated `X-Request-ID` response headers by default
 - `/healthz`, `/readyz`, and `/version` endpoints for local smoke checks and future infra wiring
 
+Current backend operational baseline:
+- typed env-based runtime settings via `PALIO_ENV`, `PALIO_LOG_LEVEL`, `PALIO_REQUEST_ID_HEADER`, `PALIO_BUILD_VERSION`, `PALIO_BUILD_COMMIT_SHA`, `PALIO_DB_RUNTIME_URL`, and `PALIO_DB_MIGRATION_URL`
+- Loguru-backed structured JSON HTTP request logs with propagated `X-Request-ID` response headers by default
+- `/healthz`, `/readyz`, and `/version` endpoints for local smoke checks and future infra wiring
+
 Contract workflow baseline:
 - `make openapi-export` commits the FastAPI-owned OpenAPI artifact to `docs/api/openapi.yaml`
 - `make openapi-types` regenerates ignored frontend TS declarations from that committed spec
 - Angular services stay hand-written even when types are generated
 
-### Still-reserved targets
+### Reserved and current targets
 
 These target names are intentionally stable now so later M0 tasks can fill them in without changing developer workflows:
 
@@ -206,7 +229,7 @@ These target names are intentionally stable now so later M0 tasks can fill them 
 - `make test-web`
 - `make test-e2e`
 
-`make test-web` and `make test-e2e` currently route to explicit TASK-9 placeholders. `make up` and `make down` remain reserved until the infra scaffold lands.
+`make up` and `make down` now start and stop the baseline same-origin stack defined in `infra/compose/docker-compose.yml`. `make test-web` and `make test-e2e` still route to explicit TASK-9 placeholders.
 
 For the current local-development baseline, see [docs/ops/local-dev.md](docs/ops/local-dev.md).
 
