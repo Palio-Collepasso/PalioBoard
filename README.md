@@ -13,12 +13,13 @@ What is already in the repo:
 - testing strategy
 - milestone plan
 - backend FastAPI scaffold with explicit module facades and a minimal app factory
+- backend PostgreSQL + SQLAlchemy + Alembic baseline with an empty `palio_board` schema migration
 - Angular 21 SPA scaffold under `apps/web/`
 
 What is not in the repo yet:
 - Docker Compose or local bootstrap files
 - `.env.example` files
-- real backend business workflows and persistence
+- real backend business workflows and domain tables
 - a runnable end-to-end local stack
 
 That means there is still not a runnable end-to-end application stack yet. The repository now has the canonical monorepo layout, a stable top-level `Makefile`, and initial backend/frontend scaffolds, but most application behavior and infrastructure internals still land in later M0 tasks.
@@ -85,7 +86,7 @@ palio/
 ├─ .github/
 │  └─ workflows/
 ├─ apps/
-│  ├─ backend/
+│  ├─ api/
 │  └─ web/
 ├─ docs/
 │  ├─ architecture/
@@ -156,6 +157,7 @@ make help
 ```bash
 make backend-dev
 make test-backend
+cd apps/api && PALIO_DB_MIGRATION_URL=postgresql+psycopg://... uv run alembic upgrade head
 cd apps/api && uv run python -m palio.shared.module_boundaries
 
 cd apps/web
@@ -168,7 +170,7 @@ The Angular SPA currently exposes three lazy route areas:
 - `/public`
 - `/maxi`
 
-`make backend-dev` starts the placeholder FastAPI app. `make test-backend` currently runs only the scaffold smoke tests, not the full backend harness planned for later tasks.
+`make backend-dev` starts the placeholder FastAPI app. `make test-backend` currently runs only the narrow scaffold and persistence-baseline smoke tests, not the full backend harness planned for later tasks. Alembic uses `PALIO_DB_MIGRATION_URL`, while runtime DB access uses `PALIO_DB_RUNTIME_URL`.
 
 ### Still-reserved targets
 

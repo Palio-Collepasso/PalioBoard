@@ -2,6 +2,8 @@
 
 This document is the current ER direction to reflect the architectural decisions discussed so far.
 
+All application tables live in the dedicated Postgres schema `palio_board`.
+
 ## Notes
 
 - `NN` means **NOT NULL**.

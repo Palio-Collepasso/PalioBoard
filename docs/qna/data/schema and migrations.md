@@ -13,6 +13,9 @@
 ### 77. Is the database split into separate schemas per module?
 **Decision:** No. v1 uses one application schema in Postgres, with module ownership enforced in Python code rather than DB schema partitioning.
 
+### 138. What is the name of the single application schema?
+**Decision:** Use one dedicated Postgres schema named `palio_board` for application tables.
+
 ## 13. Runtime consistency, persistence conventions, and contracts
 ### 109. What ID strategy is used across the schema?
 **Decision:** Use **UUIDv7** for aggregate roots and composite primary keys for pure join/helper tables. This keeps aggregate identity explicit and avoids fake surrogate ids where relational identity is already enough.

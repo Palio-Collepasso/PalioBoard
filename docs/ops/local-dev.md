@@ -5,6 +5,7 @@
 TASK-1 established the canonical top-level monorepo layout and the repository `Makefile`.
 TASK-2 adds the first runnable backend scaffold under `apps/api/`.
 TASK-3 adds the Angular SPA scaffold under `apps/web/`.
+TASK-4 adds the PostgreSQL + SQLAlchemy + Alembic backend baseline with the empty `palio_board` schema migration.
 
 At this stage:
 - `make help`, `make backend-dev`, `make test-backend`, and `make web-dev` are runnable
@@ -15,7 +16,14 @@ At this stage:
 Backend commands currently available:
 - `make backend-dev` starts the placeholder FastAPI app from `apps/api/src/palio/app/main.py`
 - `make test-backend` runs the narrow backend smoke suite currently in the scaffold
+- `cd apps/api && PALIO_DB_MIGRATION_URL=postgresql+psycopg://... uv run alembic upgrade head` applies the baseline empty-schema migration explicitly
 - `cd apps/api && uv run python -m palio.shared.module_boundaries` runs the facade-only import check locally
+
+Database configuration currently available:
+- `PALIO_DB_RUNTIME_URL` is the runtime connection string for normal app access
+- `PALIO_DB_MIGRATION_URL` is the Alembic/admin connection string for schema changes
+- application tables belong to the fixed Postgres schema `palio_board`
+- migrations remain an explicit command and are not run automatically on backend startup
 
 Frontend commands currently available:
 - `cd apps/web && npm install` installs the Angular 21 scaffold dependencies
