@@ -1,3 +1,10 @@
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+
+[sandbox_workspace_write]
+network_access = false
+writable_roots = ["~/codex-worktrees/palio-board"]
+
 [features]
 multi_agent = true
 
