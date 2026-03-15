@@ -3,11 +3,11 @@ id: TASK-11
 title: >-
   Generate template-backed documentation files and backfill template references
   on completed tasks
-status: In Progress
+status: Done
 assignee:
   - '@codex'
 created_date: '2026-03-15 14:25'
-updated_date: '2026-03-15 14:39'
+updated_date: '2026-03-15 16:57'
 labels: []
 dependencies: []
 references:
