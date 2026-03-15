@@ -1,0 +1,6 @@
+- **Start time:** `<timestamp>`
+- **Detection time:** `<timestamp>`
+- **First mitigation:** `<timestamp>`
+- **Recovery time:** `<timestamp>`
+- **Resolved by:** `<name>`
+- **Summary:** `<summary>`
