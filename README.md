@@ -229,7 +229,7 @@ These target names are intentionally stable now so later M0 tasks can fill them 
 - `make test-web`
 - `make test-e2e`
 
-`make up` and `make down` now start and stop the baseline same-origin stack defined in `infra/compose/docker-compose.yml`. `make test-web` and `make test-e2e` still route to explicit TASK-9 placeholders.
+`make up` and `make down` now start and stop the baseline same-origin stack defined in `infra/compose/docker-compose.yml`. `make test-web` now runs the Angular behavior-test harness, and `make test-e2e` now runs the Playwright shell-smoke suite against that same-origin setup. Install the Playwright Chromium browser once with `cd apps/web && npm run e2e:install` before relying on the browser suite locally.
 
 For the current local-development baseline, see [docs/ops/local-dev.md](docs/ops/local-dev.md).
 

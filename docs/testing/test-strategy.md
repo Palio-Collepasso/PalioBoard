@@ -79,7 +79,9 @@ TASK-8 splits the backend suite into `cd apps/api && uv run pytest tests/unit` a
 Current frontend baseline:
 - TASK-3 introduces `cd apps/web && npm run check-boundaries`, backed by dependency-cruiser, as the initial CI-friendly import-boundary rule for shell isolation and generic `shared/` code.
 - TASK-7 introduces `make openapi-types` and `cd apps/web && npm run generate:api-types` so the frontend can regenerate ignored TS declarations from the committed OpenAPI artifact without a running backend.
-- TASK-9 will add the broader frontend and Playwright behavioral harnesses that complement this static guardrail.
+- TASK-9 adds `cd apps/web && npm test -- --watch=false`, backed by the Angular `@angular/build:unit-test` builder plus Vitest, as the initial component/feature behavior-test entrypoint.
+- TASK-9 adds `cd apps/web && npm run e2e` as a small Playwright smoke suite for same-origin shell reachability through Nginx.
+- `docs/testing/critical-e2e-flows.md` is the task-maintained planning record for the currently active Playwright scope.
 
 ## Test pyramid / test-layer overview
 
@@ -420,6 +422,8 @@ Do not:
 Playwright exists to prove that the most important real user journeys still work end to end across browser, frontend, backend, database, projections, and realtime surfaces.
 
 It should remain small. The requirements and ADRs define the must-pass E2E set explicitly.
+
+Current baseline note: the repo currently automates only a shell-smoke flow from TASK-9 while the broader operational journeys are still waiting on later product slices. Update `docs/testing/critical-e2e-flows.md` during planning whenever the active browser coverage changes.
 
 ### Scope rules
 

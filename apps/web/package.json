@@ -9,8 +9,10 @@
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
     "check-boundaries": "depcruise --config dependency-cruiser.cjs src/app",
     "lint": "npm run check-boundaries",
-    "test": "node ./tools/reserved-target.mjs test-web TASK-9",
-    "e2e": "node ./tools/reserved-target.mjs test-e2e TASK-9"
+    "test": "ng test",
+    "test:watch": "ng test --watch",
+    "e2e": "node ./tools/run-playwright.mjs",
+    "e2e:install": "playwright install chromium"
   },
   "dependencies": {
     "@angular/animations": "21.2.4",
@@ -27,9 +29,12 @@
     "@angular/build": "21.2.2",
     "@angular/cli": "21.2.2",
     "@angular/compiler-cli": "21.2.4",
+    "@playwright/test": "^1.58.2",
     "dependency-cruiser": "^16.8.0",
+    "jsdom": "^29.0.0",
     "openapi-typescript": "^7.13.0",
-    "typescript": "~5.9.0"
+    "typescript": "~5.9.0",
+    "vitest": "^4.1.0"
   },
   "overrides": {
     "undici": "7.24.0"
