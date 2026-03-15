@@ -1,9 +1,11 @@
-Il Palio Collepassese è una manifestazione cittadina di Collepasso in cui la città viene divisa in quattro Rioni — Bosco, Tafuri, Carrozzini e Castello — che si sfidano in una serie di giochi popolari, prove sportive e attività di abilità.
+# What Palio is?
 
-La competizione è organizzata come un torneo a punti: ogni gara assegna un punteggio ai Rioni in base alla posizione ottenuta e la somma dei risultati determina la classifica finale. I giochi includono discipline sportive, prove di abilità, giochi tradizionali e attività di squadra, oltre a una sezione dedicata ai più giovani chiamata Giocasport.
+**Palio** is a town event in Collepasso in which the city is divided into four teams (*rioni*) — **Bosco, Tafuri, Carrozzini, and Castello** — that compete in a series of traditional games, sports challenges, and skill-based activities.
 
-Il programma è suddiviso tra Prepalio e Palio vero e proprio. Il Prepalio comprende alcune competizioni preliminari, mentre durante il Palio si svolge la maggior parte delle gare.
+The competition is organized as a **points-based tournament**: each event assigns points to the team according to their finishing position, and the sum of these results determines the final ranking. The games include sports disciplines, skill challenges, traditional games, and team activities, as well as a section dedicated to younger participants called **Giocasport**.
 
-Ogni atleta può partecipare a un numero limitato di specialità e contribuisce al punteggio del proprio Rione. È inoltre previsto il "Jolly": ogni Rione può scegliere una gara nella quale raddoppiare il punteggio ottenuto, aumentando così il peso strategico della prova selezionata.
+The program is divided into **Prepalio** and the **Palio** proper. The Prepalio includes some preliminary competitions, while most of the events take place during the Palio itself.
 
-Al termine delle gare viene stilata la classifica complessiva e il Rione che ha totalizzato il maggior numero di punti conquista il Palio.
+Each athlete may participate in a limited number of disciplines and contributes to the score of their team. There is also a **Jolly** rule: each team may choose one event in which the points earned are doubled, increasing the strategic importance of that selected competition.
+
+At the end of all events, the overall standings are calculated, and the team that has accumulated the highest number of points **wins the Palio**.
