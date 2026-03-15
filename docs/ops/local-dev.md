@@ -1,91 +1,162 @@
-# Local development
+# Local Development
 
-## Current baseline
+## Purpose
 
-TASK-1 established the canonical top-level monorepo layout and the repository `Makefile`.
-TASK-2 adds the first runnable backend scaffold under `apps/api/`.
-TASK-3 adds the Angular SPA scaffold under `apps/web/`.
-TASK-4 adds the PostgreSQL + SQLAlchemy + Alembic backend baseline with the empty `palio_board` schema migration.
-TASK-5 adds typed backend runtime settings, Loguru-based structured JSON request logging, and the operational `/healthz`, `/readyz`, and `/version` endpoints.
-TASK-8 adds the split backend unit/integration harness and the real-Postgres smoke-test baseline.
-TASK-6 adds the local same-origin Docker Compose stack under `infra/`.
+Explain how to set up, run, and troubleshoot the project locally.
 
-At this stage:
-- `make help`, `make backend-dev`, `make test-backend`, `make web-dev`, `make openapi-export`, and `make openapi-types` are runnable
-- `make test-web` and `make test-e2e` now run the frontend behavior and browser smoke harnesses added in TASK-9
-- `make up` and `make down` now boot and stop the baseline same-origin Docker Compose stack on `http://127.0.0.1:8080`
-- `make test` now depends on the frontend harnesses plus a one-time Playwright browser install in `apps/web`
+## Audience
 
-Backend commands currently available:
-- `make backend-dev` starts the placeholder FastAPI app from `apps/api/src/palio/app/main.py`
-- `make test-backend` runs `apps/api/tests/unit/` first and then `apps/api/tests/integration/`
-- `cd apps/api && uv run pytest tests/unit` runs the fast backend unit/smoke layer directly
-- `cd apps/api && uv run pytest tests/integration` runs the Postgres-backed integration smoke layer directly
-- `cd apps/api && PALIO_DB_MIGRATION_URL=postgresql+psycopg://... uv run alembic upgrade head` applies the baseline empty-schema migration explicitly
-- `docker compose -f infra/compose/docker-compose.yml --profile ops run --rm migrate` applies that same migration inside the local stack
-- `make openapi-export` exports `docs/api/openapi.yaml` directly from the FastAPI app without starting a server
-- `cd apps/api && uv run python -m palio.shared.module_boundaries` runs the facade-only import check locally
+- new contributors
+- regular developers
+- reviewers reproducing a change locally
 
-Database configuration currently available:
-- `PALIO_ENV` selects the typed runtime environment (`development`, `test`, or `production`)
-- `PALIO_LOG_LEVEL` controls backend JSON log verbosity
-- `PALIO_REQUEST_ID_HEADER` overrides the HTTP request-id header name (defaults to `X-Request-ID`)
-- `PALIO_BUILD_VERSION` overrides the `/version` payload version string
-- `PALIO_BUILD_COMMIT_SHA` adds optional build metadata to `/version`
-- `PALIO_DB_RUNTIME_URL` is the runtime connection string for normal app access
-- `PALIO_DB_MIGRATION_URL` is the Alembic/admin connection string for schema changes
-- `PALIO_TEST_POSTGRES_URL` optionally points backend integration tests at an existing local Postgres admin database; when unset, the suite starts a disposable Docker Postgres container
-- `PALIO_TEST_POSTGRES_IMAGE` optionally overrides the Docker image used by that disposable integration-test container
-- application tables belong to the fixed Postgres schema `palio_board`
-- migrations remain an explicit command and are not run automatically on backend startup
+## Requirements
 
-Operational backend behavior currently available:
-- `/healthz` is the liveness endpoint
-- `/readyz` reports DB readiness and returns `503` when the runtime DB is not configured or unavailable
-- `/version` returns build/runtime version metadata
-- every HTTP response includes a request id header, generated ids use UUIDv7, and backend request logs are emitted as structured JSON through Loguru
+- **OS:** Linux or macOS are the current baseline; other environments are not yet documented.
+- **Runtime(s):** Python 3.12+, Node.js LTS, Docker Engine with Compose v2
+- **Package manager(s):** `uv`, `npm`
+- **Database/services:** PostgreSQL via Docker or the same-origin Compose stack
+- **Other tools:** `make`, `curl`
 
-Frontend commands currently available:
-- `cd apps/web && npm install` installs the Angular 21 scaffold dependencies
-- `make web-dev` starts the Angular SPA with lazy `/admin`, `/public`, and `/maxi` routes
-- `make openapi-types` regenerates ignored TS declarations from the committed `docs/api/openapi.yaml` artifact
-- `cd apps/web && npm run generate:api-types` runs the app-local type-generation command
-- `cd apps/web && npm run check-boundaries` runs the dependency-cruiser import-boundary check
-- `make test-web` runs `cd apps/web && npm test -- --watch=false`
-- `cd apps/web && npm run e2e:install` installs the Chromium browser used by the Playwright smoke suite
-- `make test-e2e` runs `cd apps/web && npm run e2e`, reusing `PLAYWRIGHT_BASE_URL` when set and otherwise starting/stopping the local same-origin stack around the smoke run
+## Quick Start
 
-Compose smoke-run behavior currently available:
-- `make up` builds and starts PostgreSQL, the FastAPI container, and the Nginx same-origin proxy
-- the same-origin stack is reachable at `http://127.0.0.1:8080`
-- `http://127.0.0.1:8080/healthz`, `/readyz`, and `/version` proxy to the backend operational endpoints
-- `http://127.0.0.1:8080/api/admin/health`, `/api/public/health`, and `/realtime/health` proxy to the placeholder backend surfaces
-- Nginx serves the built SPA and falls back to `index.html` for `/`, `/admin`, `/public`, and `/maxi`
-- `/realtime/...` is proxied with upgrade-friendly settings so the placeholder websocket route can stay under the same origin
+1. Open the repo and inspect the stable command surface with `make help`.
+2. Install frontend dependencies with `cd apps/web && npm install`.
+3. Configure backend env vars only when you need non-default runtime or test DB settings.
+4. Start the backend with `make backend-dev` and the frontend with `make web-dev` for the native hot-reload loop, or use `make up` for the same-origin smoke stack.
+5. Apply migrations explicitly before workflows that need the schema.
+6. Verify health with `curl http://127.0.0.1:8080/healthz` or the equivalent backend-local endpoint.
 
-Compose smoke-run behavior currently available:
-- `make up` builds and starts PostgreSQL, the FastAPI container, and the Nginx same-origin proxy
-- the same-origin stack is reachable at `http://127.0.0.1:8080`
-- `http://127.0.0.1:8080/healthz`, `/readyz`, and `/version` proxy to the backend operational endpoints
-- `http://127.0.0.1:8080/api/admin/health`, `/api/public/health`, and `/realtime/health` proxy to the placeholder backend surfaces
-- Nginx serves the built SPA and falls back to `index.html` for `/`, `/admin`, `/public`, and `/maxi`
-- `/realtime/...` is proxied with upgrade-friendly settings so the placeholder websocket route can stay under the same origin
+## Environment Variables
 
-## Stable top-level targets
+| Variable | Required | Default | Used by | Description |
+|---|---|---|---|---|
+| `PALIO_ENV` | no | `development` | backend runtime | Selects typed runtime settings |
+| `PALIO_LOG_LEVEL` | no | app default | backend runtime | Controls JSON log verbosity |
+| `PALIO_REQUEST_ID_HEADER` | no | `X-Request-ID` | backend runtime | Overrides the propagated request-id header name |
+| `PALIO_BUILD_VERSION` | no | app default | backend runtime | Overrides `/version` output |
+| `PALIO_BUILD_COMMIT_SHA` | no | unset | backend runtime | Adds build metadata to `/version` |
+| `PALIO_DB_RUNTIME_URL` | yes for DB-backed runtime paths | unset | backend runtime | Runtime database connection string |
+| `PALIO_DB_MIGRATION_URL` | yes for migrations | unset | Alembic and migrate workflow | Admin/migration database connection string |
+| `PALIO_TEST_POSTGRES_URL` | no | disposable local Docker Postgres | backend integration tests | Reuses an existing local admin database for integration tests |
+| `PALIO_TEST_POSTGRES_IMAGE` | no | `postgres:16-alpine` | backend integration tests | Overrides the Docker image used by the disposable integration-test database |
 
-Use these target names going forward:
-- `make help`
-- `make up`
-- `make down`
-- `make backend-dev`
-- `make web-dev`
-- `make openapi-export`
-- `make openapi-types`
-- `make test`
-- `make test-backend`
-- `make test-web`
-- `make test-e2e`
+## Commands
 
-## Expected follow-up tasks
+### Install
 
-- TASK-10 will replace this baseline note with the full local bootstrap and verification guide
+```bash
+cd apps/web && npm install
+```
+
+### Start dependencies
+
+```bash
+make up
+docker compose -f infra/compose/docker-compose.yml --profile ops run --rm migrate
+```
+
+### Run backend
+
+```bash
+make backend-dev
+```
+
+### Run frontend
+
+```bash
+make web-dev
+```
+
+### Run tests
+
+```bash
+make test
+```
+
+### Run lint / type checks
+
+```bash
+cd apps/api && uv run python -m palio.shared.module_boundaries
+cd apps/web && npm run check-boundaries
+cd apps/web && npm run typecheck
+```
+
+## Common Workflows
+
+### Start from scratch
+
+1. Run `make help`, `cd apps/web && npm install`, and confirm `uv` is available for backend commands.
+2. Use the native loop (`make backend-dev`, `make web-dev`) for day-to-day work, or `make up` plus the one-shot `migrate` service for same-origin smoke verification.
+
+### Reset local database
+
+1. Stop the stack with `make down`.
+2. Recreate the stack with `make up`, then rerun `docker compose -f infra/compose/docker-compose.yml --profile ops run --rm migrate`.
+
+### Apply migrations
+
+1. Set `PALIO_DB_MIGRATION_URL` for the target database when running locally without Compose.
+2. Run `cd apps/api && uv run alembic upgrade head` or use the profiled Compose `migrate` service.
+
+### Seed local data
+
+1. No shared seed workflow is documented yet.
+2. Until a task establishes one, keep data setup task-local and document reusable scenarios in `docs/testing/fixtures.md`.
+
+### Run a specific test
+
+1. Use `cd apps/api && uv run pytest tests/unit` or `cd apps/api && uv run pytest tests/integration` for backend layers.
+2. Use `cd apps/web && npm test -- --watch=false` for frontend behavior tests or `cd apps/web && npm run e2e` for the browser smoke suite.
+
+## Verification Checklist
+
+- [ ] App starts successfully
+- [ ] DB/services reachable
+- [ ] Health endpoint works
+- [ ] Frontend loads
+- [ ] Tests can run locally
+
+## Troubleshooting
+
+Template for each troubleshooting entry: `docs/templates/ops/local-dev-troubleshooting-item.template.md`
+
+### Backend readiness stays unhealthy
+
+- **Symptoms:**
+  - `/readyz` returns `503`
+- **Likely cause:** The runtime DB is unavailable or migrations have not been applied.
+- **How to diagnose:**
+  - Check `PALIO_DB_RUNTIME_URL`
+  - Run the one-shot migrate command and inspect backend logs
+- **How to fix:**
+  1. Ensure the DB service is reachable.
+  2. Apply migrations explicitly before retrying readiness checks.
+- **Prevention:** Keep the migration step explicit in local verification notes.
+
+### Playwright smoke tests cannot reach the shell routes
+
+- **Symptoms:**
+  - `npm run e2e` fails on `/`, `/admin`, `/public`, or `/maxi`
+- **Likely cause:** The same-origin stack is not up or the SPA build/proxy path is stale.
+- **How to diagnose:**
+  - Confirm `make up` succeeded
+  - Curl `/healthz` and open the shell routes manually
+- **How to fix:**
+  1. Restart the stack.
+  2. Rebuild or rerun the smoke path after the proxy and SPA are healthy.
+- **Prevention:** Keep local stack verification tied to `docs/testing/critical-e2e-flows.md`.
+
+---
+
+## FAQ
+
+Template for each FAQ entry: `docs/templates/ops/local-dev-faq-item.template.md`
+
+### Should I use Docker Compose for daily frontend and backend coding?
+
+Use native `make backend-dev` and `make web-dev` for the normal hot-reload loop. Keep full Compose runs for same-origin verification and production-like smoke checks.
+
+### Are migrations run automatically by `make up`?
+
+No. The architecture keeps migrations explicit, so run the profiled `migrate` service or `alembic upgrade head` yourself.
