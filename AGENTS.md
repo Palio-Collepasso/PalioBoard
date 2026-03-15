@@ -36,8 +36,20 @@ You MUST read the overview resource to understand the complete workflow. The inf
 - Update documentation when behavior, schema, API contracts, architecture, or operational truth changes.
 - **Flag** contradictions between docs, code, tests, and generated contracts instead of silently choosing one interpretation.
 
+## Mandatory documentation impact check during planning
+
+Before writing an implementation plan, perform a documentation impact check (`docs/engineering/documentation-impact-matrix.md`).
+
+A plan is not complete until it explicitly states:
+- which documentation files were reviewed,
+- which documentation files must be updated as part of the task,
+- which documentation files were considered and do not need changes.
+
+If any of these files are affected, their update must be planned in the same task and completed **BEFORE** writing any code.
+If unsure whether a document is affected, ask the user.
+
 ## Review behavior
-- Follow `docs/code-review.md` when reviewing or responding to review comments.
+- Follow `docs/engineering/code-review.md` when reviewing or responding to review comments.
 
 ## Done when
 - relevant lint, typecheck, and tests pass
