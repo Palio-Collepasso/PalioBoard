@@ -8,9 +8,9 @@ definition_of_done:
     "all material doubts are resolved by asking the user",
     "any relevant Q&A clarification is recorded",
     "all affected documents are kept up to date",
-    "`README.md` is up to date",
     "any material conflict is flagged",
     "any document or folder that became unmanageably large is flagged",
+    "changes are tracked in REDLINING.md"
   ]
 date_format: yyyy-mm-dd
 max_column_width: 20

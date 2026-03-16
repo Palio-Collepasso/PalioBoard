@@ -43,6 +43,7 @@ task_branch_slug="$(
 branch_name="tasks/${task_branch_slug}"
 worktree_root="${HOME}/codex-worktrees/palio-board/tasks"
 worktree_path="${worktree_root}/${task_branch_slug}"
+created_worktree=0
 
 mkdir -p "$worktree_root"
 
@@ -51,8 +52,47 @@ if [ -d "$worktree_path/.git" ] || [ -f "$worktree_path/.git" ]; then
   :
 elif [ -n "$existing_branch" ]; then
   git -C "$repo_root" worktree add "$worktree_path" "$branch_name"
+  created_worktree=1
 else
   git -C "$repo_root" worktree add -b "$branch_name" "$worktree_path" HEAD
+  created_worktree=1
+fi
+
+if [ "$created_worktree" -eq 1 ]; then
+  shared_backlog_source="${repo_root}/backlog"
+  shared_backlog_target="${worktree_path}/backlog"
+  shared_backlog_backup=""
+
+  if ! command -v mount >/dev/null 2>&1; then
+    printf 'mount command not found; cannot bind-mount %s into %s\n' \
+      "$shared_backlog_source" "$shared_backlog_target" >&2
+    exit 1
+  fi
+
+  mount_cmd=(mount --bind)
+  if command -v sudo >/dev/null 2>&1; then
+    mount_cmd=(sudo mount --bind)
+  fi
+
+  if [ -e "$shared_backlog_target" ]; then
+    shared_backlog_backup="${worktree_path}/.backlog.bind-backup.$$"
+    mv "$shared_backlog_target" "$shared_backlog_backup"
+  fi
+
+  mkdir -p "$shared_backlog_target"
+  if ! "${mount_cmd[@]}" "$shared_backlog_source" "$shared_backlog_target"; then
+    rmdir "$shared_backlog_target" || true
+    if [ -n "$shared_backlog_backup" ] && [ -e "$shared_backlog_backup" ]; then
+      mv "$shared_backlog_backup" "$shared_backlog_target"
+    fi
+    printf 'Failed to bind-mount %s into %s. Check mount permissions.\n' \
+      "$shared_backlog_source" "$shared_backlog_target" >&2
+    exit 1
+  fi
+
+  if [ -n "$shared_backlog_backup" ] && [ -e "$shared_backlog_backup" ]; then
+    rm -rf "$shared_backlog_backup"
+  fi
 fi
 
 printf 'Opening codex in %s\n' "$worktree_path"

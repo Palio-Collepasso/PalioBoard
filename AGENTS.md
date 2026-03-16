@@ -29,7 +29,7 @@ When asked to write an implementation plan for a task:
 ## Task implementation
 When a plan is approved and you work on the task:
 
-- Ensure you are on task branch: `tickets/ticket-<ticket-id>-<title>`.
+- Ensure you are on task branch: `tasks/task-<task-id>-<title>`.
 - Ensure any doubt is clarified.
 - Update documentation when behavior, schema, API contracts, architecture, or operational truth changes.
 - **Flag** contradictions between docs, code, tests, and generated contracts instead of silently choosing one interpretation.
