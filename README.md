@@ -147,6 +147,7 @@ The repository now exposes the canonical top-level command names, and the backen
 * Docker + Docker Compose
 * Make
 * uv
+* pre-commit
 
 ### Discover the command surface
 
@@ -162,19 +163,22 @@ make help
 
 This creates the standard task worktree under `~/codex-worktrees/palio-board/tasks/` and opens `codex` in that worktree, reusing the existing branch/worktree when present.
 
-### Scaffold commands
+### Install dependencies and hooks
+
+```bash
+cd apps/web
+npm install
+cd ../api
+uv run --group dev pre-commit install --hook-type pre-commit --hook-type pre-push
+cd ../web
+npm run e2e:install
+```
+
+### Native app loop
 
 ```bash
 make backend-dev
-make test-backend
-cd apps/api && PALIO_DB_MIGRATION_URL=postgresql+psycopg://... uv run alembic upgrade head
-make openapi-export
-cd apps/api && uv run python -m palio.shared.module_boundaries
-
-cd apps/web
-npm install
 make web-dev
-make openapi-types
 ```
 
 ### Same-origin local stack
@@ -201,16 +205,11 @@ The Angular SPA currently exposes three lazy route areas:
 - `/public`
 - `/maxi`
 
-`make backend-dev` starts the placeholder FastAPI app. `make test-backend` now runs the split backend harness: `apps/api/tests/unit/` first, then `apps/api/tests/integration/` against a real local Postgres database. By default the integration layer starts a disposable Docker `postgres:16-alpine` container; set `PALIO_TEST_POSTGRES_URL` to reuse an existing local Postgres admin database instead. Alembic uses `PALIO_DB_MIGRATION_URL`, while runtime DB access uses `PALIO_DB_RUNTIME_URL`.
+`make backend-dev` starts the placeholder FastAPI app. `make test-backend` runs the split backend harness: `apps/api/tests/unit/` first, then `apps/api/tests/integration/` against a real local Postgres database. By default the integration layer now reuses the database image and bootstrap settings defined in `infra/compose/docker-compose.yml`; set `PALIO_TEST_POSTGRES_URL` to reuse an existing local Postgres admin database instead. Alembic uses `PALIO_DB_MIGRATION_URL`, while runtime DB access uses `PALIO_DB_RUNTIME_URL`.
 
 Current backend operational baseline:
 - typed env-based runtime settings via `PALIO_ENV`, `PALIO_LOG_LEVEL`, `PALIO_REQUEST_ID_HEADER`, `PALIO_BUILD_VERSION`, `PALIO_BUILD_COMMIT_SHA`, `PALIO_DB_RUNTIME_URL`, and `PALIO_DB_MIGRATION_URL`
 - backend integration-test settings via `PALIO_TEST_POSTGRES_URL` and `PALIO_TEST_POSTGRES_IMAGE`
-- Loguru-backed structured JSON HTTP request logs with propagated `X-Request-ID` response headers by default
-- `/healthz`, `/readyz`, and `/version` endpoints for local smoke checks and future infra wiring
-
-Current backend operational baseline:
-- typed env-based runtime settings via `PALIO_ENV`, `PALIO_LOG_LEVEL`, `PALIO_REQUEST_ID_HEADER`, `PALIO_BUILD_VERSION`, `PALIO_BUILD_COMMIT_SHA`, `PALIO_DB_RUNTIME_URL`, and `PALIO_DB_MIGRATION_URL`
 - Loguru-backed structured JSON HTTP request logs with propagated `X-Request-ID` response headers by default
 - `/healthz`, `/readyz`, and `/version` endpoints for local smoke checks and future infra wiring
 
@@ -219,17 +218,21 @@ Contract workflow baseline:
 - `make openapi-types` regenerates ignored frontend TS declarations from that committed spec
 - Angular services stay hand-written even when types are generated
 
-### Reserved and current targets
+### Quality gates
 
-These target names are intentionally stable now so later M0 tasks can fill them in without changing developer workflows:
+The repository-level quality-gate surface is stable and is what local hooks plus CI should call:
 
-- `make up`
-- `make down`
+- `make format`
+- `make format-check`
+- `make lint`
+- `make typecheck`
+- `make check-boundaries`
+- `make check-openapi`
 - `make test`
-- `make test-web`
-- `make test-e2e`
+- `make build`
+- `make verify`
 
-`make up` and `make down` now start and stop the baseline same-origin stack defined in `infra/compose/docker-compose.yml`. `make test-web` now runs the Angular behavior-test harness, and `make test-e2e` now runs the Playwright shell-smoke suite against that same-origin setup. Install the Playwright Chromium browser once with `cd apps/web && npm run e2e:install` before relying on the browser suite locally.
+`make format` applies the backend formatter, while `make verify` runs the full baseline gate set: formatting checks, linting, typing, architectural boundary checks, OpenAPI verification, tests, and frontend build validation. The installed Git hooks use `pre-commit` for fast local checks and `pre-push` for the heavier type/test/build/contract path.
 
 For the current local-development baseline, see [docs/ops/local-dev.md](docs/ops/local-dev.md).
 
@@ -281,9 +284,10 @@ See [docs/domain/palio-context.md](docs/domain/palio-context.md), [docs/domain/p
 * `make` is the top-level command surface
 * `uv` for Python dependency management / execution
 * `npm` for frontend
-* `dependency-cruiser` for frontend import-boundary checks
-* pre-commit hooks before commit
-* automated CI
+* `ruff`, `pyright`, and `pytest` for backend quality gates
+* `dependency-cruiser`, Angular type checks, Angular tests, and Angular build validation for frontend quality gates
+* `pre-commit` hooks on `pre-commit` and `pre-push`
+* automated CI for the same repo-level gate set
 * manual production deploy
 
 ### Recommended workflow
@@ -308,40 +312,39 @@ Read [docs/testing/test-strategy.md](docs/testing/test-strategy.md) before imple
 
 For the current scaffold details, see [apps/api/README.md](apps/api/README.md), [apps/web/README.md](apps/web/README.md), and [docs/ops/local-dev.md](docs/ops/local-dev.md).
 
-### Test layers
+### Local quality-gate workflow
 
-TO BE DONE. As an example:
-* pure domain rules → unit tests
-* authoritative state transitions / official writes → Postgres-backed integration tests
-* standings / projections → unit tests + integration tests
-* live collaboration / leases / conflicts → realtime integration tests
-* user-visible critical flows → Playwright E2E
+Use the repo-level `make` targets for the stable command surface:
 
-### Critical E2E flows for v1
+```bash
+make format
+make lint
+make typecheck
+make check-boundaries
+make check-openapi
+make test
+make build
+make verify
+```
 
-TO BE DONE. As an example:
-* complete a ranking game
-* verify public update after completion
-* progress and complete a 1v1 tournament
-* post-completion edit and admin review behavior
-* concurrent live updates and field locking
+Install the hooks once from `apps/api/` so the local Git workflow runs the same gates automatically:
+
+```bash
+cd apps/api
+uv run --group dev pre-commit install --hook-type pre-commit --hook-type pre-push
+```
 
 ### Run tests
 
-The stable top-level test entrypoint is:
+The stable top-level test entrypoints are:
 ```bash
 make test
-```
-
-Reserved per-area targets:
-
-```bash
 make test-backend
 make test-web
 make test-e2e
 ```
 
-These targets become runnable in later M0 tasks once the backend, frontend, and Playwright harnesses are added.
+Install the Playwright Chromium browser once with `cd apps/web && npm run e2e:install` before relying on the browser suite locally.
 
 ## Contributing
 

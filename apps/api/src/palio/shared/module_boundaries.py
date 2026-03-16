@@ -1,6 +1,5 @@
 """Check that backend modules import each other through `facade.py` only."""
 
-
 import argparse
 import ast
 from dataclasses import dataclass
@@ -21,7 +20,9 @@ class BoundaryViolation:
     message: str
 
 
-def check_module_boundaries(modules_root: Path = DEFAULT_MODULES_ROOT) -> list[BoundaryViolation]:
+def check_module_boundaries(
+    modules_root: Path = DEFAULT_MODULES_ROOT,
+) -> list[BoundaryViolation]:
     """Return every forbidden cross-module import under `palio.modules`."""
 
     violations: list[BoundaryViolation] = []

@@ -21,8 +21,7 @@ def test_boundary_checker_reports_cross_module_internal_imports(tmp_path: Path) 
     (modules_root / "authorization" / "__init__.py").write_text("")
     (modules_root / "authorization" / "infrastructure" / "__init__.py").write_text("")
     (modules_root / "authorization" / "infrastructure" / "repo.py").write_text(
-        "class Repo:\n"
-        "    pass\n"
+        "class Repo:\n    pass\n"
     )
 
     assert check_module_boundaries(modules_root) == [

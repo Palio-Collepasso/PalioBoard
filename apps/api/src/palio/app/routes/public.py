@@ -9,7 +9,7 @@ def create_public_router(runtime: ApplicationRuntime) -> APIRouter:
     router = APIRouter(prefix="/api/public", tags=["public"])
 
     @router.get("/health")
-    def public_health() -> dict[str, object]:
+    async def public_health() -> dict[str, object]:
         return {
             "surface": "public",
             "status": "ok",

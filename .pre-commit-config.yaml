@@ -1,0 +1,62 @@
+default_install_hook_types:
+  - pre-commit
+  - pre-push
+
+repos:
+  - repo: local
+    hooks:
+      - id: format
+        name: make format
+        entry: make format
+        language: system
+        pass_filenames: false
+        stages:
+          - pre-commit
+
+      - id: lint
+        name: make lint
+        entry: make lint
+        language: system
+        pass_filenames: false
+        stages:
+          - pre-commit
+
+      - id: check-boundaries
+        name: make check-boundaries
+        entry: make check-boundaries
+        language: system
+        pass_filenames: false
+        stages:
+          - pre-commit
+
+      - id: check-openapi
+        name: make check-openapi
+        entry: make check-openapi
+        language: system
+        pass_filenames: false
+        stages:
+          - pre-push
+
+      - id: typecheck
+        name: make typecheck
+        entry: make typecheck
+        language: system
+        pass_filenames: false
+        stages:
+          - pre-push
+
+      - id: test
+        name: make test
+        entry: make test
+        language: system
+        pass_filenames: false
+        stages:
+          - pre-push
+
+      - id: build
+        name: make build
+        entry: make build
+        language: system
+        pass_filenames: false
+        stages:
+          - pre-push

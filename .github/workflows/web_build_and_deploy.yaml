@@ -7,46 +7,55 @@ on:
   push:
     branches: [ "main" ]
     paths:
-      - 'apps/web/**'
+      - "apps/web/**"
   pull_request:
     branches: [ "main" ]
     paths:
-      - 'apps/web/**'
+      - "apps/web/**"
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ["24.x"]
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        sparse-checkout: 'apps/web'
-        sparse-checkout-cone-mode: false
-    - name: Move files to root
-      run: |
-        ls -lah
-        shopt -s dotglob
-        mv apps/web/* .
-        rm -rf apps
-        ls -lah
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: 24.x
-        cache: 'npm'
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm test
-    - name: Upload GitHub Pages artifact
-      uses: actions/upload-pages-artifact@v4.0.0
-      with:
-        path: 'dist/web'
-        
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: "apps/web"
+          sparse-checkout-cone-mode: false
+
+      - name: Move files to root
+        run: |
+          ls -lah
+          shopt -s dotglob
+          mv apps/web/* .
+          rm -rf apps
+          ls -lah
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+
+      - run: npm ci
+      - run: npm run build --if-present
+      - run: npm test
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v4.0.0
+        with:
+          path: "dist/web"
+
   deploy:
     needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     permissions:
-      pages: write      # to deploy to Pages
-      id-token: write   # to verify the deployment originates from an appropriate source
+      actions: read
+      pages: write
+      id-token: write
 
     environment:
       name: github-pages
@@ -57,4 +66,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-          

@@ -30,6 +30,13 @@ Describe the testing approach, test layers, ownership, and minimum expectations 
 - Critical flows can be covered end-to-end, but the suite must stay small and high-signal.
 - Static checks complement behavior tests; they do not replace them.
 
+## Quality-Gate Baseline
+
+- **Stable repo command surface:** `make format`, `make format-check`, `make lint`, `make typecheck`, `make check-boundaries`, `make check-openapi`, `make test`, `make build`, `make verify`
+- **Local `pre-commit` stage:** formatting, linting, and architectural boundary checks
+- **Local `pre-push` stage:** OpenAPI verification, type checks, tests, and build validation
+- **CI baseline:** run the same repo-level gates against the whole monorepo before merge
+
 ## Change-Type Matrix
 
 | Change type | Unit | Integration | API contract | E2E | Manual |
@@ -72,7 +79,7 @@ Template for each test-layer entry: `docs/templates/testing/test-layer-expectati
 - **Required setup:**
   - real Postgres
   - real Alembic migrations
-  - task-owned support such as `apps/api/tests/support/postgres.py`
+  - repo-owned support such as `apps/api/tests/support/postgres.py`, keeping disposable defaults aligned with the local infra config
 - **Failure signals:**
   - schema mismatch
   - migration failure
@@ -167,11 +174,18 @@ Template for each coverage-expectation entry: `docs/templates/testing/coverage-e
 
 ## Tooling and Commands
 
+- **Run formatting:** `make format` or `make format-check`
+- **Run lint checks:** `make lint`
+- **Run type checks:** `make typecheck`
+- **Run boundary checks:** `make check-boundaries`
+- **Run OpenAPI workflow checks:** `make check-openapi`
 - **Run all tests:** `make test`
-- **Run unit tests:** `cd apps/api && uv run pytest tests/unit` or `cd apps/web && npm test -- --watch=false`
-- **Run integration tests:** `cd apps/api && uv run pytest tests/integration`
+- **Run build validation:** `make build`
+- **Run the full baseline gate set:** `make verify`
+- **Run unit tests:** `cd apps/api && uv run --group dev pytest tests/unit` or `cd apps/web && npm test -- --watch=false`
+- **Run integration tests:** `cd apps/api && uv run --group dev pytest tests/integration`
 - **Run E2E tests:** `cd apps/web && npm run e2e`
-- **Run lint/type checks:** `cd apps/api && uv run python -m palio.shared.module_boundaries`, `cd apps/web && npm run check-boundaries`, `cd apps/web && npm run typecheck`
+- **Run local Git hooks manually:** `cd apps/api && uv run --group dev pre-commit run --all-files --hook-stage pre-commit` or `cd apps/api && uv run --group dev pre-commit run --all-files --hook-stage pre-push`
 
 ## Review Checklist
 

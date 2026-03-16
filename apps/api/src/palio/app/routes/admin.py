@@ -9,7 +9,7 @@ def create_admin_router(runtime: ApplicationRuntime) -> APIRouter:
     router = APIRouter(prefix="/api/admin", tags=["admin"])
 
     @router.get("/health")
-    def admin_health() -> dict[str, object]:
+    async def admin_health() -> dict[str, object]:
         return {
             "surface": "admin",
             "status": "ok",

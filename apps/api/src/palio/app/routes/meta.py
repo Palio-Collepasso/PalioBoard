@@ -12,7 +12,7 @@ def create_meta_router(runtime: ApplicationRuntime) -> APIRouter:
     router = APIRouter(tags=["meta"])
 
     @router.get("/healthz")
-    def healthcheck() -> dict[str, object]:
+    async def healthcheck() -> dict[str, object]:
         return {
             "status": "ok",
             "app": runtime.settings.app_name,
@@ -27,7 +27,7 @@ def create_meta_router(runtime: ApplicationRuntime) -> APIRouter:
             }
         },
     )
-    def readiness() -> JSONResponse:
+    async def readiness() -> JSONResponse:
         readiness_check = runtime.database.check_readiness()
         status_code = (
             status.HTTP_200_OK
@@ -45,7 +45,7 @@ def create_meta_router(runtime: ApplicationRuntime) -> APIRouter:
         )
 
     @router.get("/version")
-    def version() -> dict[str, object]:
+    async def version() -> dict[str, object]:
         payload: dict[str, object] = {
             "app": runtime.settings.app_name,
             "environment": runtime.settings.environment.value,

@@ -46,16 +46,18 @@ The backend integration layer proves migration/bootstrap and runtime readiness a
 - disposable Postgres container or reused local admin DB
 - isolated test database per run
 - real Alembic migration application
+- disposable container defaults loaded from `infra/compose/docker-compose.yml`
 
 #### Important values / assumptions
 
-- The default disposable image is `postgres:16-alpine`.
+- The default disposable image matches the `db` service image in `infra/compose/docker-compose.yml`.
 - The application schema is `palio_board`.
 - `PALIO_TEST_POSTGRES_URL` can override the disposable server path.
+- `PALIO_TEST_POSTGRES_IMAGE` can override only the disposable image while keeping the compose-backed bootstrap values.
 
 #### Setup instructions
 
-1. Run `cd apps/api && uv run pytest tests/integration`.
+1. Run `cd apps/api && uv run --group dev pytest tests/integration`.
 2. Let the harness start a disposable Postgres container automatically, or set `PALIO_TEST_POSTGRES_URL` first.
 
 #### Reset / cleanup instructions
@@ -84,6 +86,7 @@ The backend integration layer proves migration/bootstrap and runtime readiness a
 #### Notes
 
 - Update `docs/testing/test-strategy.md` and `docs/ops/local-dev.md` if the harness contract changes.
+- Keep the disposable-test defaults aligned with `infra/compose/docker-compose.yml` so the integration harness and local stack do not drift.
 - Promote additional fixture IDs here when the backend adds stable seeded scenarios.
 
 ### `FX-002` — Same-origin shell smoke routes

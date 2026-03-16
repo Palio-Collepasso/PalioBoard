@@ -1,0 +1,55 @@
+name: Quality Gates
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  quality-gates:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ["24.x"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install backend tooling
+        working-directory: apps/api
+        run: uv sync --frozen --group dev
+
+      - name: Install frontend dependencies
+        working-directory: apps/web
+        run: npm ci
+
+      - name: Install Playwright browser
+        working-directory: apps/web
+        run: npx playwright install --with-deps chromium
+
+      - name: Run pre-commit stage
+        working-directory: apps/api
+        run: uv run --group dev pre-commit run --all-files --hook-stage pre-commit
+
+      - name: Run pre-push stage
+        working-directory: apps/api
+        run: uv run --group dev pre-commit run --all-files --hook-stage pre-push
