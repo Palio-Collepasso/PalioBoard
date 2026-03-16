@@ -2,9 +2,9 @@
 
 import argparse
 import ast
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, Sequence
 
 PACKAGE_PREFIX = ("palio", "modules")
 DEFAULT_MODULES_ROOT = Path(__file__).resolve().parents[1] / "modules"
@@ -68,7 +68,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     """CLI entrypoint for local and CI boundary checks."""
 
     parser = argparse.ArgumentParser(
-        description="Validate that backend modules import each other via facade.py only.",
+        description=(
+            "Validate that backend modules import each other via facade.py only."
+        ),
     )
     parser.add_argument(
         "modules_root",

@@ -1,19 +1,19 @@
 """Helpers for Postgres-backed backend integration tests."""
 
-from dataclasses import dataclass
-from functools import lru_cache
-from pathlib import Path
 import os
 import socket
 import subprocess
 import sys
 import time
 import uuid
+from dataclasses import dataclass
+from functools import lru_cache
+from pathlib import Path
 
 import psycopg
+import yaml
 from psycopg import sql
 from sqlalchemy.engine import make_url
-import yaml
 
 APPLICATION_SCHEMA = "palio_board"
 BASELINE_REVISION = "20260314_0001"
@@ -117,8 +117,8 @@ def load_local_stack_postgres_defaults() -> LocalStackPostgresDefaults:
     missing_keys = [key for key in required_keys if key not in environment]
     if missing_keys:
         raise RuntimeError(
-            "The local stack db service is missing required Postgres environment values: "
-            + ", ".join(missing_keys)
+            "The local stack db service is missing required Postgres "
+            "environment values: " + ", ".join(missing_keys)
         )
 
     return LocalStackPostgresDefaults(
@@ -202,12 +202,14 @@ def wait_for_postgres(admin_url: str) -> None:
     deadline = time.monotonic() + POSTGRES_STARTUP_TIMEOUT_SECONDS
     while time.monotonic() < deadline:
         try:
-            with psycopg.connect(
-                to_psycopg_conninfo(admin_url),
-                autocommit=True,
-            ) as connection:
-                with connection.cursor() as cursor:
-                    cursor.execute("SELECT 1")
+            with (
+                psycopg.connect(
+                    to_psycopg_conninfo(admin_url),
+                    autocommit=True,
+                ) as connection,
+                connection.cursor() as cursor,
+            ):
+                cursor.execute("SELECT 1")
             return
         except psycopg.OperationalError:
             time.sleep(0.25)
@@ -222,11 +224,13 @@ def create_database(admin_url: str) -> MigratedPostgresDatabase:
     """Create one isolated database for an integration test."""
 
     database_name = f"palio_test_{uuid.uuid4().hex}"
-    with psycopg.connect(to_psycopg_conninfo(admin_url), autocommit=True) as connection:
-        with connection.cursor() as cursor:
-            cursor.execute(
-                sql.SQL("CREATE DATABASE {}").format(sql.Identifier(database_name))
-            )
+    with (
+        psycopg.connect(to_psycopg_conninfo(admin_url), autocommit=True) as connection,
+        connection.cursor() as cursor,
+    ):
+        cursor.execute(
+            sql.SQL("CREATE DATABASE {}").format(sql.Identifier(database_name))
+        )
 
     return MigratedPostgresDatabase(
         admin_url=admin_url,
@@ -238,25 +242,27 @@ def create_database(admin_url: str) -> MigratedPostgresDatabase:
 def drop_database(database: MigratedPostgresDatabase) -> None:
     """Drop one isolated database after the test finishes."""
 
-    with psycopg.connect(
-        to_psycopg_conninfo(database.admin_url),
-        autocommit=True,
-    ) as connection:
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """
+    with (
+        psycopg.connect(
+            to_psycopg_conninfo(database.admin_url),
+            autocommit=True,
+        ) as connection,
+        connection.cursor() as cursor,
+    ):
+        cursor.execute(
+            """
                 SELECT pg_terminate_backend(pid)
                 FROM pg_stat_activity
                 WHERE datname = %s
                   AND pid <> pg_backend_pid()
                 """,
-                (database.database_name,),
+            (database.database_name,),
+        )
+        cursor.execute(
+            sql.SQL("DROP DATABASE IF EXISTS {}").format(
+                sql.Identifier(database.database_name)
             )
-            cursor.execute(
-                sql.SQL("DROP DATABASE IF EXISTS {}").format(
-                    sql.Identifier(database.database_name)
-                )
-            )
+        )
 
 
 def apply_migrations(database_url: str) -> None:

@@ -10,9 +10,9 @@ from palio.settings import (
 
 __all__ = [
     "APPLICATION_SCHEMA",
-    "DatabaseRuntime",
     "MIGRATION_DATABASE_URL_ENV_VAR",
     "RUNTIME_DATABASE_URL_ENV_VAR",
+    "DatabaseRuntime",
     "SqlAlchemyUnitOfWork",
     "UnitOfWork",
     "build_database_runtime",

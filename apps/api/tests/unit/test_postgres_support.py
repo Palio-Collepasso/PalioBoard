@@ -1,11 +1,13 @@
 from pathlib import Path
 
+import pytest
+
 from tests.support import postgres
 
 
 def test_load_local_stack_postgres_defaults_reads_compose_values(
     tmp_path: Path,
-    monkeypatch,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     compose_file = tmp_path / "docker-compose.yml"
     compose_file.write_text(

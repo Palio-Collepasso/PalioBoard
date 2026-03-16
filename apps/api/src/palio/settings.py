@@ -1,9 +1,9 @@
 """Typed runtime settings for the Palio backend."""
 
+import os
 from collections.abc import Mapping
 from dataclasses import dataclass
 from enum import StrEnum
-import os
 
 from palio import __version__
 
