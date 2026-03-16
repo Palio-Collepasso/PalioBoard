@@ -2,7 +2,7 @@
 
 This directory is the canonical home for the Angular SPA and frontend test harness.
 
-TASK-3 establishes the initial Angular 21 scaffold for M0 with:
+The current Angular 21 scaffold includes:
 - one SPA and three lazy route shells: `admin`, `public`, and `maxi`
 - `src/app/` boundaries for `core/`, `shell-*`, `features/`, and `shared/{api,ui,utils,types}`
 - placeholder API service layers for `admin`, `public`, and `realtime`
@@ -18,7 +18,7 @@ Current command surface:
 - `npm run e2e` runs the Playwright shell smoke suite, reusing `PLAYWRIGHT_BASE_URL` when set and otherwise managing the local same-origin stack automatically
 - `npm run e2e:install` installs the Playwright Chromium browser used by the smoke suite
 
-Contract workflow baseline from TASK-7:
+Contract workflow baseline:
 - generated API types live under `src/app/shared/api/generated/`
 - generated API types are derived from the committed backend spec and are not committed
 - Angular services under `src/app/shared/api/` remain hand-written

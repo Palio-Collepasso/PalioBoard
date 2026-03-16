@@ -25,7 +25,7 @@ This document applies to all externally consumed API endpoints.
 
 ## Standard Error Envelope
 
-The backend scaffolding completed in `TASK-1` through `TASK-9` has not yet ratified a custom machine-readable application error envelope. Use the structure below as the template for future task-backed error-contract updates.
+The current backend scaffolding has not yet ratified a custom machine-readable application error envelope. Use the structure below as the template for future committed error-contract updates.
 
 ```json
 {
@@ -83,7 +83,7 @@ Use this template when a future task commits stable optimistic-concurrency or st
 
 ## Error Code Index
 
-> The records in this section are illustrative examples only. Remove them as soon as the first real task-backed error definition is documented here.
+> The records in this section are illustrative examples only. Remove them as soon as the first real error definition is documented here.
 
 | Error code | HTTP status | Category | Retryable | Notes |
 |---|---:|---|---|---|
@@ -96,7 +96,7 @@ Use this template when a future task commits stable optimistic-concurrency or st
 
 Template for each error definition: `docs/templates/api/error-definition.template.md`
 
-> The record in this section is illustrative only. Remove it as soon as the first real task-backed error definition is documented here.
+> The record in this section is illustrative only. Remove it as soon as the first real error definition is documented here.
 
 ### `validation_error`
 

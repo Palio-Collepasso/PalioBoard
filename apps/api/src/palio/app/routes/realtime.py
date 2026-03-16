@@ -1,3 +1,4 @@
+# pyright: reportUnusedFunction=false
 """Placeholder realtime routes."""
 
 from fastapi import APIRouter, WebSocket
@@ -9,7 +10,7 @@ def create_realtime_router(runtime: ApplicationRuntime) -> APIRouter:
     router = APIRouter(prefix="/realtime", tags=["realtime"])
 
     @router.get("/health")
-    def realtime_health() -> dict[str, object]:
+    async def realtime_health() -> dict[str, object]:
         return {
             "surface": "realtime",
             "status": "ok",

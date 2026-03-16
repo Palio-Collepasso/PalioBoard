@@ -1,11 +1,10 @@
 """Check that backend modules import each other through `facade.py` only."""
 
-
 import argparse
 import ast
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, Sequence
 
 PACKAGE_PREFIX = ("palio", "modules")
 DEFAULT_MODULES_ROOT = Path(__file__).resolve().parents[1] / "modules"
@@ -21,7 +20,9 @@ class BoundaryViolation:
     message: str
 
 
-def check_module_boundaries(modules_root: Path = DEFAULT_MODULES_ROOT) -> list[BoundaryViolation]:
+def check_module_boundaries(
+    modules_root: Path = DEFAULT_MODULES_ROOT,
+) -> list[BoundaryViolation]:
     """Return every forbidden cross-module import under `palio.modules`."""
 
     violations: list[BoundaryViolation] = []
@@ -67,7 +68,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     """CLI entrypoint for local and CI boundary checks."""
 
     parser = argparse.ArgumentParser(
-        description="Validate that backend modules import each other via facade.py only.",
+        description=(
+            "Validate that backend modules import each other via facade.py only."
+        ),
     )
     parser.add_argument(
         "modules_root",

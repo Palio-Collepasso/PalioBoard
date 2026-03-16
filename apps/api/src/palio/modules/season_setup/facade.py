@@ -8,5 +8,8 @@ SeasonSetupFacade = ModuleFacade
 def build_season_setup_facade() -> SeasonSetupFacade:
     return ModuleFacade(
         module_name="season_setup",
-        purpose="Season, teams, competitions, games, points configuration, and field catalogs.",
+        purpose=(
+            "Season, teams, competitions, games, points configuration, "
+            "and field catalogs."
+        ),
     )

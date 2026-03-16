@@ -4,6 +4,10 @@
 
 Provide operational procedures for diagnosing, mitigating, and recovering from production or environment issues.
 
+Current coverage note:
+- this runbook currently covers only foundation-stage availability and migration incidents
+- add business-workflow incidents here when the corresponding product slices expose stable operator-facing recovery paths
+
 ## Usage Rules
 
 - Prefer the least risky mitigation first.
@@ -15,9 +19,9 @@ Provide operational procedures for diagnosing, mitigating, and recovering from p
 
 | Area | Owner | Escalation |
 |---|---|---|
-| application | task owner / repo maintainer | open follow-up work and notify the current deployment owner |
-| database | task owner / repo maintainer | escalate when readiness or migration recovery is blocked |
-| infrastructure | task owner / repo maintainer | escalate when Compose, Nginx, or VPS-level recovery is needed |
+| application | repo maintainer | open follow-up work and notify the current deployment owner |
+| database | repo maintainer | escalate when readiness or migration recovery is blocked |
+| infrastructure | repo maintainer | escalate when Compose, Nginx, or VPS-level recovery is needed |
 
 ## Incident Severity Guide
 
@@ -33,6 +37,15 @@ Provide operational procedures for diagnosing, mitigating, and recovering from p
 |---|---|---|---|
 | `RB-001` | Readiness or health checks fail after a stack change | SEV-1 to SEV-2 | application/infrastructure |
 | `RB-002` | Explicit migration step fails or was skipped | SEV-1 to SEV-2 | database/application |
+
+---
+
+## Future Runbook Candidates
+
+Promote additional runbook items here when the corresponding workflows exist and have stable recovery procedures:
+- public standings or results stay stale after an authoritative change
+- live ranking collaboration fails or enters a conflict or lease storm
+- suspected standings mismatch or projection drift requires operator triage
 
 ---
 

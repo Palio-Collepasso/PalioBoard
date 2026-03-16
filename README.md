@@ -23,7 +23,7 @@ What is not in the repo yet:
 - real backend business workflows and domain tables
 - a production-ready end-to-end application stack
 
-That means the repository now has a baseline same-origin local stack for smoke checks, but most application behavior and deeper infrastructure concerns still land in later M0 tasks.
+That means the repository now has a baseline same-origin local stack for smoke checks, but most application behavior and deeper infrastructure concerns still land in later roadmap milestones.
 
 
 ## Overview
@@ -90,14 +90,14 @@ palio/
 │  ├─ api/
 │  └─ web/
 ├─ docs/
+│  ├─ _raw/
 │  ├─ api/
 │  ├─ architecture/
 │  ├─ domain/
 │  ├─ ops/
 │  ├─ product/
 │  ├─ qna/
-│  ├─ testing/
-│  └─ milestones.md
+│  └─ testing/
 ├─ infra/
 ├─ tools/
 ├─ evals/
@@ -113,27 +113,28 @@ If you are starting work in this repo, use these documents in order:
 3. [docs/domain/er-schema.md](docs/domain/er-schema.md)
 4. [docs/testing/test-strategy.md](docs/testing/test-strategy.md)
 5. [docs/qna/README.md](docs/qna/README.md)
-6. [docs/milestones.md](docs/milestones.md)
+6. [docs/product/roadmap.md](docs/product/roadmap.md)
 
 Additional high-signal references:
 - [docs/product/acceptance-scenarios.md](docs/product/acceptance-scenarios.md)
+- [docs/domain/business-rules.md](docs/domain/business-rules.md)
 - [docs/domain/game-catalog.md](docs/domain/game-catalog.md)
 - [docs/domain/palio-rules.md](docs/domain/palio-rules.md)
 
 ## Working in this repo today
 
-The canonical top-level implementation skeleton has landed, and `apps/api/` plus `apps/web/` now contain the first runnable app scaffolds. The repo is still mid-bootstrap, but it now includes a baseline same-origin local stack under `infra/` for M1 smoke verification.
+The canonical top-level implementation skeleton has landed, and `apps/api/` plus `apps/web/` now contain the first runnable app scaffolds. The repo is still mid-bootstrap, but it now includes a baseline same-origin local stack under `infra/` for `m-0` smoke verification.
 
 Today, useful work in this repository is:
 - using `make help` to discover the stable top-level command surface
 - iterating on the FastAPI and Angular scaffolds under `apps/api/` and `apps/web/`
 - refining product, domain, and architecture decisions
 - validating missing requirements and edge cases in Q&A
-- planning thin slices for Milestone 1
+- planning thin slices for `m-0` and later milestones
 - reviewing ADRs and test expectations before implementation
-- populating the remaining infrastructure and deeper app slices through their dedicated M0 tasks
+- populating the remaining infrastructure and deeper app slices through the remaining roadmap milestones
 
-The first implementation milestone is documented in [docs/milestones.md](docs/milestones.md): stand up the monorepo skeleton, schema/migrations, auth plumbing, seeded catalogs, and season-setup flows.
+The active roadmap summary lives in [docs/product/roadmap.md](docs/product/roadmap.md).
 
 
 ## Quick start
@@ -147,6 +148,7 @@ The repository now exposes the canonical top-level command names, and the backen
 * Docker + Docker Compose
 * Make
 * uv
+* pre-commit
 
 ### Discover the command surface
 
@@ -154,27 +156,22 @@ The repository now exposes the canonical top-level command names, and the backen
 make help
 ```
 
-### Task worktree helper
+### Install dependencies and hooks
 
 ```bash
-./tools/task-worktree-codex.sh 6
+cd apps/web
+npm install
+cd ../api
+uv run --group dev pre-commit install --hook-type pre-commit --hook-type pre-push
+cd ../web
+npm run e2e:install
 ```
 
-This creates the standard task worktree under `~/codex-worktrees/palio-board/tasks/` and opens `codex` in that worktree, reusing the existing branch/worktree when present.
-
-### Scaffold commands
+### Native app loop
 
 ```bash
 make backend-dev
-make test-backend
-cd apps/api && PALIO_DB_MIGRATION_URL=postgresql+psycopg://... uv run alembic upgrade head
-make openapi-export
-cd apps/api && uv run python -m palio.shared.module_boundaries
-
-cd apps/web
-npm install
 make web-dev
-make openapi-types
 ```
 
 ### Same-origin local stack
@@ -201,16 +198,11 @@ The Angular SPA currently exposes three lazy route areas:
 - `/public`
 - `/maxi`
 
-`make backend-dev` starts the placeholder FastAPI app. `make test-backend` now runs the split backend harness: `apps/api/tests/unit/` first, then `apps/api/tests/integration/` against a real local Postgres database. By default the integration layer starts a disposable Docker `postgres:16-alpine` container; set `PALIO_TEST_POSTGRES_URL` to reuse an existing local Postgres admin database instead. Alembic uses `PALIO_DB_MIGRATION_URL`, while runtime DB access uses `PALIO_DB_RUNTIME_URL`.
+`make backend-dev` starts the placeholder FastAPI app. `make test-backend` runs the split backend harness: `apps/api/tests/unit/` first, then `apps/api/tests/integration/` against a real local Postgres database. By default the integration layer now reuses the database image and bootstrap settings defined in `infra/compose/docker-compose.yml`; set `PALIO_TEST_POSTGRES_URL` to reuse an existing local Postgres admin database instead. Alembic uses `PALIO_DB_MIGRATION_URL`, while runtime DB access uses `PALIO_DB_RUNTIME_URL`.
 
 Current backend operational baseline:
 - typed env-based runtime settings via `PALIO_ENV`, `PALIO_LOG_LEVEL`, `PALIO_REQUEST_ID_HEADER`, `PALIO_BUILD_VERSION`, `PALIO_BUILD_COMMIT_SHA`, `PALIO_DB_RUNTIME_URL`, and `PALIO_DB_MIGRATION_URL`
 - backend integration-test settings via `PALIO_TEST_POSTGRES_URL` and `PALIO_TEST_POSTGRES_IMAGE`
-- Loguru-backed structured JSON HTTP request logs with propagated `X-Request-ID` response headers by default
-- `/healthz`, `/readyz`, and `/version` endpoints for local smoke checks and future infra wiring
-
-Current backend operational baseline:
-- typed env-based runtime settings via `PALIO_ENV`, `PALIO_LOG_LEVEL`, `PALIO_REQUEST_ID_HEADER`, `PALIO_BUILD_VERSION`, `PALIO_BUILD_COMMIT_SHA`, `PALIO_DB_RUNTIME_URL`, and `PALIO_DB_MIGRATION_URL`
 - Loguru-backed structured JSON HTTP request logs with propagated `X-Request-ID` response headers by default
 - `/healthz`, `/readyz`, and `/version` endpoints for local smoke checks and future infra wiring
 
@@ -219,17 +211,21 @@ Contract workflow baseline:
 - `make openapi-types` regenerates ignored frontend TS declarations from that committed spec
 - Angular services stay hand-written even when types are generated
 
-### Reserved and current targets
+### Quality gates
 
-These target names are intentionally stable now so later M0 tasks can fill them in without changing developer workflows:
+The repository-level quality-gate surface is stable and is what local hooks plus CI should call:
 
-- `make up`
-- `make down`
+- `make format`
+- `make format-check`
+- `make lint`
+- `make typecheck`
+- `make check-boundaries`
+- `make check-openapi`
 - `make test`
-- `make test-web`
-- `make test-e2e`
+- `make build`
+- `make verify`
 
-`make up` and `make down` now start and stop the baseline same-origin stack defined in `infra/compose/docker-compose.yml`. `make test-web` now runs the Angular behavior-test harness, and `make test-e2e` now runs the Playwright shell-smoke suite against that same-origin setup. Install the Playwright Chromium browser once with `cd apps/web && npm run e2e:install` before relying on the browser suite locally.
+`make format` applies the backend formatter, while `make verify` runs the full baseline gate set: formatting checks, linting, typing, architectural boundary checks, OpenAPI verification, tests, and frontend build validation. The installed Git hooks use `pre-commit` for fast local checks and `pre-push` for the heavier type/test/build/contract path.
 
 For the current local-development baseline, see [docs/ops/local-dev.md](docs/ops/local-dev.md).
 
@@ -272,27 +268,16 @@ Important v1 rules include:
 - Prepalio subgames roll up into a final Prepalio ranking, which then feeds Palio standings
 - once official result data exists, game setup becomes immutable
 
-See [docs/domain/palio-context.md](docs/domain/palio-context.md), [docs/domain/palio-rules.md](docs/domain/palio-rules.md), and [docs/qna/product/README.md](docs/qna/product/README.md).
+See [docs/domain/palio.md](docs/domain/palio.md), [docs/domain/business-rules.md](docs/domain/business-rules.md), [docs/domain/palio-rules.md](docs/domain/palio-rules.md), and [docs/qna/product/README.md](docs/qna/product/README.md).
 
 ## Development
 
-### Tooling
+- Use `make` as the stable top-level command surface.
+- For local setup, bootstrap commands, hooks, and smoke checks: [docs/ops/local-dev.md](docs/ops/local-dev.md)
+- For scaffold-specific command surfaces: [apps/api/README.md](apps/api/README.md), [apps/web/README.md](apps/web/README.md)
+- For test depth expectations: [docs/testing/test-strategy.md](docs/testing/test-strategy.md)
+- For long-lived architectural decisions: [docs/architecture/adr/README.md](docs/architecture/adr/README.md).
 
-* `make` is the top-level command surface
-* `uv` for Python dependency management / execution
-* `npm` for frontend
-* `dependency-cruiser` for frontend import-boundary checks
-* pre-commit hooks before commit
-* automated CI
-* manual production deploy
-
-### Recommended workflow
-
-1. Read the relevant docs before implementing a change
-2. Implement a vertical thin slice
-3. Add the matching tests at the correct layer
-4. Update docs when behavior or architecture changes
-5. Add an ADR if the change affects long-lived technical direction
 ## Testing
 
 The repository already defines the required test depth for implementation work.
@@ -302,46 +287,46 @@ Expected layers:
 - Postgres-backed integration tests for authoritative workflows, audit, projections, immutability, and state transitions
 - realtime integration tests for leases, stale writes, reconnects, and restart recovery
 - a small number of frontend behavior tests
-- a very small Playwright suite for critical operational flows
+- a very small Playwright same-origin shell smoke suite for the current scaffold, with broader critical flows landing in later milestones
 
-Read [docs/testing/test-strategy.md](docs/testing/test-strategy.md) before implementing backend, realtime, or UI flows.
+For more information, read:
+- [docs/testing/test-strategy.md](docs/testing/test-strategy.md) for test depth and quality-gate policy
+- [docs/testing/critical-e2e-flows.md](docs/testing/critical-e2e-flows.md) for the must-pass browser flows
+- [docs/testing/fixtures.md](docs/testing/fixtures.md) for shared test data assumptions
 
-For the current scaffold details, see [apps/api/README.md](apps/api/README.md), [apps/web/README.md](apps/web/README.md), and [docs/ops/local-dev.md](docs/ops/local-dev.md).
+### Local quality-gate workflow
 
-### Test layers
+Use the repo-level `make` targets for the stable command surface:
 
-TO BE DONE. As an example:
-* pure domain rules → unit tests
-* authoritative state transitions / official writes → Postgres-backed integration tests
-* standings / projections → unit tests + integration tests
-* live collaboration / leases / conflicts → realtime integration tests
-* user-visible critical flows → Playwright E2E
+```bash
+make format
+make lint
+make typecheck
+make check-boundaries
+make check-openapi
+make test
+make build
+make verify
+```
 
-### Critical E2E flows for v1
+Install the hooks once from `apps/api/` so the local Git workflow runs the same gates automatically:
 
-TO BE DONE. As an example:
-* complete a ranking game
-* verify public update after completion
-* progress and complete a 1v1 tournament
-* post-completion edit and admin review behavior
-* concurrent live updates and field locking
+```bash
+cd apps/api
+uv run --group dev pre-commit install --hook-type pre-commit --hook-type pre-push
+```
 
 ### Run tests
 
-The stable top-level test entrypoint is:
+The stable top-level test entrypoints are:
 ```bash
 make test
-```
-
-Reserved per-area targets:
-
-```bash
 make test-backend
 make test-web
 make test-e2e
 ```
 
-These targets become runnable in later M0 tasks once the backend, frontend, and Playwright harnesses are added.
+Install the Playwright Chromium browser once with `cd apps/web && npm run e2e:install` before relying on the browser suite locally.
 
 ## Contributing
 
@@ -356,25 +341,6 @@ Before opening a PR:
 * write a new ADR when changing architectural boundaries or long-lived decisions
 
 For larger changes, open an issue or design discussion first.
-
-## Roadmap
-
-The current roadmap is defined by these milestones:
-
-1. **M1 — Delivery foundation and architecture skeleton**  
-   Establish the monorepo skeleton, app shells, database/migrations, local delivery rails, and CI guardrails.
-2. **M2 — Identity, authorization, and season setup**  
-   Add auth integration, roles/capabilities, user provisioning, and the full season/team/game configuration flow.
-3. **M3 — Trusted ranking result backbone**  
-   Deliver authoritative ranking result entry, validation, audit, projection recompute, and initial public reads.
-4. **M4 — Live ranking operations and collaboration safety**  
-   Add in-progress ranking workflows, live drafts, leases, stale-write protection, and reconnect/restart recovery.
-5. **M5 — Advanced standings rules: Jolly, Prepalio, Giocasport, adjustments**  
-   Implement competition-specific scoring rules, Jolly constraints, Prepalio roll-up, Giocasport separation, and manual adjustments.
-6. **M6 — 1v1 tournament workflow**  
-   Deliver semifinal pairings, match progression, derived final ranking, override handling, and leaderboard impact on completion.
-
-Dependencies, exit criteria, and risks for each milestone live in [docs/milestones.md](docs/milestones.md).
 
 ## License
 
