@@ -1,8 +1,8 @@
-# Backend
+# API
 
 This directory is the canonical home for the FastAPI backend and backend test harness.
 
-Current TASK-8 baseline:
+Current baseline:
 - `pyproject.toml` with runtime dependencies for the FastAPI app plus a dev dependency group for tests, typing, formatting, and hook tooling used by the repo `Makefile`
 - `alembic.ini` plus `migrations/` with the baseline revision that creates the empty `palio_board` application schema
 - `src/palio/app/` as the explicit composition root with Loguru JSON request logging, UUIDv7 request-id propagation, and the operational `/healthz`, `/readyz`, and `/version` endpoints
@@ -26,7 +26,7 @@ Current local commands from this directory:
 - `uv run --group dev python -m palio.app.export_openapi ../../docs/api/openapi.yaml`
 - `uv run python -m palio.shared.module_boundaries`
 
-Contract workflow baseline from TASK-7:
+Contract workflow baseline:
 - FastAPI owns the committed OpenAPI artifact at `docs/api/openapi.yaml`
 - the export command runs from application code and does not require a running backend
 - frontend TypeScript types are generated from that committed spec and are not committed
@@ -42,7 +42,7 @@ Runtime environment variables currently supported:
 - `PALIO_TEST_POSTGRES_URL` optionally points the integration suite at an existing local Postgres admin database instead of starting a disposable container
 - `PALIO_TEST_POSTGRES_IMAGE` optionally overrides the Docker image used when the integration suite starts its disposable local Postgres instance instead of the compose-backed default
 
-Still deferred to later tasks:
+Still deferred to later milestones:
 - real business workflows and API contracts
 - domain tables beyond the empty-schema migration
 - deeper Postgres-backed workflow coverage beyond the current migration/readiness smoke checks

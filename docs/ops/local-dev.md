@@ -94,10 +94,10 @@ make verify
 
 ### Start from scratch
 
-1. Run `make help`, `cd apps/web && npm install`, and confirm `uv` is available for backend commands.
-2. Install hooks with `cd apps/api && uv run --group dev pre-commit install --hook-type pre-commit --hook-type pre-push`.
-3. Install the Playwright browser once with `cd apps/web && npm run e2e:install`.
-4. Use the native loop (`make backend-dev`, `make web-dev`) for day-to-day work, or `make up` plus the one-shot `migrate` service for same-origin smoke verification.
+1. Follow [Quick Start](#quick-start)
+2. Choose either:
+  - the native loop: `make backend-dev`, `make web-dev`, or
+  - the same-origin smoke path: `make up` plus the one-shot `migrate` service.
 
 ### Reset local database
 
@@ -112,7 +112,7 @@ make verify
 ### Seed local data
 
 1. No shared seed workflow is documented yet.
-2. Until a task establishes one, keep data setup task-local and document reusable scenarios in `docs/testing/fixtures.md`.
+2. Until a shared seed workflow is established, keep data setup local to the change and document reusable scenarios in `docs/testing/fixtures.md`.
 
 ### Run a specific test
 

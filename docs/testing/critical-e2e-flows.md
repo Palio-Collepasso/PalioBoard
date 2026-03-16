@@ -12,6 +12,13 @@ List the end-to-end flows that must remain healthy because they protect core bus
 - Link each flow to the fixtures and docs it depends on.
 - Record whether the flow is required on every PR, on release, nightly, or manually.
 
+## Current Coverage Note
+
+The current critical set is intentionally limited to the same-origin shell smoke path because the repo does not yet expose stable browser-tested business workflows.
+
+Future note:
+- promote ranking completion, public update, tournament progression, post-completion review, and live-collaboration flows here as soon as those slices exist and their browser coverage is reliable enough to protect the release gate
+
 ## Flow Index
 
 | Flow ID | Title | Priority | Cadence | Owner |

@@ -11,6 +11,15 @@ Describe the testing approach, test layers, ownership, and minimum expectations 
 - Match test depth to the layer where the risk actually lives.
 - Keep Playwright intentionally small and focused on operationally critical flows.
 
+## Current Coverage Note
+
+The current repo only automates foundation-stage backend smoke, contract, and shell-reachability checks.
+
+Future note:
+- promote a separate realtime-integration layer here when live ranking transport and conflict behavior land
+- deepen the critical E2E set when ranking completion, public update, tournament, review, and live-collaboration flows become stable enough for routine browser coverage
+- drop this note once coverage is no longer foundation-stage
+
 ## Test Layers
 
 | Layer | Purpose | Scope | Speed | Typical owner |
@@ -20,6 +29,9 @@ Describe the testing approach, test layers, ownership, and minimum expectations 
 | API contract | Prove committed client/server shape stays stable | OpenAPI export, generated types, endpoint/status surface | medium | backend author with frontend consumer validation |
 | E2E | Prove must-not-break user-visible flows through the deployed stack | same-origin shell reachability today; broader operational flows later | slow | frontend or full-stack feature author |
 | Manual verification | Cover risky operational checks not yet automated | deploy smoke, migration review, incident recovery checks | variable | change owner or reviewer |
+
+> Future note:
+- split out a dedicated realtime-integration layer once WebSocket or SSE collaboration behavior becomes part of the active test surface
 
 ## Guiding Principles
 
@@ -71,7 +83,7 @@ Template for each test-layer entry: `docs/templates/testing/test-layer-expectati
 ### Integration Tests
 
 - **Purpose:** Prove authoritative workflows and environment wiring against real infrastructure.
-- **Boundary under test:** FastAPI plus PostgreSQL, migrations, and related task-owned support code.
+- **Boundary under test:** FastAPI plus PostgreSQL, migrations, and related repo-owned support code.
 - **What to test:**
   - migration/bootstrap behavior
   - readiness and health behavior against a real migrated database
@@ -109,7 +121,7 @@ Template for each test-layer entry: `docs/templates/testing/test-layer-expectati
 - **Use when:**
   - the change affects deploy or rollback procedure
   - the risk is operational but not yet worth permanent automation
-- **Checklist format:** Record the exact commands, endpoints, and expected results in task notes or deployment docs.
+- **Checklist format:** Record the exact commands, endpoints, and expected results in change notes or deployment docs.
 
 ## Coverage Expectations
 
@@ -164,24 +176,34 @@ Template for each coverage-expectation entry: `docs/templates/testing/coverage-e
   - record the failure mode and the follow-up owner
   - do not silently normalize intermittent failures
 - **Can flaky tests block merge?:** Yes, when they are part of the required quality gate.
-- **Escalation path:** Record the issue in the active task or follow-up work and update the relevant docs if the failure changes required local/deploy workflow.
+- **Escalation path:** Record the issue in follow-up work and update the relevant docs if the failure changes required local/deploy workflow.
 
 ## Test Data Policy
 
 - Canonical fixtures live in: `apps/api/tests/support/` and `apps/web/e2e/`, with shared documentation in `docs/testing/fixtures.md`.
-- Shared seed assumptions: Prefer minimal task-owned fixtures that model one narrow scenario honestly.
+- Shared seed assumptions: Prefer minimal fixtures that model one narrow scenario honestly.
 - Sensitive/production-derived data policy: Do not use production-derived datasets in repo fixtures.
+
+## Current Scenario Sets
+
+The current maintained scenario set is intentionally small:
+
+### `CS-001` — Foundation smoke set
+
+- **Purpose:** Provide the minimum shared scenarios needed to validate the current backend and browser scaffolds honestly.
+- **Fixtures included:**
+  - `FX-001`
+  - `FX-002`
+- **Used for:**
+  - local regression checks for the current scaffolded stack
+  - baseline backend integration and browser smoke verification
+
+Future note:
+- add richer scenario sets here when stable named business fixtures exist across multiple suites
 
 ## Tooling and Commands
 
-- **Run formatting:** `make format` or `make format-check`
-- **Run lint checks:** `make lint`
-- **Run type checks:** `make typecheck`
-- **Run boundary checks:** `make check-boundaries`
-- **Run OpenAPI workflow checks:** `make check-openapi`
-- **Run all tests:** `make test`
-- **Run build validation:** `make build`
-- **Run the full baseline gate set:** `make verify`
+- **Repo-level quality gates:** Use the stable `make` targets listed in [Quality-Gate Baseline](#quality-gate-baseline) and the local workflow in `docs/ops/local-dev.md`.
 - **Run unit tests:** `cd apps/api && uv run --group dev pytest tests/unit` or `cd apps/web && npm test -- --watch=false`
 - **Run integration tests:** `cd apps/api && uv run --group dev pytest tests/integration`
 - **Run E2E tests:** `cd apps/web && npm run e2e`

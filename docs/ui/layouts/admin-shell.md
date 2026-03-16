@@ -62,7 +62,7 @@ Use a fixed or sticky top bar above the main content.
 - Right side: utilities, notifications, context action, profile
 - Surface: white with subtle bottom border
 
-The top bar should not become a second navigation system. It supports the current task; it does not replace the sidebar.
+The top bar should not become a second navigation system. It supports the current workflow; it does not replace the sidebar.
 
 ### 3. Main content canvas
 

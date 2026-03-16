@@ -12,8 +12,8 @@ Covers build, migration, release, verification, rollback, and communication step
 
 | Environment | Purpose | URL/Location | Owner | Notes |
 |---|---|---|---|---|
-| local | dev | `http://127.0.0.1:8080` | repo contributors | Same-origin Docker Compose smoke stack from `TASK-6` |
-| production | live | single VPS/VM, configured per operator | deployment owner | Current architecture assumes Docker Compose, Nginx, one backend instance, and planned downtime |
+| local | dev | `http://127.0.0.1:8080` | repo contributors | Same-origin Docker Compose smoke stack |
+| production | live | single VPS/VM, configured per operator | deployment owner | Docker Compose + Nginx, one backend instance, and planned downtime |
 
 ## Release Principles
 
@@ -30,6 +30,15 @@ Covers build, migration, release, verification, rollback, and communication step
 - [ ] Migration impact reviewed
 - [ ] Backward compatibility reviewed
 - [ ] Rollback plan ready
+
+## Release Input
+
+> Record the release input used for each deployment:
+- git SHA or release tag;
+- Docker image reference(s) if applicable;
+- migration version(s);
+- operator name;
+- deploy timestamp.
 
 ## Deployment Procedure
 
@@ -57,6 +66,9 @@ Covers build, migration, release, verification, rollback, and communication step
 
 1. Check `/healthz`, `/readyz`, and `/version`.
 2. Verify the same-origin proxy still serves `/`, `/api/admin/health`, `/api/public/health`, and `/realtime/health`.
+
+Future note:
+- add admin, public, and maxi workflow smoke checks here when those surfaces expose stable business behavior beyond the current scaffold and health-path baseline
 
 ### 6. Communicate completion
 
@@ -88,7 +100,7 @@ Template for each rollback scenario: `docs/templates/ops/deploy-rollback-scenari
 - **Data considerations:**
   - If migrations already ran, confirm the schema remains backward-compatible before rolling back application code.
 - **Post-rollback verification:**
-  - Re-check `/healthz`, `/readyz`, `/version`, `/`, and the proxy health routes.
+  - Repeat the standard post-deploy verification checklist.
 - **Follow-up actions:**
   - Capture the failure mode in `docs/ops/runbook.md` if it becomes a recurring operational issue.
 
@@ -115,13 +127,7 @@ Template for each deployment scenario: `docs/templates/ops/deploy-scenario.templ
 - **Use when:** The schema or data move is not safely reversible or backward-compatible.
 - **Procedure:** Treat as a planned maintenance event with an explicit rollback decision point before application restart.
 - **Extra checks:** Require manual review of migration impact and follow the incident hooks if verification fails.
-- **Approval required from:** Deployment owner and task owner
-
-## Incident Hooks
-
-If deployment fails or causes degraded service, continue in:
-
-- `docs/ops/runbook.md`
+- **Approval required from:** Deployment owner and the maintainer responsible for the risky migration
 
 ## Release History
 
@@ -131,4 +137,18 @@ Template for each release-history row: `docs/templates/ops/deploy-release-histor
 
 | Date | Version/Ref | Environment | Operator | Result | Notes |
 |---|---|---|---|---|---|
-| `2026-03-15` | `example-ref` | `local` | `example-operator` | success | Example row showing the expected release-history format. |
+| `2026-03-15` | `example-ref` | `production` | `example-operator` | success | Example row showing the expected release-history format. |
+
+
+## Repo-specific TODOs
+
+Replace placeholders with:
+- exact VPS access method;
+- exact Docker Compose commands;
+- exact health-check endpoints;
+- exact smoke-test sequence;
+- exact backup/restore references if any.
+
+## Incident Handoff
+
+If deployment fails or causes degraded service, continue in `docs/ops/runbook.md`.

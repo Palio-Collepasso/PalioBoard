@@ -1,6 +1,6 @@
 # Milestones
 
-## M1 — Delivery foundation and architecture skeleton
+## m-0 — Delivery foundation and architecture skeleton
 
 **Depends on:** none
 
@@ -38,9 +38,9 @@ Every other milestone depends on stable repo structure, migrations, delivery com
 
 ---
 
-## M2 — Identity, authorization, and season setup
+## m-1 — Identity, authorization, and season setup
 
-**Depends on:** M1
+**Depends on:** m-0
 
 **Objective**
 
@@ -78,9 +78,9 @@ Result entry is meaningless until there are users, permissions, teams, games, fi
 
 ---
 
-## M3 — Trusted ranking result backbone
+## m-2 — Trusted ranking result backbone
 
-**Depends on:** M2
+**Depends on:** m-1
 
 **Objective**
 
@@ -117,9 +117,9 @@ This is the smallest milestone that proves the core product promise: trusted off
 
 ---
 
-## M4 — Live ranking operations and collaboration safety
+## m-3 — Live ranking operations and collaboration safety
 
-**Depends on:** M3
+**Depends on:** m-2
 
 **Objective**
 
@@ -155,9 +155,9 @@ Live ranking entry is one of the highest-risk and highest-value v1 workflows. It
 
 ---
 
-## M5 — Advanced standings rules: Jolly, Prepalio, Giocasport, adjustments
+## m-4 — Advanced standings rules: Jolly, Prepalio, Giocasport, adjustments
 
-**Depends on:** M3
+**Depends on:** m-2
 
 **Objective**
 
@@ -193,9 +193,9 @@ These rules are central to business correctness and directly affect trust in the
 
 ---
 
-## M6 — 1v1 tournament workflow
+## m-5 — 1v1 tournament workflow
 
-**Depends on:** M3 and M5
+**Depends on:** m-2 and m-4
 
 **Objective**
 
@@ -233,9 +233,9 @@ Tournament support is a distinct template, but still depends on the already-stab
 
 ---
 
-## M7 — Trust and exception workflows
+## m-6 — Trust and exception workflows
 
-**Depends on:** M3, M4, M5, M6
+**Depends on:** m-2, m-3, m-4, and m-5
 
 **Objective**
 
@@ -271,9 +271,9 @@ These flows are required for the real event, but they depend on all primary resu
 
 ---
 
-## M8 — Public/maxi completion and release hardening
+## m-7 — Public/maxi completion and release hardening
 
-**Depends on:** M3, M4, M5, M6, M7
+**Depends on:** m-2, m-3, m-4, m-5, m-6
 
 **Objective**
 
@@ -311,7 +311,7 @@ This milestone integrates and hardens everything already built. It should come l
 
 ## Notes on sequencing
 
-- **M3 is the first true product-value milestone.** Reach it as early as possible.
-- **M4 and M5 can overlap slightly** once M3 is stable, but M4 should not change authoritative scoring rules and M5 should not introduce live-collaboration shortcuts.
-- **M7 must not be skipped.** The PRD and functional requirements make trust, appeal-window visibility, auditability, and post-completion correction behavior part of v1, not polish.
-- **M8 is not “just UI”.** It is where deployment, read models, and acceptance-level confidence are finished.
+- **m-2 is the first true product-value milestone.** Reach it as early as possible.
+- **m-3 and m-4 can overlap slightly** once m-2 is stable, but m-3 should not change authoritative scoring rules and m-4 should not introduce live-collaboration shortcuts.
+- **m-6 must not be skipped.** The PRD and functional requirements make trust, appeal-window visibility, auditability, and post-completion correction behavior part of v1, not polish.
+- **m-7 is not “just UI”.** It is where deployment, read models, and acceptance-level confidence are finished.

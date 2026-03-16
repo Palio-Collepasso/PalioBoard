@@ -2,14 +2,20 @@
 
 ## Purpose
 
-Document the shared fixtures, seeds, and canonical test datasets used across the project.
+Document the named fixtures, seeds, and canonical data scenarios used by tests.
+
+Good fixture documentation helps agents and humans answer:
+- which scenario already exists;
+- when a shared fixture is safe to modify;
+- which tests depend on a given dataset;
+- whether a failure is caused by product logic or by broken fixture assumptions.
 
 ## Principles
 
 - Fixtures should be deterministic.
 - Fixtures should be minimal but realistic.
-- Shared fixtures must be stable and reusable.
-- Business-meaningful scenarios should have named fixtures.
+- Shared fixtures should model recognizable business scenarios.
+- If multiple suites depend on a fixture, document it here.
 
 ## Fixture Index
 
@@ -24,7 +30,15 @@ Document the shared fixtures, seeds, and canonical test datasets used across the
 
 Template for each fixture entry: `docs/templates/testing/fixture.template.md`
 
-> Next-pass guidance: keep this file limited to shared canonical scenarios only. Do not document every test dataset here; add entries only when a fixture is reused across suites or carries important shared constraints that future tasks must preserve.
+> Next-pass guidance: keep this file limited to shared fixture definitions. Do not document every test dataset here; add entries only when a fixture is reused across suites or carries important shared constraints that future changes must preserve.
+
+## Current Coverage Note
+
+The shared fixture catalog currently covers only the technical fixtures reused by the baseline harnesses.
+
+Future note:
+- promote named business-scenario fixtures here when stable seeded season, ranking, review, tournament, or live-collaboration datasets exist across multiple suites
+- drop this note once the shared fixture catalog is no longer foundation-stage
 
 
 ### `FX-001` — Disposable Postgres integration database
@@ -101,7 +115,7 @@ The backend integration layer proves migration/bootstrap and runtime readiness a
 
 #### Scenario represented
 
-The current Playwright smoke suite proves that `/`, `/admin`, `/public`, and `/maxi` are reachable through the local same-origin stack introduced by `TASK-6`.
+The current Playwright smoke suite proves that `/`, `/admin`, `/public`, and `/maxi`
 
 #### Contents
 
@@ -154,7 +168,7 @@ The current Playwright smoke suite proves that `/`, `/admin`, `/public`, and `/m
 
 Template for each scenario-set entry: `docs/templates/testing/canonical-scenario-set.template.md`
 
-### M0 smoke verification
+### m-0 smoke verification
 
 - **Purpose:** Provide the minimum reusable scenarios needed to validate the current backend and browser scaffolds honestly.
 - **Fixtures included:**
