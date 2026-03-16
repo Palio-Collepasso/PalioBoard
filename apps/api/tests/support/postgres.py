@@ -1,7 +1,6 @@
 """Helpers for Postgres-backed backend integration tests."""
 
 import os
-import socket
 import subprocess
 import sys
 import time
@@ -9,11 +8,13 @@ import uuid
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
+from typing import Any, cast
 
 import psycopg
 import yaml
 from psycopg import sql
 from sqlalchemy.engine import make_url
+from testcontainers.postgres import PostgresContainer
 
 APPLICATION_SCHEMA = "palio_board"
 BASELINE_REVISION = "20260314_0001"
@@ -39,10 +40,7 @@ class LocalStackPostgresDefaults:
     def admin_url(self) -> str:
         """Build the local admin URL for the shared defaults."""
 
-        return (
-            "postgresql+psycopg://"
-            f"{self.user}:{self.password}@127.0.0.1:5432/{self.database}"
-        )
+        return f"postgresql+psycopg://{self.user}:{self.password}@127.0.0.1:5432/{self.database}"
 
 
 @dataclass(frozen=True, slots=True)
@@ -50,7 +48,7 @@ class PostgresServer:
     """Represent the Postgres server used by the integration suite."""
 
     admin_url: str
-    container_id: str | None = None
+    container: Any | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -86,24 +84,30 @@ def to_psycopg_conninfo(database_url: str) -> str:
 def load_local_stack_postgres_defaults() -> LocalStackPostgresDefaults:
     """Load the disposable test-server defaults from the local Compose stack."""
 
-    specification = yaml.safe_load(LOCAL_STACK_COMPOSE_FILE.read_text(encoding="utf-8"))
-    services = specification.get("services")
-    if not isinstance(services, dict):
-        raise RuntimeError(
+    specification = _require_mapping(
+        yaml.safe_load(LOCAL_STACK_COMPOSE_FILE.read_text(encoding="utf-8")),
+        error_message=(
+            "The local stack compose file does not define a top-level mapping."
+        ),
+    )
+    services = _require_mapping(
+        specification.get("services"),
+        error_message=(
             "The local stack compose file does not define a services mapping for tests."
-        )
-
-    db_service = services.get("db")
-    if not isinstance(db_service, dict):
-        raise RuntimeError(
+        ),
+    )
+    db_service = _require_mapping(
+        services.get("db"),
+        error_message=(
             "The local stack compose file does not define a db service for tests."
-        )
-
-    environment = db_service.get("environment")
-    if not isinstance(environment, dict):
-        raise RuntimeError(
+        ),
+    )
+    environment = _require_mapping(
+        db_service.get("environment"),
+        error_message=(
             "The local stack db service does not define dict-based environment values."
-        )
+        ),
+    )
 
     image = db_service.get("image")
     if not isinstance(image, str):
@@ -138,62 +142,37 @@ def start_postgres_server() -> PostgresServer:
         return PostgresServer(admin_url=configured_url)
 
     defaults = load_local_stack_postgres_defaults()
-    host_port = _pick_free_port()
-    container_name = f"palio-task-8-postgres-{uuid.uuid4().hex[:8]}"
     image = os.environ.get(TEST_POSTGRES_IMAGE_ENV_VAR, defaults.image)
-    command = [
-        "docker",
-        "run",
-        "--detach",
-        "--rm",
-        "--name",
-        container_name,
-        "--publish",
-        f"127.0.0.1:{host_port}:5432",
-        "--env",
-        f"POSTGRES_DB={defaults.database}",
-        "--env",
-        f"POSTGRES_USER={defaults.user}",
-        "--env",
-        f"POSTGRES_PASSWORD={defaults.password}",
-        image,
-    ]
-    completed = subprocess.run(
-        command,
-        check=False,
-        capture_output=True,
-        text=True,
+    container = PostgresContainer(
+        image=image,
+        username=defaults.user,
+        password=defaults.password,
+        dbname=defaults.database,
     )
-    if completed.returncode != 0:
-        message = (
-            completed.stderr.strip() or completed.stdout.strip() or "unknown error"
-        )
-        raise RuntimeError(f"Unable to start the Postgres test container: {message}")
+    try:
+        container.start()
+    except Exception as exc:
+        raise RuntimeError("Unable to start the Postgres test container.") from exc
 
     admin_url = (
-        make_url(defaults.admin_url)
-        .set(port=host_port)
+        make_url(container.get_connection_url())
+        .set(drivername="postgresql+psycopg")
         .render_as_string(hide_password=False)
     )
     wait_for_postgres(admin_url)
     return PostgresServer(
         admin_url=admin_url,
-        container_id=completed.stdout.strip(),
+        container=container,
     )
 
 
 def stop_postgres_server(server: PostgresServer) -> None:
     """Stop the disposable Postgres container when the suite ends."""
 
-    if server.container_id is None:
+    if server.container is None:
         return
 
-    subprocess.run(
-        ["docker", "stop", server.container_id],
-        check=False,
-        capture_output=True,
-        text=True,
-    )
+    server.container.stop()
 
 
 def wait_for_postgres(admin_url: str) -> None:
@@ -291,9 +270,14 @@ def apply_migrations(database_url: str) -> None:
     raise RuntimeError(f"Unable to apply Alembic migrations: {message}")
 
 
-def _pick_free_port() -> int:
-    """Reserve one local TCP port for the disposable Postgres container."""
+def _require_mapping(
+    value: object,
+    *,
+    error_message: str,
+) -> dict[str, object]:
+    """Return a dict-like value or raise a repo-specific runtime error."""
 
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-        sock.bind(("127.0.0.1", 0))
-        return int(sock.getsockname()[1])
+    if not isinstance(value, dict):
+        raise RuntimeError(error_message)
+
+    return cast(dict[str, object], value)

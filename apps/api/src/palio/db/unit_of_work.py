@@ -11,7 +11,7 @@ type SessionFactory = Callable[[], Session]
 class UnitOfWork(Protocol):
     """Session-bound transaction contract used by orchestrators."""
 
-    session: Session
+    session: Session | None
 
     def __enter__(self) -> Self: ...
 

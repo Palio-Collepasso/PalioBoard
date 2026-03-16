@@ -1,3 +1,4 @@
+# pyright: reportUnusedFunction=false
 """Placeholder public API routes."""
 
 from fastapi import APIRouter

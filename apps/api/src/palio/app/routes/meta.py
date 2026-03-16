@@ -1,3 +1,4 @@
+# pyright: reportUnusedFunction=false
 """Operational meta routes."""
 
 from fastapi import APIRouter, status

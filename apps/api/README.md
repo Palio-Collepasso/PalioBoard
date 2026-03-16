@@ -10,7 +10,7 @@ Current baseline:
 - `src/palio/db/` for the runtime/migration DB configuration, SQLAlchemy runtime assembly, readiness probing, and the session-bound Unit of Work baseline
 - `src/palio/shared/` and `src/palio/modules/` for cross-cutting technical primitives and the documented modular-monolith package layout
 - `tests/unit/` for fast backend smoke/configuration checks and `tests/integration/` for real-Postgres migration/readiness coverage
-- `tests/support/postgres.py` for the Postgres-backed integration harness, which can reuse an existing local server or start a disposable Docker Postgres container using the same image/bootstrap settings as `infra/compose/docker-compose.yml`
+- `tests/support/postgres.py` for the Postgres-backed integration harness, which can reuse an existing local server or start a disposable Postgres test container using the same image/bootstrap settings as `infra/compose/docker-compose.yml`
 
 Current local commands from this directory:
 - `uv run --group dev pre-commit install --hook-type pre-commit --hook-type pre-push`
@@ -39,8 +39,8 @@ Runtime environment variables currently supported:
 - `PALIO_BUILD_COMMIT_SHA` adds commit/build metadata to `/version`
 - `PALIO_DB_RUNTIME_URL` configures normal runtime DB access and readiness checks
 - `PALIO_DB_MIGRATION_URL` configures Alembic/schema-change access
-- `PALIO_TEST_POSTGRES_URL` optionally points the integration suite at an existing local Postgres admin database instead of starting a disposable container
-- `PALIO_TEST_POSTGRES_IMAGE` optionally overrides the Docker image used when the integration suite starts its disposable local Postgres instance instead of the compose-backed default
+- `PALIO_TEST_POSTGRES_URL` optionally points the integration suite at an existing local Postgres admin database instead of starting a disposable test container
+- `PALIO_TEST_POSTGRES_IMAGE` optionally overrides the image used when the integration suite starts its disposable local Postgres test container instead of the compose-backed default
 
 Still deferred to later milestones:
 - real business workflows and API contracts

@@ -1,3 +1,4 @@
+# pyright: reportUnusedFunction=false
 """Placeholder realtime routes."""
 
 from fastapi import APIRouter, WebSocket

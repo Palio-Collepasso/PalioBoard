@@ -40,8 +40,8 @@ Explain how to set up, run, and troubleshoot the project locally.
 | `PALIO_BUILD_COMMIT_SHA` | no | unset | backend runtime | Adds build metadata to `/version` |
 | `PALIO_DB_RUNTIME_URL` | yes for DB-backed runtime paths | unset | backend runtime | Runtime database connection string |
 | `PALIO_DB_MIGRATION_URL` | yes for migrations | unset | Alembic and migrate workflow | Admin/migration database connection string |
-| `PALIO_TEST_POSTGRES_URL` | no | disposable local Docker Postgres matching `infra/compose/docker-compose.yml` | backend integration tests | Reuses an existing local admin database for integration tests |
-| `PALIO_TEST_POSTGRES_IMAGE` | no | DB image from `infra/compose/docker-compose.yml` | backend integration tests | Overrides the Docker image used by the disposable integration-test database |
+| `PALIO_TEST_POSTGRES_URL` | no | disposable Postgres test container matching `infra/compose/docker-compose.yml` | backend integration tests | Reuses an existing local admin database for integration tests |
+| `PALIO_TEST_POSTGRES_IMAGE` | no | DB image from `infra/compose/docker-compose.yml` | backend integration tests | Overrides the image used by the disposable integration-test database |
 
 ## Commands
 

@@ -57,7 +57,7 @@ The backend integration layer proves migration/bootstrap and runtime readiness a
 
 #### Contents
 
-- disposable Postgres container or reused local admin DB
+- disposable Postgres test container or reused local admin DB
 - isolated test database per run
 - real Alembic migration application
 - disposable container defaults loaded from `infra/compose/docker-compose.yml`
@@ -72,12 +72,12 @@ The backend integration layer proves migration/bootstrap and runtime readiness a
 #### Setup instructions
 
 1. Run `cd apps/api && uv run --group dev pytest tests/integration`.
-2. Let the harness start a disposable Postgres container automatically, or set `PALIO_TEST_POSTGRES_URL` first.
+2. Let the harness start a disposable Postgres test container automatically, or set `PALIO_TEST_POSTGRES_URL` first.
 
 #### Reset / cleanup instructions
 
 1. Let the test harness drop the isolated database after the run.
-2. Stop the disposable Docker container if the harness had to create one.
+2. Let the harness stop the disposable test container automatically if it started one.
 
 #### Safe to modify?
 
