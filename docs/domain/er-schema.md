@@ -328,18 +328,6 @@ Seeded role bundles.
 
 ---
 
-### `capabilities`
-
-Capability catalog. Capabilities are defined in code; the DB stores seeded catalog rows and mappings.
-
-| Column | Type | Constraints |
-|---|---|---|
-| id | uuid | PK |
-| code | varchar(120) | NN, UQ |
-| description | text |  |
-
----
-
 ### `role_capabilities`
 
 Many-to-many between roles and capabilities.
@@ -347,7 +335,7 @@ Many-to-many between roles and capabilities.
 | Column | Type | Constraints |
 |---|---|---|
 | role_id | uuid | PK, FK -> roles.id, NN |
-| capability_id | uuid | PK, FK -> capabilities.id, NN |
+| capability | varchar(120) | PK, NN |
 
 ---
 
@@ -358,7 +346,7 @@ Direct per-user capability grants. Supported by schema, but not used in v1 UI/fl
 | Column | Type | Constraints |
 |---|---|---|
 | user_id | uuid | PK, FK -> users.id, NN |
-| capability_id | uuid | PK, FK -> capabilities.id, NN |
+| capability | varchar(120) | PK, NN |
 | created_at | timestamptz | NN |
 
 ---
@@ -446,10 +434,6 @@ A stale row from an old `live_cycle` is harmless and ignored.
 - `leaderboard_position_counts.(season_id, competition_id, team_id)` -> `leaderboard_current.(season_id, competition_id, team_id)`
 - `user_roles.user_id` -> `users.id`
 - `user_roles.role_id` -> `roles.id`
-- `role_capabilities.role_id` -> `roles.id`
-- `role_capabilities.capability_id` -> `capabilities.id`
-- `user_capabilities.user_id` -> `users.id`
-- `user_capabilities.capability_id` -> `capabilities.id`
 - `audit_logs.actor_user_id` -> `users.id`
 - `game_live_drafts.game_id` -> `games.id`
 
