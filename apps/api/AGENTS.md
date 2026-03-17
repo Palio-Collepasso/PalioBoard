@@ -1,7 +1,7 @@
-# API / backend instructions
+# API Instructions
 
 ## Scope
-This file applies to backend work under `apps/api/`.
+This file applies to api work under `apps/api/`.
 
 ## Core rules
 - Keep business logic in Python, not in the frontend, database views, or migrations.

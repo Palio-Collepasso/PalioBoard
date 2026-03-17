@@ -69,15 +69,15 @@ Template for each runbook item: `docs/templates/ops/runbook-item.template.md`
 
 - **How to detect:**
   - curl `/healthz`, `/readyz`, `/api/admin/health`, and `/api/public/health`
-  - review backend and Nginx logs for startup or proxy failures
+  - review api and Nginx logs for startup or proxy failures
 - **Dashboards/logs/tools:**
   - Docker Compose logs
-  - backend JSON request/application logs
+  - api JSON request/application logs
 
 #### Likely causes
 
 - runtime DB is unavailable or misconfigured
-- Nginx or backend container did not start with the expected image/config
+- Nginx or api container did not start with the expected image/config
 
 #### Immediate safety checks
 
@@ -93,7 +93,7 @@ Template for each runbook item: `docs/templates/ops/runbook-item.template.md`
 
 #### Recovery steps
 
-1. Restore the last known-good backend/proxy configuration.
+1. Restore the last known-good api/proxy configuration.
 2. Re-run the health checks and same-origin smoke paths.
 3. Record the root cause and required follow-up.
 
@@ -152,7 +152,7 @@ Template for each runbook item: `docs/templates/ops/runbook-item.template.md`
   - confirm the expected Alembic revision and schema exist
 - **Dashboards/logs/tools:**
   - `alembic` output
-  - backend logs
+  - api logs
   - Postgres inspection queries
 
 #### Likely causes

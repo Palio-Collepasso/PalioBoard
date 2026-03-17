@@ -31,6 +31,6 @@ Build the frontend slice of TASK-15 so a superadmin can view the user-management
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [ ] #1 The `/admin/settings/users` route implements the documented table, empty state, and create-user modal or drawer using the protected admin session flow.
-- [ ] #2 The create-user flow submits email, password, and seeded role to the backend, and handles success, validation, forbidden, and backend failure states clearly in the UI.
+- [ ] #2 The create-user flow submits email, password, and seeded role to the api, and handles success, validation, forbidden, and api failure states clearly in the UI.
 - [ ] #3 The task adds frontend integration coverage and updates any affected UI documentation or local setup notes for the user-management flow.
 <!-- AC:END -->

@@ -15,7 +15,7 @@ export class PublicApiService {
         endpoint: joinUrlSegments(this.basePath, 'palio', 'standings'),
         bullets: [
           'Anonymous route area under /public.',
-          'Immediate visibility remains a backend/public-read concern.',
+          'Immediate visibility remains a api/public-read concern.',
           'Projection-backed screens land in later slices.'
         ],
         surface: 'public'

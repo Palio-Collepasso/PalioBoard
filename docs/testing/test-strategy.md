@@ -7,13 +7,13 @@ Describe the testing approach, test layers, ownership, and minimum expectations 
 ## Goals
 
 - Catch regressions in trust-critical workflows early.
-- Keep feedback fast for common backend and frontend changes.
+- Keep feedback fast for common api and frontend changes.
 - Match test depth to the layer where the risk actually lives.
 - Keep Playwright intentionally small and focused on operationally critical flows.
 
 ## Current Coverage Note
 
-The current repo only automates foundation-stage backend smoke, contract, and shell-reachability checks.
+The current repo only automates foundation-stage api smoke, contract, and shell-reachability checks.
 
 Future note:
 - promote a separate realtime-integration layer here when live ranking transport and conflict behavior land
@@ -24,9 +24,9 @@ Future note:
 
 | Layer | Purpose | Scope | Speed | Typical owner |
 |---|---|---|---|---|
-| Unit | Prove pure, deterministic business or utility logic | calculations, validation helpers, ranking derivation helpers, DTO mappers | fast | backend or frontend feature author |
-| Integration | Prove workflow correctness across real infrastructure boundaries | FastAPI workflows, Postgres transactions, migrations, audit/projection side effects | medium | backend feature author |
-| API contract | Prove committed client/server shape stays stable | OpenAPI export, generated types, endpoint/status surface | medium | backend author with frontend consumer validation |
+| Unit | Prove pure, deterministic business or utility logic | calculations, validation helpers, ranking derivation helpers, DTO mappers | fast | api or frontend feature author |
+| Integration | Prove workflow correctness across real infrastructure boundaries | FastAPI workflows, Postgres transactions, migrations, audit/projection side effects | medium | api feature author |
+| API contract | Prove committed client/server shape stays stable | OpenAPI export, generated types, endpoint/status surface | medium | api author with frontend consumer validation |
 | E2E | Prove must-not-break user-visible flows through the deployed stack | same-origin shell reachability today; broader operational flows later | slow | frontend or full-stack feature author |
 | Manual verification | Cover risky operational checks not yet automated | deploy smoke, migration review, incident recovery checks | variable | change owner or reviewer |
 
@@ -38,7 +38,7 @@ Future note:
 - Prefer the cheapest test that can reliably catch the real risk.
 - DB-centric workflows belong in real Postgres integration tests, not mocks.
 - Official result, audit, and projection behavior must be proven together when they share one transaction.
-- Frontend tests should protect rendering and interaction wiring, not re-implement backend-owned business rules.
+- Frontend tests should protect rendering and interaction wiring, not re-implement api-owned business rules.
 - Critical flows can be covered end-to-end, but the suite must stay small and high-signal.
 - Static checks complement behavior tests; they do not replace them.
 
@@ -77,7 +77,7 @@ Template for each test-layer entry: `docs/templates/testing/test-layer-expectati
 - **What not to test:**
   - transactional workflow semantics
   - proxying, migrations, or container orchestration
-- **Preferred test style:** Table-driven backend cases and focused frontend behavior specs.
+- **Preferred test style:** Table-driven api cases and focused frontend behavior specs.
 - **Fixtures/mocks guidance:** Keep fixtures minimal and explicit; avoid repository mocks for DB-backed workflows.
 
 ### Integration Tests
@@ -127,7 +127,7 @@ Template for each test-layer entry: `docs/templates/testing/test-layer-expectati
 
 Template for each coverage-expectation entry: `docs/templates/testing/coverage-expectation.template.md`
 
-### Backend workflow and persistence changes
+### Api workflow and persistence changes
 
 - **Minimum required tests:**
   - integration coverage against real Postgres
@@ -142,7 +142,7 @@ Template for each coverage-expectation entry: `docs/templates/testing/coverage-e
   - focused frontend behavior tests
 - **Nice-to-have tests:**
   - Playwright coverage only when the affected path is already considered critical
-- **Notes:** Avoid large snapshots and keep business-rule ownership in backend tests.
+- **Notes:** Avoid large snapshots and keep business-rule ownership in api tests.
 
 ### Realtime or browser critical-flow changes
 
@@ -165,7 +165,7 @@ Template for each coverage-expectation entry: `docs/templates/testing/coverage-e
 ## Non-Goals
 
 - Broad UI snapshot coverage.
-- SQLite substitutes for backend integration tests.
+- SQLite substitutes for api integration tests.
 - Large browser suites before the corresponding user journeys exist.
 
 ## Flaky Test Policy
@@ -190,13 +190,13 @@ The current maintained scenario set is intentionally small:
 
 ### `CS-001` — Foundation smoke set
 
-- **Purpose:** Provide the minimum shared scenarios needed to validate the current backend and browser scaffolds honestly.
+- **Purpose:** Provide the minimum shared scenarios needed to validate the current api and browser scaffolds honestly.
 - **Fixtures included:**
   - `FX-001`
   - `FX-002`
 - **Used for:**
   - local regression checks for the current scaffolded stack
-  - baseline backend integration and browser smoke verification
+  - baseline api integration and browser smoke verification
 
 Future note:
 - add richer scenario sets here when stable named business fixtures exist across multiple suites

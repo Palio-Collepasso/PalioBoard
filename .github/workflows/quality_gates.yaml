@@ -34,7 +34,7 @@ jobs:
           cache: "npm"
           cache-dependency-path: apps/web/package-lock.json
 
-      - name: Install backend tooling
+      - name: Install api tooling
         working-directory: apps/api
         run: uv sync --frozen --group dev
 

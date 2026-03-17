@@ -16,14 +16,14 @@ Establish the project skeleton, delivery rails, and architectural guardrails so 
 - PostgreSQL, Alembic, and baseline migrations.
 - Docker Compose, Nginx, health/version endpoints, env-based config.
 - CI, pre-commit, lint/format/typecheck/test commands, OpenAPI export/generation workflow.
-- Test harnesses for backend unit/integration tests, frontend tests, and Playwright smoke setup.
+- Test harnesses for api unit/integration tests, frontend tests, and Playwright smoke setup.
 
 **Exit criteria**
 
 - The whole stack boots locally from documented commands.
 - CI runs and enforces the agreed baseline checks.
 - A baseline migration creates the empty schema successfully.
-- Backend/frontend shells are reachable and wired through the same-origin proxy.
+- Api/frontend shells are reachable and wired through the same-origin proxy.
 - Architectural guardrails are in place enough to prevent obvious boundary violations.
 
 **Risks**
@@ -48,7 +48,7 @@ Make the application configurable and safe to access so admins can prepare a sea
 
 **Scope**
 
-- Supabase Auth integration at the backend boundary.
+- Supabase Auth integration at the api boundary.
 - Application users, seeded roles, seeded capabilities, and policy checks.
 - Minimal superadmin-only user provisioning flow.
 - One-season setup flow in the UI.
@@ -61,7 +61,7 @@ Make the application configurable and safe to access so admins can prepare a sea
 **Exit criteria**
 
 - A superadmin can create a user with one seeded role.
-- Admin and judge access is enforced by backend policy, not only by UI hiding.
+- Admin and judge access is enforced by api policy, not only by UI hiding.
 - An admin can configure the season, teams, games, selected fields, and points tables from the UI.
 - Attempts to perform unauthorized actions are rejected with structured errors.
 - Setup immutability rules are implemented and covered by tests.

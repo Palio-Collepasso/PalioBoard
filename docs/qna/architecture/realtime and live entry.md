@@ -19,10 +19,10 @@
 **Decision:** Field leases are stored in a dedicated database-backed lease table keyed by game and field, with holder, token, and expiration metadata.
 
 ### 44. What is the source of truth for time?
-**Decision:** The backend/database clock is authoritative for all business and collaboration timing, including lease expiry.
+**Decision:** The api/database clock is authoritative for all business and collaboration timing, including lease expiry.
 
 ### 45. How are live drafts modeled in the final design?
-**Decision:** Live-game state is **memory-first**. Active draft values, leases, connected editors, and live revision counters live in backend memory first. Persisted draft snapshots exist separately for restart recovery, but live collaboration is driven from memory.
+**Decision:** Live-game state is **memory-first**. Active draft values, leases, connected editors, and live revision counters live in api memory first. Persisted draft snapshots exist separately for restart recovery, but live collaboration is driven from memory.
 
 ### 46. Are live draft snapshots part of official audited business history?
 **Decision:** No. Persisted draft snapshots are stored in a dedicated provisional draft area/table/module, clearly separate from official business state and audit history.
@@ -33,8 +33,8 @@
 - when a field lease ends
 - as a best-effort flush when the user leaves/closes the game
 
-### 48. How is live state restored after backend restart?
-**Decision:** On restart, the backend reloads the persisted provisional draft snapshots into memory. That hydrated in-memory state becomes the new live draft state, and reconnecting clients receive it.
+### 48. How is live state restored after api restart?
+**Decision:** On restart, the api reloads the persisted provisional draft snapshots into memory. That hydrated in-memory state becomes the new live draft state, and reconnecting clients receive it.
 
 ### 49. Can multiple games be in progress simultaneously?
 **Decision:** Yes. The architecture must support multiple in-progress games at once, especially for Prepalio scenarios.
@@ -50,10 +50,10 @@
 ### 51. How are realtime channels scoped?
 **Decision:** Realtime is scoped **per game**. There is one logical live collaboration/read stream per `game_id`, not a global current-game channel.
 
-### 52. Is there special backend business logic for maxi-screen selection?
-**Decision:** No. Maxi-screen pages are normal Angular pages designed for projector usage. There is no special backend “featured game” business state. A user with the frontend-only maxi-screen shortcut can simply open the page for a specific game.
+### 52. Is there special api business logic for maxi-screen selection?
+**Decision:** No. Maxi-screen pages are normal Angular pages designed for projector usage. There is no special api “featured game” business state. A user with the frontend-only maxi-screen shortcut can simply open the page for a specific game.
 
-### 53. Is the maxi-screen route protected by backend authorization?
+### 53. Is the maxi-screen route protected by api authorization?
 **Decision:** No. Maxi-screen is a public route. The related capability exists only so the frontend can show or hide a shortcut/button.
 
 ### 54. What is sent over realtime channels?

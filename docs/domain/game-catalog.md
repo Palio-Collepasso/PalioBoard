@@ -695,4 +695,4 @@ These entries represent the Giocasport games listed in the regulation. They belo
    - any game whose native mechanics later change by organizer clarification
 
 9. **Public-facing terminology should mirror the regulation.**  
-   Even when the backend normalizes a game to `ranking` or `tournament_1v1`, the UI should still show the actual regulation-facing game name and any important organizer notes.
+   Even when the api normalizes a game to `ranking` or `tournament_1v1`, the UI should still show the actual regulation-facing game name and any important organizer notes.

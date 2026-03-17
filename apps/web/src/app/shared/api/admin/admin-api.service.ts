@@ -27,7 +27,7 @@ export class AdminApiService {
         bullets: [
           'No global store is introduced in the scaffold.',
           'Shared UI stays generic and import-safe.',
-          'Backend ownership remains in Python only.'
+          'Api ownership remains in Python only.'
         ],
         surface: 'admin'
       }

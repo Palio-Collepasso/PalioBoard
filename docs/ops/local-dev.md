@@ -24,24 +24,24 @@ Explain how to set up, run, and troubleshoot the project locally.
 2. Install frontend dependencies with `cd apps/web && npm install`.
 3. Install Git hooks from `apps/api` with `uv run --group dev pre-commit install --hook-type pre-commit --hook-type pre-push`.
 4. Install the Playwright Chromium browser once from `apps/web` with `npm run e2e:install`.
-5. Configure backend env vars only when you need non-default runtime or test DB settings.
-6. Start the backend with `make backend-dev` and the frontend with `make web-dev` for the native hot-reload loop, or use `make up` for the same-origin smoke stack.
+5. Configure api env vars only when you need non-default runtime or test DB settings.
+6. Start the api with `make api-dev` and the frontend with `make web-dev` for the native hot-reload loop, or use `make up` for the same-origin smoke stack.
 7. Apply migrations explicitly before workflows that need the schema.
-8. Verify health with `curl http://127.0.0.1:8080/healthz` or the equivalent backend-local endpoint.
+8. Verify health with `curl http://127.0.0.1:8080/healthz` or the equivalent api-local endpoint.
 
 ## Environment Variables
 
 | Variable | Required | Default | Used by | Description |
 |---|---|---|---|---|
-| `PALIO_ENV` | no | `development` | backend runtime | Selects typed runtime settings |
-| `PALIO_LOG_LEVEL` | no | app default | backend runtime | Controls JSON log verbosity |
-| `PALIO_REQUEST_ID_HEADER` | no | `X-Request-ID` | backend runtime | Overrides the propagated request-id header name |
-| `PALIO_BUILD_VERSION` | no | app default | backend runtime | Overrides `/version` output |
-| `PALIO_BUILD_COMMIT_SHA` | no | unset | backend runtime | Adds build metadata to `/version` |
-| `PALIO_DB_RUNTIME_URL` | yes for DB-backed runtime paths | unset | backend runtime | Runtime database connection string |
+| `PALIO_ENV` | no | `development` | api runtime | Selects typed runtime settings |
+| `PALIO_LOG_LEVEL` | no | app default | api runtime | Controls JSON log verbosity |
+| `PALIO_REQUEST_ID_HEADER` | no | `X-Request-ID` | api runtime | Overrides the propagated request-id header name |
+| `PALIO_BUILD_VERSION` | no | app default | api runtime | Overrides `/version` output |
+| `PALIO_BUILD_COMMIT_SHA` | no | unset | api runtime | Adds build metadata to `/version` |
+| `PALIO_DB_RUNTIME_URL` | yes for DB-backed runtime paths | unset | api runtime | Runtime database connection string |
 | `PALIO_DB_MIGRATION_URL` | yes for migrations | unset | Alembic and migrate workflow | Admin/migration database connection string |
-| `PALIO_TEST_POSTGRES_URL` | no | disposable Postgres test container matching `infra/compose/docker-compose.yml` | backend integration tests | Reuses an existing local admin database for integration tests |
-| `PALIO_TEST_POSTGRES_IMAGE` | no | DB image from `infra/compose/docker-compose.yml` | backend integration tests | Overrides the image used by the disposable integration-test database |
+| `PALIO_TEST_POSTGRES_URL` | no | disposable Postgres test container matching `infra/compose/docker-compose.yml` | api integration tests | Reuses an existing local admin database for integration tests |
+| `PALIO_TEST_POSTGRES_IMAGE` | no | DB image from `infra/compose/docker-compose.yml` | api integration tests | Overrides the image used by the disposable integration-test database |
 
 ## Commands
 
@@ -60,10 +60,10 @@ make up
 docker compose -f infra/compose/docker-compose.yml --profile ops run --rm migrate
 ```
 
-### Run backend
+### Run api
 
 ```bash
-make backend-dev
+make api-dev
 ```
 
 ### Run frontend
@@ -96,7 +96,7 @@ make verify
 
 1. Follow [Quick Start](#quick-start)
 2. Choose either:
-  - the native loop: `make backend-dev`, `make web-dev`, or
+  - the native loop: `make api-dev`, `make web-dev`, or
   - the same-origin smoke path: `make up` plus the one-shot `migrate` service.
 
 ### Reset local database
@@ -116,7 +116,7 @@ make verify
 
 ### Run a specific test
 
-1. Use `cd apps/api && uv run --group dev pytest tests/unit` or `cd apps/api && uv run --group dev pytest tests/integration` for backend layers.
+1. Use `cd apps/api && uv run --group dev pytest tests/unit` or `cd apps/api && uv run --group dev pytest tests/integration` for api layers.
 2. Use `cd apps/web && npm test -- --watch=false` for frontend behavior tests or `cd apps/web && npm run e2e` for the browser smoke suite.
 
 ### Run the Git hooks manually
@@ -137,14 +137,14 @@ make verify
 
 Template for each troubleshooting entry: `docs/templates/ops/local-dev-troubleshooting-item.template.md`
 
-### Backend readiness stays unhealthy
+### API readiness stays unhealthy
 
 - **Symptoms:**
   - `/readyz` returns `503`
 - **Likely cause:** The runtime DB is unavailable or migrations have not been applied.
 - **How to diagnose:**
   - Check `PALIO_DB_RUNTIME_URL`
-  - Run the one-shot migrate command and inspect backend logs
+  - Run the one-shot migrate command and inspect api logs
 - **How to fix:**
   1. Ensure the DB service is reachable.
   2. Apply migrations explicitly before retrying readiness checks.
@@ -168,7 +168,7 @@ Template for each troubleshooting entry: `docs/templates/ops/local-dev-troublesh
 - **Symptoms:**
   - `.git/hooks/pre-commit` or `.git/hooks/pre-push` exits immediately
   - `uv run --group dev pre-commit ...` fails before the repo checks run
-- **Likely cause:** The backend dev tooling group was not installed through `uv run`, or the hooks were never installed for this clone/worktree.
+- **Likely cause:** The api dev tooling group was not installed through `uv run`, or the hooks were never installed for this clone/worktree.
 - **How to diagnose:**
   - Re-run `cd apps/api && uv run --group dev pre-commit --version`
   - Check whether `.git/hooks/pre-commit` and `.git/hooks/pre-push` exist
@@ -177,7 +177,7 @@ Template for each troubleshooting entry: `docs/templates/ops/local-dev-troublesh
   2. Re-run the desired hook stage with `uv run --group dev pre-commit run --all-files --hook-stage ...`.
 - **Prevention:** Install the hooks as part of the initial local bootstrap.
 
-### `make check-openapi` fails after backend or contract changes
+### `make check-openapi` fails after api or contract changes
 
 - **Symptoms:**
   - `make check-openapi` exits non-zero
@@ -198,9 +198,9 @@ Template for each troubleshooting entry: `docs/templates/ops/local-dev-troublesh
 
 Template for each FAQ entry: `docs/templates/ops/local-dev-faq-item.template.md`
 
-### Should I use Docker Compose for daily frontend and backend coding?
+### Should I use Docker Compose for daily frontend and api coding?
 
-Use native `make backend-dev` and `make web-dev` for the normal hot-reload loop. Keep full Compose runs for same-origin verification and production-like smoke checks.
+Use native `make api-dev` and `make web-dev` for the normal hot-reload loop. Keep full Compose runs for same-origin verification and production-like smoke checks.
 
 ### Are migrations run automatically by `make up`?
 

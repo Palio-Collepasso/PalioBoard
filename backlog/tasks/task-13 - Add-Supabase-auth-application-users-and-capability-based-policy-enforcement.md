@@ -26,12 +26,12 @@ priority: high
 ## Description
 
 <!-- SECTION:DESCRIPTION:BEGIN -->
-Introduce the backend identity and authorization foundation for m-1 so protected APIs resolve real application users, seeded roles/capabilities, and backend-enforced policy checks before any setup workflows depend on them.
+Introduce the api identity and authorization foundation for m-1 so protected APIs resolve real application users, seeded roles/capabilities, and api-enforced policy checks before any setup workflows depend on them.
 <!-- SECTION:DESCRIPTION:END -->
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Protected backend entry points validate Supabase bearer tokens through an explicit identity-provider adapter and resolve a linked application user for request and audit context.
+- [ ] #1 Protected api entry points validate Supabase bearer tokens through an explicit identity-provider adapter and resolve a linked application user for request and audit context.
 - [ ] #2 The application schema and seed workflow provide a code-defined capability vocabulary, roles, role-capability mappings, user-role assignments, and the default Superadmin/Admin/Judge bundles plus a documented bootstrap path for the first superadmin.
 - [ ] #3 Capability-based policy helpers return structured unauthorized and forbidden errors, and the task updates the affected tests, docs, and committed API contracts.
 <!-- AC:END -->

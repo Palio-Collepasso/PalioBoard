@@ -1,6 +1,6 @@
 ---
 id: TASK-8
-title: Add backend unit and integration test harnesses against real Postgres
+title: Add api unit and integration test harnesses against real Postgres
 status: Done
 assignee:
   - '@codex'
@@ -22,12 +22,12 @@ priority: medium
 ## Description
 
 <!-- SECTION:DESCRIPTION:BEGIN -->
-Create the backend testing baseline with fast unit-test entrypoints and Postgres-backed integration-test wiring that applies real migrations and exercises the application skeleton honestly.
+Create the api testing baseline with fast unit-test entrypoints and Postgres-backed integration-test wiring that applies real migrations and exercises the application skeleton honestly.
 <!-- SECTION:DESCRIPTION:END -->
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [x] #1 Backend tests are split into unit and Postgres-backed integration layers in line with the documented strategy.
+- [x] #1 Api tests are split into unit and Postgres-backed integration layers in line with the documented strategy.
 - [x] #2 Integration tests run against a real local PostgreSQL database and apply real migrations rather than using SQLite substitutes.
 - [x] #3 The test harness includes at least one smoke path for app startup or health endpoints and one smoke path for migration/application bootstrapping.
 <!-- AC:END -->
@@ -35,24 +35,24 @@ Create the backend testing baseline with fast unit-test entrypoints and Postgres
 ## Implementation Plan
 
 <!-- SECTION:PLAN:BEGIN -->
-1. Restructure the backend pytest layout into explicit `unit` and `integration` layers under `apps/api/tests/`, moving the current smoke/config/boundary tests into the appropriate bucket and updating `apps/api/pyproject.toml` plus the top-level `Makefile` so the backend test entrypoint runs the split deliberately instead of one undifferentiated suite.
-2. Add shared backend test support under `apps/api/tests/` for environment overrides, app/runtime construction, and reusable assertions so unit tests stay DB-free while integration tests opt into real Postgres wiring through a single documented harness.
-3. Introduce a real-Postgres integration harness that targets a local PostgreSQL server, creates isolated test databases for the suite, applies the real Alembic migrations into those databases, and then feeds the resulting runtime/migration URLs into the backend without any SQLite fallback or fake DB layer.
+1. Restructure the api pytest layout into explicit `unit` and `integration` layers under `apps/api/tests/`, moving the current smoke/config/boundary tests into the appropriate bucket and updating `apps/api/pyproject.toml` plus the top-level `Makefile` so the api test entrypoint runs the split deliberately instead of one undifferentiated suite.
+2. Add shared api test support under `apps/api/tests/` for environment overrides, app/runtime construction, and reusable assertions so unit tests stay DB-free while integration tests opt into real Postgres wiring through a single documented harness.
+3. Introduce a real-Postgres integration harness that targets a local PostgreSQL server, creates isolated test databases for the suite, applies the real Alembic migrations into those databases, and then feeds the resulting runtime/migration URLs into the api without any SQLite fallback or fake DB layer.
 4. Add the first Postgres-backed smoke coverage required by this task: one integration path that proves migration/bootstrap against a real database (for example asserting the migrated `palio_board` schema exists) and one integration path that proves the application/readiness surface works when pointed at the migrated Postgres runtime. Keep app-boot/config smoke coverage that does not need a live DB in the unit layer.
-5. Update the affected documentation and repo guidance so the new backend harness is the documented truth: at minimum `apps/api/README.md`, `README.md`, `docs/ops/local-dev.md`, `docs/testing/test-strategy.md`, and `REDLINING.md` should explain the unit/integration split, the local Postgres prerequisite/configuration, and the intended validation commands (`pytest` layer commands plus `make test-backend`).
-6. Validate the finished harness with the narrowest honest checks for this task: run the unit suite, run the Postgres-backed integration suite against a real local database with real migrations, and confirm the stable repo entrypoint (`make test-backend`) exercises the split successfully.
+5. Update the affected documentation and repo guidance so the new api harness is the documented truth: at minimum `apps/api/README.md`, `README.md`, `docs/ops/local-dev.md`, `docs/testing/test-strategy.md`, and `REDLINING.md` should explain the unit/integration split, the local Postgres prerequisite/configuration, and the intended validation commands (`pytest` layer commands plus `make test-api`).
+6. Validate the finished harness with the narrowest honest checks for this task: run the unit suite, run the Postgres-backed integration suite against a real local database with real migrations, and confirm the stable repo entrypoint (`make test-api`) exercises the split successfully.
 <!-- SECTION:PLAN:END -->
 
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
-Research completed before planning: reviewed Backlog workflow overview/task-execution guidance, TASK-8 plus dependency task records (TASK-2, TASK-4, TASK-5), `apps/api/AGENTS.md`, `apps/api/README.md`, `docs/testing/test-strategy.md`, `docs/ops/local-dev.md`, `docs/qna/architecture/deployment and operations.md`, `docs/qna/data/schema and migrations.md`, `docs/architecture/architecture.md`, `docs/architecture/adr/ADR-0009-testing-and-quality-gates.md`, the top-level `README.md`, and the current backend runtime/migration/test files.
+Research completed before planning: reviewed Backlog workflow overview/task-execution guidance, TASK-8 plus dependency task records (TASK-2, TASK-4, TASK-5), `apps/api/AGENTS.md`, `apps/api/README.md`, `docs/testing/test-strategy.md`, `docs/ops/local-dev.md`, `docs/qna/architecture/deployment and operations.md`, `docs/qna/data/schema and migrations.md`, `docs/architecture/architecture.md`, `docs/architecture/adr/ADR-0009-testing-and-quality-gates.md`, the top-level `README.md`, and the current api runtime/migration/test files.
 
-Current codebase findings: `apps/api/tests/` is still a single unsplit smoke suite (`test_app.py`, `test_db_runtime.py`, `test_settings.py`, `test_module_boundaries.py`, `test_openapi_export.py`); `make test-backend` still runs `cd apps/api && uv run pytest`; Alembic and runtime DB wiring already exist, and the baseline migration creates only the `palio_board` schema.
+Current codebase findings: `apps/api/tests/` is still a single unsplit smoke suite (`test_app.py`, `test_db_runtime.py`, `test_settings.py`, `test_module_boundaries.py`, `test_openapi_export.py`); `make test-api` still runs `cd apps/api && uv run pytest`; Alembic and runtime DB wiring already exist, and the baseline migration creates only the `palio_board` schema.
 
 Local prerequisite check completed during planning: `uv` and `docker` are available in this worktree environment, so a real-local-Postgres integration harness is viable. No code changes started; waiting for explicit user approval before implementation.
 
-Implemented the split backend harness under `apps/api/tests/unit/` and `apps/api/tests/integration/`, plus shared Postgres helpers under `apps/api/tests/support/postgres.py`. `make test-backend` now runs the two layers sequentially, and app-local `uv run pytest` also succeeds against the packaged split layout.
+Implemented the split api harness under `apps/api/tests/unit/` and `apps/api/tests/integration/`, plus shared Postgres helpers under `apps/api/tests/support/postgres.py`. `make test-api` now runs the two layers sequentially, and app-local `uv run pytest` also succeeds against the packaged split layout.
 
 Integration tests now use a real local PostgreSQL database only: by default they start a disposable Docker `postgres:16-alpine` container, create isolated test databases, and apply the real Alembic migrations with `python -m alembic -x db_url=... upgrade head`. `PALIO_TEST_POSTGRES_URL` can point the suite at an existing local admin database instead.
 
@@ -66,15 +66,15 @@ During validation, the existing `palio.db` package export mismatch surfaced beca
 ## Final Summary
 
 <!-- SECTION:FINAL_SUMMARY:BEGIN -->
-Implemented TASK-8 by splitting the backend suite into `apps/api/tests/unit/` and `apps/api/tests/integration/`, updating `apps/api/pyproject.toml` and the top-level `Makefile` so the backend test entrypoint now runs fast unit checks separately from the real-Postgres integration layer.
+Implemented TASK-8 by splitting the api suite into `apps/api/tests/unit/` and `apps/api/tests/integration/`, updating `apps/api/pyproject.toml` and the top-level `Makefile` so the api test entrypoint now runs fast unit checks separately from the real-Postgres integration layer.
 
 Added a reusable Postgres integration harness in `apps/api/tests/support/postgres.py`. The integration suite either reuses an existing local Postgres admin database via `PALIO_TEST_POSTGRES_URL` or starts a disposable Docker `postgres:16-alpine` container, then creates isolated test databases and applies the real Alembic migrations before exercising the app.
 
-Added the first honest smoke coverage at the correct layer: a migration/bootstrap test that asserts the real migrated `palio_board` schema and Alembic revision exist, and an app/readiness smoke test that verifies `/readyz`, `/healthz`, and `/version` against a migrated Postgres runtime. Updated the backend/local-dev/testing docs and `REDLINING.md` to match the new harness.
+Added the first honest smoke coverage at the correct layer: a migration/bootstrap test that asserts the real migrated `palio_board` schema and Alembic revision exist, and an app/readiness smoke test that verifies `/readyz`, `/healthz`, and `/version` against a migrated Postgres runtime. Updated the api/local-dev/testing docs and `REDLINING.md` to match the new harness.
 
 Validation run:
 - `cd apps/api && uv run pytest tests/unit`
 - `cd apps/api && uv run pytest tests/integration`
 - `cd apps/api && uv run pytest`
-- `env -u VIRTUAL_ENV make test-backend`
+- `env -u VIRTUAL_ENV make test-api`
 <!-- SECTION:FINAL_SUMMARY:END -->

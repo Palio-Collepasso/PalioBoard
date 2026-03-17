@@ -24,7 +24,7 @@ def create_meta_router(runtime: ApplicationRuntime) -> APIRouter:
         "/readyz",
         responses={
             status.HTTP_503_SERVICE_UNAVAILABLE: {
-                "description": "Backend runtime is not ready"
+                "description": "Api runtime is not ready"
             }
         },
     )

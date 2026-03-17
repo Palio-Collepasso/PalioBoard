@@ -23,11 +23,11 @@ It captures the **current architecture direction** up to this point in the conve
 ### 5. Is portability to plain Postgres a hard requirement?
 **Decision:** Yes. The architecture must remain portable to self-hosted Postgres later, so Supabase-specific features must not become part of core business correctness.
 
-### 6. Should the backend connect to Supabase through Supabase data APIs?
+### 6. Should the api connect to Supabase through Supabase data APIs?
 **Decision:** No. Python connects directly to Postgres using standard database connectivity and treats Supabase as a hosted Postgres instance.
 
 ### 7. Should runtime authorization depend on Postgres RLS or user-level DB identities?
-**Decision:** No. Authorization stays in Python. The backend uses a single application DB user for runtime access rather than impersonating end users at the database level.
+**Decision:** No. Authorization stays in Python. The api uses a single application DB user for runtime access rather than impersonating end users at the database level.
 
 ---
 
@@ -58,7 +58,7 @@ It captures the **current architecture direction** up to this point in the conve
 **Decision:** v1 includes only a **minimal superadmin UI** for creating a user with an email, a password, and a seeded role. Users are active immediately on creation.
 
 ### 16. Does the minimal user UI also provision the identity-provider account?
-**Decision:** Yes. The backend provisions the Auth identity and the linked application user in a single orchestrated workflow.
+**Decision:** Yes. The api provisions the Auth identity and the linked application user in a single orchestrated workflow.
 
 ### 17. What login method is used in v1?
 **Decision:** Email and password.
@@ -67,7 +67,7 @@ It captures the **current architecture direction** up to this point in the conve
 **Decision:** No. v1 keeps provisioning extremely minimal: the superadmin creates the user with a password, and credentials are handed over manually offline.
 
 ### 19. How are cross-system provisioning failures handled?
-**Decision:** User provisioning is treated as a two-step external workflow with best-effort compensation. The backend creates the identity-provider account first, then creates the application user. If the second step fails, the backend attempts to remove the identity-provider account and logs any unrecoverable partial failure clearly.
+**Decision:** User provisioning is treated as a two-step external workflow with best-effort compensation. The api creates the identity-provider account first, then creates the application user. If the second step fails, the api attempts to remove the identity-provider account and logs any unrecoverable partial failure clearly.
 
 ### 20. Should auth be abstracted for future SSO/custom identity?
 **Decision:** Yes. Authentication and provisioning sit behind explicit identity-provider adapters so Supabase Auth can be replaced later without touching application/domain logic.
@@ -77,9 +77,9 @@ It captures the **current architecture direction** up to this point in the conve
 
 ---
 
-## 3. Backend structure and module boundaries
+## 3. Api structure and module boundaries
 
-### 22. What backend architecture style should be used?
+### 22. What api architecture style should be used?
 **Decision:** A Python **modular monolith** with explicit bounded modules.
 
 ### 23. How are module boundaries enforced?
@@ -156,10 +156,10 @@ It captures the **current architecture direction** up to this point in the conve
 **Decision:** Field leases are stored in a dedicated database-backed lease table keyed by game and field, with holder, token, and expiration metadata.
 
 ### 44. What is the source of truth for time?
-**Decision:** The backend/database clock is authoritative for all business and collaboration timing, including lease expiry.
+**Decision:** The api/database clock is authoritative for all business and collaboration timing, including lease expiry.
 
 ### 45. How are live drafts modeled in the final design?
-**Decision:** Live-game state is **memory-first**. Active draft values, leases, connected editors, and live revision counters live in backend memory first. Persisted draft snapshots exist separately for restart recovery, but live collaboration is driven from memory.
+**Decision:** Live-game state is **memory-first**. Active draft values, leases, connected editors, and live revision counters live in api memory first. Persisted draft snapshots exist separately for restart recovery, but live collaboration is driven from memory.
 
 ### 46. Are live draft snapshots part of official audited business history?
 **Decision:** No. Persisted draft snapshots are stored in a dedicated provisional draft area/table/module, clearly separate from official business state and audit history.
@@ -170,8 +170,8 @@ It captures the **current architecture direction** up to this point in the conve
 - when a field lease ends
 - as a best-effort flush when the user leaves/closes the game
 
-### 48. How is live state restored after backend restart?
-**Decision:** On restart, the backend reloads the persisted provisional draft snapshots into memory. That hydrated in-memory state becomes the new live draft state, and reconnecting clients receive it.
+### 48. How is live state restored after api restart?
+**Decision:** On restart, the api reloads the persisted provisional draft snapshots into memory. That hydrated in-memory state becomes the new live draft state, and reconnecting clients receive it.
 
 ### 49. Can multiple games be in progress simultaneously?
 **Decision:** Yes. The architecture must support multiple in-progress games at once, especially for Prepalio scenarios.
@@ -189,10 +189,10 @@ It captures the **current architecture direction** up to this point in the conve
 ### 51. How are realtime channels scoped?
 **Decision:** Realtime is scoped **per game**. There is one logical live collaboration/read stream per `game_id`, not a global current-game channel.
 
-### 52. Is there special backend business logic for maxi-screen selection?
-**Decision:** No. Maxi-screen pages are normal Angular pages designed for projector usage. There is no special backend “featured game” business state. A user with the frontend-only maxi-screen shortcut can simply open the page for a specific game.
+### 52. Is there special api business logic for maxi-screen selection?
+**Decision:** No. Maxi-screen pages are normal Angular pages designed for projector usage. There is no special api “featured game” business state. A user with the frontend-only maxi-screen shortcut can simply open the page for a specific game.
 
-### 53. Is the maxi-screen route protected by backend authorization?
+### 53. Is the maxi-screen route protected by api authorization?
 **Decision:** No. Maxi-screen is a public route. The related capability exists only so the frontend can show or hide a shortcut/button.
 
 ### 54. What is sent over realtime channels?
@@ -221,7 +221,7 @@ It captures the **current architecture direction** up to this point in the conve
 **Decision:** REST with explicit command/query endpoints. The API surface is intent-oriented, not generic CRUD.
 
 ### 61. Is the API split into multiple surfaces?
-**Decision:** Yes. The backend is explicitly split into:
+**Decision:** Yes. The api is explicitly split into:
 - `/api/admin/...` for authenticated command/query operations
 - `/api/public/...` for anonymous read models
 - `/realtime/...` for SSE and WebSocket endpoints
@@ -266,7 +266,7 @@ Angular translates error codes and data into user-friendly messages.
 **Decision:** Yes. It should have explicit internal boundaries, using separate shell areas, features, and a single `shared/` root with subfolders such as `shared/ui` and `shared/api`.
 
 ### 71. How is frontend API access organized?
-**Decision:** Separate Angular API service layers exist for each backend surface: admin, public, and realtime.
+**Decision:** Separate Angular API service layers exist for each api surface: admin, public, and realtime.
 
 ### 72. Is realtime handling global in the SPA?
 **Decision:** No. Realtime handling is feature-scoped per shell/feature, not managed through one global application-wide store or bus.
@@ -281,7 +281,7 @@ Angular translates error codes and data into user-friendly messages.
 ### 74. What owns schema evolution?
 **Decision:** Alembic is the primary source of truth for schema evolution. Supabase is treated as a hosting platform, not the schema authority.
 
-### 75. Are schema changes run automatically on backend startup?
+### 75. Are schema changes run automatically on api startup?
 **Decision:** No. Migrations are an explicit deployment step.
 
 ### 76. Are runtime and migration DB credentials separated?
@@ -306,8 +306,8 @@ Angular translates error codes and data into user-friendly messages.
 ### 81. What reverse proxy is used?
 **Decision:** Nginx.
 
-### 82. Is one backend instance assumed in v1?
-**Decision:** Yes. v1 assumes one backend instance, while still keeping correctness in DB-backed structures where needed and avoiding in-memory correctness dependencies where possible.
+### 82. Is one api instance assumed in v1?
+**Decision:** Yes. v1 assumes one api instance, while still keeping correctness in DB-backed structures where needed and avoiding in-memory correctness dependencies where possible.
 
 ### 83. Is extra infrastructure such as Redis or message brokers required in v1?
 **Decision:** No. v1 intentionally avoids Redis, brokers, worker services, and other extra runtime components. Redis may become relevant later as an implementation of the live-state adapter.
@@ -344,22 +344,22 @@ Angular translates error codes and data into user-friendly messages.
 **Decision:** Production uses the real identity-provider adapter, while local development can use a dev identity adapter or bypass mode so the team can work locally without depending on the real cloud identity service.
 
 ### 93. What test database is used?
-**Decision:** Backend integration tests use a real local Postgres test database, not SQLite.
+**Decision:** Api integration tests use a real local Postgres test database, not SQLite.
 
 ### 94. What repository strategy is used?
-**Decision:** The whole project uses a monorepo containing frontend, backend, shared generated API types, migrations, and deployment configuration.
+**Decision:** The whole project uses a monorepo containing frontend, api, shared generated API types, migrations, and deployment configuration.
 
 ---
 
-## 12. Backend stack, project structure, and developer tooling
+## 12. Api stack, project structure, and developer tooling
 
-### 95. What framework and core backend stack are standardized for v1?
+### 95. What framework and core api stack are standardized for v1?
 **Decision:** Standardize on **FastAPI + Pydantic DTOs + SQLAlchemy 2.x + Alembic**. Keep API DTOs and persistence models separate so transport contracts do not leak into ORM internals.
 
 ### 96. What project structure should the monorepo use?
-**Decision:** Use a single monorepo with `apps/api`, `apps/web`, `infra`, `docs`, `tools`, and a top-level `Makefile` plus `.github/workflows`. The backend keeps bounded modules with `facade/application/domain/infrastructure`; the frontend keeps three lazy shells, `features/`, and one `shared/` root with subfolders.
+**Decision:** Use a single monorepo with `apps/api`, `apps/web`, `infra`, `docs`, `tools`, and a top-level `Makefile` plus `.github/workflows`. The api keeps bounded modules with `facade/application/domain/infrastructure`; the frontend keeps three lazy shells, `features/`, and one `shared/` root with subfolders.
 
-### 97. Should `event_operations` and `results` remain separate backend modules?
+### 97. Should `event_operations` and `results` remain separate api modules?
 **Decision:** Yes. `event_operations` should own lifecycle/state transitions, while `results` owns canonical official result persistence. That boundary will stay useful as live draft and review flows grow.
 
 ### 98. What local development database/auth setup is preferred?
@@ -377,8 +377,8 @@ Angular translates error codes and data into user-friendly messages.
 ### 102. What browser end-to-end flows are must-pass in v1?
 **Decision:** Keep a small Playwright suite focused on the risky flows: completing a raning game, public update propagation, 1v1 progression/completion, post-completion edit behavior, and concurrent live-result locking/conflict behavior.
 
-### 103. Should backend architectural boundaries be enforced automatically?
-**Decision:** Yes. Add CI checks that fail when one backend module imports another module’s internals. Boundaries should be enforceable rules, not only code-review discipline.
+### 103. Should api architectural boundaries be enforced automatically?
+**Decision:** Yes. Add CI checks that fail when one api module imports another module’s internals. Boundaries should be enforceable rules, not only code-review discipline.
 
 ### 104. Should frontend architectural boundaries also be enforced automatically?
 **Decision:** Yes. Add CI checks so shells do not depend on each other casually, `shared/` stays generic, and feature imports respect the intended layering.
@@ -406,7 +406,7 @@ Angular translates error codes and data into user-friendly messages.
 ### 111. Where should UUIDv7 values be generated?
 **Decision:** Generate them in Python, not in the database. Application-side generation keeps the system portable to plain Postgres and avoids coupling aggregate creation to DB-specific functions.
 
-### 112. How is dependency wiring handled inside the backend?
+### 112. How is dependency wiring handled inside the api?
 **Decision:** Keep wiring manual and explicit in the composition root. That is simpler than introducing a DI framework now, while still leaving room to adopt DI later if the graph grows.
 
 ### 113. Where do active field leases live in the final design?
@@ -425,7 +425,7 @@ Angular translates error codes and data into user-friendly messages.
 **Decision:** Use idempotent scripts or queries outside normal app startup. Alembic owns schema evolution; seed commands own roles, role-capability mappings, bootstrap users, and other reference data.
 
 ### 118. How should OpenAPI contracts be managed in the repo?
-**Decision:** Commit the OpenAPI spec as a versioned artifact and generate TypeScript types from that file. Do not make the frontend depend on a running backend just to regenerate types.
+**Decision:** Commit the OpenAPI spec as a versioned artifact and generate TypeScript types from that file. Do not make the frontend depend on a running api just to regenerate types.
 
 ### 119. Should generated TypeScript types be committed?
 **Decision:** No. Commit only the OpenAPI spec; regenerate TS types locally or in CI through `make`. That keeps review noise down and makes the spec the single committed contract artifact.

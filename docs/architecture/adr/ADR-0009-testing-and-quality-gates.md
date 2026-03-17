@@ -12,11 +12,11 @@ The highest-risk failures are transactional, concurrent, and integration-heavy:
 - post-completion edits
 - 1v1 progression
 - live-entry conflicts
-- frontend/backend contract drift
+- frontend/api contract drift
 
 ## Decision
 
-Backend testing strategy:
+Api testing strategy:
 
 - pure unit tests for domain logic
 - integration tests against real local PostgreSQL
@@ -40,7 +40,7 @@ Quality/tooling:
 - Python: Ruff + Pyright + pytest + pre-commit
 - frontend: npm-based lint/test/build
 - monorepo: make as stable command surface
-- architectural import checks in CI for backend and frontend boundaries
+- architectural import checks in CI for api and frontend boundaries
 
 ## Consequences
 
@@ -58,4 +58,4 @@ Quality/tooling:
 ## Follow-ups
 
 - Keep the Playwright suite small and critical-path only.
-- Keep backend integration tests first-class, because correctness is DB-centric.
+- Keep api integration tests first-class, because correctness is DB-centric.

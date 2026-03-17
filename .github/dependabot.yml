@@ -12,7 +12,7 @@ updates:
       interval: "daily"
 
   - package-ecosystem: "uv"
-    directory: "/apps/backend"
+    directory: "/apps/api"
     schedule:
       interval: "daily"
 

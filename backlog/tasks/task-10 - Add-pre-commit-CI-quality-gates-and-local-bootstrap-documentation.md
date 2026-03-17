@@ -44,7 +44,7 @@ Close out m-0 by wiring the agreed quality gates into pre-commit and GitHub Acti
 Draft plan pending user approval.
 
 Research summary
-- Current repo state: root `.pre-commit-config.yaml` is missing; `.github/workflows/web_build_and_deploy.yaml` is still a stock web-only GitHub Pages workflow; the root `Makefile` only exposes `up/down/backend-dev/web-dev/openapi-export/openapi-types/test*`; backend tooling in `apps/api/pyproject.toml` does not yet define Ruff or Pyright; the frontend already exposes `build`, `typecheck`, `check-boundaries`, `test`, and `e2e`; `apps/api/tests/support/postgres.py` still carries inline Postgres defaults (`postgres:16-alpine`, URL/password) instead of clearly reusing infra-owned config.
+- Current repo state: root `.pre-commit-config.yaml` is missing; `.github/workflows/web_build_and_deploy.yaml` is still a stock web-only GitHub Pages workflow; the root `Makefile` only exposes `up/down/api-dev/web-dev/openapi-export/openapi-types/test*`; api tooling in `apps/api/pyproject.toml` does not yet define Ruff or Pyright; the frontend already exposes `build`, `typecheck`, `check-boundaries`, `test`, and `e2e`; `apps/api/tests/support/postgres.py` still carries inline Postgres defaults (`postgres:16-alpine`, URL/password) instead of clearly reusing infra-owned config.
 
 Documentation impact check
 Reviewed:
@@ -68,7 +68,7 @@ Must update in this task (complete before code per repo rule):
 - `docs/testing/test-strategy.md` — record the actual baseline quality gates and their stable entrypoints.
 
 Likely update depending on final implementation:
-- `docs/testing/fixtures.md` — if the backend Postgres harness contract or local E2E prerequisites change.
+- `docs/testing/fixtures.md` — if the api Postgres harness contract or local E2E prerequisites change.
 - `docs/testing/critical-e2e-flows.md` — if the per-PR E2E cadence, entrypoint, or manual fallback changes.
 
 Reviewed and currently expected to stay unchanged unless implementation uncovers a contradiction:
@@ -91,9 +91,9 @@ Implementation plan
 - Extend the root `Makefile` with explicit top-level targets for formatting/linting, typing, build validation, OpenAPI verification/type generation, and architecture boundary checks so local hooks and CI call one canonical surface.
 - Keep the existing app-level commands as the underlying implementation, but prefer `make` at the repo root.
 
-3. Add missing backend tooling
+3. Add missing api tooling
 - Add Ruff and Pyright to `apps/api/pyproject.toml` with minimal repo-appropriate config.
-- Wire backend formatting/lint/type commands through `uv run ...` so they work in both local hooks and GitHub Actions.
+- Wire api formatting/lint/type commands through `uv run ...` so they work in both local hooks and GitHub Actions.
 
 4. Wire pre-commit with fast/slow stages
 - Add a root `.pre-commit-config.yaml`.
@@ -103,7 +103,7 @@ Implementation plan
 5. Add repo CI without losing the dedicated frontend deploy workflow
 - Add a repo-quality workflow that checks out the full monorepo, sets up Node and Python/uv, caches dependencies, and runs the canonical `make` targets.
 - Keep or restore the dedicated frontend deploy workflow separately if GitHub Pages is still needed.
-- Enforce backend and frontend boundary checks, backend Ruff/Pyright/pytest, frontend lint/typecheck/test/build, and the OpenAPI export/type-generation workflow.
+- Enforce api and frontend boundary checks, api Ruff/Pyright/pytest, frontend lint/typecheck/test/build, and the OpenAPI export/type-generation workflow.
 - Make the OpenAPI gate fail on drift in `docs/api/openapi.yaml`; make type generation an executable check even though the generated TS declarations remain uncommitted.
 
 6. Reconcile shared bootstrap/test config
@@ -120,15 +120,15 @@ Plan execution note: approved on 2026-03-15 and completed with the planned struc
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
-Future verification check: the backend Postgres integration harness should no longer rely on hardcoded container image/default bootstrap values in `apps/api/tests/support/postgres.py`. As part of the `m-0` quality-gate/bootstrap pass, verify the tests reuse the infra-owned Docker image/service configuration introduced by the infra tasks instead of carrying separate inline defaults.
+Future verification check: the api Postgres integration harness should no longer rely on hardcoded container image/default bootstrap values in `apps/api/tests/support/postgres.py`. As part of the `m-0` quality-gate/bootstrap pass, verify the tests reuse the infra-owned Docker image/service configuration introduced by the infra tasks instead of carrying separate inline defaults.
 
 Research pass on 2026-03-15: root pre-commit config is missing, the only GitHub Actions workflow is a stock web-only GitHub Pages pipeline, the root Makefile does not yet expose lint/type/build/boundary/contract gates, and `apps/api/tests/support/postgres.py` still duplicates disposable Postgres defaults instead of clearly reusing infra-owned config.
 
 Implemented the repo-level quality-gate surface in `Makefile`, added root `pre-commit` / `pre-push` hooks, and added a dedicated monorepo quality-gates workflow that runs the same checks through `pre-commit` while keeping the web deploy workflow separate.
 
-Added backend dev tooling (`ruff`, `pyright`, `pre-commit`) via the API dependency group, aligned the disposable Postgres integration harness with `infra/compose/docker-compose.yml`, and added unit coverage for the shared Compose-derived defaults.
+Added api dev tooling (`ruff`, `pyright`, `pre-commit`) via the API dependency group, aligned the disposable Postgres integration harness with `infra/compose/docker-compose.yml`, and added unit coverage for the shared Compose-derived defaults.
 
-Verification note: in-sandbox backend HTTP tests and `pre-commit` metadata writes hit environment restrictions (loopback port binding and home-cache write access), so final validation used `env -u VIRTUAL_ENV UV_CACHE_DIR=/tmp/uv-cache make verify` outside the sandbox plus `PRE_COMMIT_HOME=/tmp/pre-commit ... pre-commit run --hook-stage pre-commit` and `--hook-stage pre-push`.
+Verification note: in-sandbox api HTTP tests and `pre-commit` metadata writes hit environment restrictions (loopback port binding and home-cache write access), so final validation used `env -u VIRTUAL_ENV UV_CACHE_DIR=/tmp/uv-cache make verify` outside the sandbox plus `PRE_COMMIT_HOME=/tmp/pre-commit ... pre-commit run --hook-stage pre-commit` and `--hook-stage pre-push`.
 
 Post-review fix on 2026-03-16: cleaned the malformed GitHub Actions workflow tail, then split the workflows cleanly into `.github/workflows/quality_gates.yaml` for repo-wide gates and `.github/workflows/web_build_and_deploy.yaml` for the frontend Pages deploy path. The README, roadmap doc, and deployment Q&A were then reconciled to the current `m-0` truth.
 <!-- SECTION:NOTES:END -->
@@ -140,9 +140,9 @@ Implemented the `m-0` quality-gate and bootstrap pass for the monorepo.
 
 What changed:
 - Added stable repo-level quality-gate targets in `Makefile` for formatting, linting, typing, boundary checks, OpenAPI verification, build validation, and full-suite verification.
-- Added backend dev tooling through `apps/api/pyproject.toml` and `uv.lock` with Ruff, Pyright, and pre-commit support.
+- Added api dev tooling through `apps/api/pyproject.toml` and `uv.lock` with Ruff, Pyright, and pre-commit support.
 - Added a root `.pre-commit-config.yaml` that uses fast `pre-commit` hooks for format/lint/boundaries and heavier `pre-push` hooks for OpenAPI, type, test, and build validation.
-- Added a repo-wide quality-gates workflow that installs backend and frontend tooling, installs Playwright Chromium, and runs the same hook stages in CI, while keeping the frontend-only deploy workflow separate.
+- Added a repo-wide quality-gates workflow that installs api and frontend tooling, installs Playwright Chromium, and runs the same hook stages in CI, while keeping the frontend-only deploy workflow separate.
 - Aligned `apps/api/tests/support/postgres.py` with the local Compose DB service so disposable integration-test defaults reuse infra-owned image/bootstrap settings instead of inline hardcoded values, and added `apps/api/tests/unit/test_postgres_support.py` coverage for that contract.
 - Updated `README.md`, `docs/ops/local-dev.md`, `docs/testing/test-strategy.md`, `docs/testing/fixtures.md`, `docs/qna/architecture/deployment and operations.md`, `docs/_raw/milestones.md`, and `apps/api/README.md` so the documented bootstrap, troubleshooting, roadmap, and verification commands match the implemented `m-0` command surface.
 - Converted the placeholder HTTP health/version routes to `async def` and corrected the `UnitOfWork` protocol method stubs so the expanded type/test gate path stays green.
@@ -156,7 +156,7 @@ Validation run:
 - `env -u VIRTUAL_ENV PRE_COMMIT_HOME=/tmp/pre-commit UV_CACHE_DIR=/tmp/uv-cache uv run --group dev pre-commit run --all-files --hook-stage pre-push`
 
 Risks / follow-up:
-- None required for TASK-10. The only environment-specific caveat was that local sandbox restrictions prevented honest execution of the backend HTTP and Docker-backed paths, so final verification was completed outside the sandbox.
+- None required for TASK-10. The only environment-specific caveat was that local sandbox restrictions prevented honest execution of the api HTTP and Docker-backed paths, so final verification was completed outside the sandbox.
 
 Follow-up: after self-review, cleaned the malformed workflow tail, restored `.github/workflows/web_build_and_deploy.yaml` as the frontend Pages workflow, and moved the repo-wide checks into `.github/workflows/quality_gates.yaml`.
 <!-- SECTION:FINAL_SUMMARY:END -->

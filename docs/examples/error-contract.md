@@ -5,10 +5,10 @@
 Define the stable, machine-readable error contract exposed by the PalioBoard API.
 
 This document exists so that:
-- backend and frontend use the same error vocabulary;
+- api and frontend use the same error vocabulary;
 - concurrent-edit and stale-write situations are handled predictably;
 - domain-rule violations are distinguishable from transport or authentication failures;
-- user-facing messages can be translated from stable backend error codes.
+- user-facing messages can be translated from stable api error codes.
 
 ## Scope
 

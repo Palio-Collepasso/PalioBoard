@@ -1,1 +1,1 @@
-"""Bounded backend modules for the Palio modular monolith."""
+"""Bounded api modules for the Palio modular monolith."""

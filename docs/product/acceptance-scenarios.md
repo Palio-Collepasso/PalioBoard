@@ -59,14 +59,14 @@ Keep scenarios focused on observable behavior. When a source leaves room for int
 **And** the user can refresh or resume from the latest state without a silent overwrite
 
 ### 6. Recover ranking live state after reconnect or restart
-**Given** a ranking-format game is in progress and live updates were saved before a disconnect or backend restart  
+**Given** a ranking-format game is in progress and live updates were saved before a disconnect or api restart  
 **When** a judge reconnects and reopens that live game  
 **Then** the latest saved in-progress state is restored  
 **And** the user is informed when a conflict occurred  
 **And** editing can continue from the restored server state
 
 **Notes**
-- After a backend restart, active field locks are not assumed to survive and must be reacquired.
+- After a api restart, active field locks are not assumed to survive and must be reacquired.
 
 ### 7. Progress a 1v1 tournament and expose bracket progression **[Must-pass E2E]**
 **Given** a fixed 4-team 1v1 tournament has valid semifinal pairings and is in progress  

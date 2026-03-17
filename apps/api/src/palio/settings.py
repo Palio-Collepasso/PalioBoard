@@ -1,4 +1,4 @@
-"""Typed runtime settings for the Palio backend."""
+"""Typed runtime settings for the Palio api."""
 
 import os
 from collections.abc import Mapping

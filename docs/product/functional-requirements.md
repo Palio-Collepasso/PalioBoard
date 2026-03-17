@@ -187,7 +187,7 @@ The system shall support reconnect/conflict recovery by restoring the latest ser
 
 When a ranking game enters in progress, the system shall initialize the live draft from the current official result state.
 
-The system shall support recovery of in-progress draft state after reconnect or backend restart.
+The system shall support recovery of in-progress draft state after reconnect or api restart.
 
 The system shall not update the leaderboard from ranking in-progress draft data.
 
@@ -345,7 +345,7 @@ The system shall prevent silent overwrite of concurrent live-result edits.
 
 The system shall return machine-readable error codes and structured data to the client.
 
-The frontend shall be able to translate backend error codes into user-friendly messages.
+The frontend shall be able to translate api error codes into user-friendly messages.
 
 ## 16. E2E-critical behaviors
 

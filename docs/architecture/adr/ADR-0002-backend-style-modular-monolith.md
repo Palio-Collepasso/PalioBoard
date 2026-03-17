@@ -1,4 +1,4 @@
-# ADR-0002 — Backend Style: Modular Monolith with Strict Module Boundaries
+# ADR-0002 — Api Style: Modular Monolith with Strict Module Boundaries
 
 - Status: Accepted
 - Date: 2026-03-11
@@ -61,5 +61,5 @@ Rules:
 
 ## Follow-ups
 
-- Add automated architecture import checks in CI for backend modules.
+- Add automated architecture import checks in CI for api modules.
 - Revisit DI only if dependency graphs become painful.

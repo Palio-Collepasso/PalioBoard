@@ -1,4 +1,4 @@
-"""Helpers for Postgres-backed backend integration tests."""
+"""Helpers for Postgres-backed api integration tests."""
 
 import os
 import subprocess

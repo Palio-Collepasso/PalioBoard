@@ -26,7 +26,7 @@
 **Decision:** v1 includes only a **minimal superadmin UI** for creating a user with an email, a password, and a seeded role. Users are active immediately on creation.
 
 ### 16. Does the minimal user UI also provision the identity-provider account?
-**Decision:** Yes. The backend provisions the Auth identity and the linked application user in a single orchestrated workflow.
+**Decision:** Yes. The api provisions the Auth identity and the linked application user in a single orchestrated workflow.
 
 ### 17. What login method is used in v1?
 **Decision:** Email and password.
@@ -35,7 +35,7 @@
 **Decision:** No. v1 keeps provisioning extremely minimal: the superadmin creates the user with a password, and credentials are handed over manually offline.
 
 ### 19. How are cross-system provisioning failures handled?
-**Decision:** User provisioning is treated as a two-step external workflow with best-effort compensation. The backend creates the identity-provider account first, then creates the application user. If the second step fails, the backend attempts to remove the identity-provider account and logs any unrecoverable partial failure clearly.
+**Decision:** User provisioning is treated as a two-step external workflow with best-effort compensation. The api creates the identity-provider account first, then creates the application user. If the second step fails, the api attempts to remove the identity-provider account and logs any unrecoverable partial failure clearly.
 
 ### 20. Should auth be abstracted for future SSO/custom identity?
 **Decision:** Yes. Authentication and provisioning sit behind explicit identity-provider adapters so Supabase Auth can be replaced later without touching application/domain logic.

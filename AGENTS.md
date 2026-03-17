@@ -12,9 +12,9 @@
 Read the workflow overview (`backlog://workflow/overview`), before creating or updating tasks, or when you're unsure whether to track work.
 
 ### Use the nearest `AGENTS.md` for stack-specific commands and conventions
-- Backend/API work: `apps/api/AGENTS.md`
+- API work: `apps/api/AGENTS.md`
 - Frontend/web work: `apps/web/AGENTS.md`
-- Do not mix backend and frontend conventions in one change unless the task is explicitly full-stack.
+- Do not mix api and frontend conventions in one change unless the task is explicitly full-stack.
 
 ## Implementation plan
 When asked to write an implementation plan for a task:

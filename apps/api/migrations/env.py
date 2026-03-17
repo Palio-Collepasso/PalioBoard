@@ -1,4 +1,4 @@
-"""Alembic environment for the Palio backend."""
+"""Alembic environment for the Palio api."""
 
 from logging.config import fileConfig
 

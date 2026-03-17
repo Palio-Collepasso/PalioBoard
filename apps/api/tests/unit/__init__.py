@@ -1,1 +1,1 @@
-"""Fast backend unit and smoke tests."""
+"""Fast api unit and smoke tests."""

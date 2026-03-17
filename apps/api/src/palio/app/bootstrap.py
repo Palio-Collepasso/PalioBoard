@@ -1,4 +1,4 @@
-"""Manual application wiring for the backend composition root."""
+"""Manual application wiring for the api composition root."""
 
 from dataclasses import dataclass
 
@@ -92,7 +92,7 @@ def build_module_facades() -> ModuleFacades:
 
 
 def build_runtime() -> ApplicationRuntime:
-    """Build the minimal backend runtime used by the scaffold."""
+    """Build the minimal api runtime used by the scaffold."""
 
     settings = load_settings()
     return ApplicationRuntime(

@@ -30,6 +30,6 @@ Build the frontend slice of TASK-16 so admins can manage the active season ident
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [ ] #1 The `/admin/season` route implements the documented season identity and rioni editing layout, including inline validation, row editing, and lock or rules summaries.
-- [ ] #2 The page reads and writes backend-owned season data through the authenticated admin session and surfaces forbidden or validation errors without duplicating business rules in the client.
+- [ ] #2 The page reads and writes api-owned season data through the authenticated admin session and surfaces forbidden or validation errors without duplicating business rules in the client.
 - [ ] #3 The task adds frontend integration coverage and updates any affected UI documentation or local setup notes for the season-setup page.
 <!-- AC:END -->

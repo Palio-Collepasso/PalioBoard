@@ -13,7 +13,7 @@ Covers build, migration, release, verification, rollback, and communication step
 | Environment | Purpose | URL/Location | Owner | Notes |
 |---|---|---|---|---|
 | local | dev | `http://127.0.0.1:8080` | repo contributors | Same-origin Docker Compose smoke stack |
-| production | live | single VPS/VM, configured per operator | deployment owner | Docker Compose + Nginx, one backend instance, and planned downtime |
+| production | live | single VPS/VM, configured per operator | deployment owner | Docker Compose + Nginx, one api instance, and planned downtime |
 
 ## Release Principles
 
@@ -49,17 +49,17 @@ Covers build, migration, release, verification, rollback, and communication step
 
 ### 2. Build artifacts
 
-1. Build the backend and Nginx images from `infra/docker/`.
+1. Build the api and Nginx images from `infra/docker/`.
 2. Confirm the committed `docs/api/openapi.yaml` and any generated frontend types are up to date if the release changed the contract.
 
 ### 3. Apply migrations
 
 1. Run the explicit migration step before starting the new app version.
-2. Do not hide migrations inside backend startup; the same explicit rule used in local smoke checks applies to deployment.
+2. Do not hide migrations inside api startup; the same explicit rule used in local smoke checks applies to deployment.
 
 ### 4. Deploy application
 
-1. Update the Compose-managed backend and Nginx images on the target host.
+1. Update the Compose-managed api and Nginx images on the target host.
 2. Restart the stack in the smallest acceptable maintenance window for the single-instance v1 deployment model.
 
 ### 5. Post-deploy verification
@@ -95,7 +95,7 @@ Template for each rollback scenario: `docs/templates/ops/deploy-rollback-scenari
 - **Risk:** The single production stack is partially or fully unavailable.
 - **Decision owner:** Deployment owner on duty
 - **Rollback steps:**
-  1. Revert to the previous known-good backend and Nginx image set.
+  1. Revert to the previous known-good api and Nginx image set.
   2. Restart the Compose-managed stack with the previous release ref.
 - **Data considerations:**
   - If migrations already ran, confirm the schema remains backward-compatible before rolling back application code.

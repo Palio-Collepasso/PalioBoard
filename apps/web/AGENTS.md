@@ -4,7 +4,7 @@
 This file applies to frontend work under `apps/web/`.
 
 ## Core rules
-- Keep business rules and official truth in the backend. The frontend should present and edit server-owned state, not redefine it.
+- Keep business rules and official truth in the api. The frontend should present and edit server-owned state, not redefine it.
 - Preserve shell separation: admin, public, and maxi-screen concerns should stay explicit.
 - Prefer feature-local state. Do not introduce a global store without a documented reason.
 - Keep admin, public, and realtime API clients clearly separated.

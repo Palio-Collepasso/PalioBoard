@@ -21,7 +21,7 @@ Good fixture documentation helps agents and humans answer:
 
 | Fixture ID | Name | Scope | Used by | Source |
 |---|---|---|---|---|
-| `FX-001` | Disposable Postgres integration database | integration | backend integration suite | `apps/api/tests/support/postgres.py` |
+| `FX-001` | Disposable Postgres integration database | integration | api integration suite | `apps/api/tests/support/postgres.py` |
 | `FX-002` | Same-origin shell smoke routes | e2e | Playwright shell smoke suite | `apps/web/e2e/shell-smoke.spec.ts` |
 
 ---
@@ -45,15 +45,15 @@ Future note:
 
 - **Status:** active
 - **Scope:** integration
-- **Purpose:** Support real-Postgres backend integration tests with isolated databases and real Alembic migrations.
+- **Purpose:** Support real-Postgres api integration tests with isolated databases and real Alembic migrations.
 - **Defined in:** `apps/api/tests/support/postgres.py`
 - **Used by:**
   - `apps/api/tests/integration/`
-  - `make test-backend`
+  - `make test-api`
 
 #### Scenario represented
 
-The backend integration layer proves migration/bootstrap and runtime readiness against a real PostgreSQL instance instead of SQLite or fake persistence.
+The api integration layer proves migration/bootstrap and runtime readiness against a real PostgreSQL instance instead of SQLite or fake persistence.
 
 #### Contents
 
@@ -82,11 +82,11 @@ The backend integration layer proves migration/bootstrap and runtime readiness a
 #### Safe to modify?
 
 - **Yes/No:** no
-- **Constraints:** Keep the schema name, migration application flow, and override env vars consistent with the backend harness docs.
+- **Constraints:** Keep the schema name, migration application flow, and override env vars consistent with the api harness docs.
 
 #### Common consumers
 
-- backend smoke/integration coverage
+- api smoke/integration coverage
 - migration and readiness verification
 
 #### Related business rules
@@ -101,7 +101,7 @@ The backend integration layer proves migration/bootstrap and runtime readiness a
 
 - Update `docs/testing/test-strategy.md` and `docs/ops/local-dev.md` if the harness contract changes.
 - Keep the disposable-test defaults aligned with `infra/compose/docker-compose.yml` so the integration harness and local stack do not drift.
-- Promote additional fixture IDs here when the backend adds stable seeded scenarios.
+- Promote additional fixture IDs here when the api adds stable seeded scenarios.
 
 ### `FX-002` — Same-origin shell smoke routes
 
@@ -170,7 +170,7 @@ Template for each scenario-set entry: `docs/templates/testing/canonical-scenario
 
 ### m-0 smoke verification
 
-- **Purpose:** Provide the minimum reusable scenarios needed to validate the current backend and browser scaffolds honestly.
+- **Purpose:** Provide the minimum reusable scenarios needed to validate the current api and browser scaffolds honestly.
 - **Fixtures included:**
   - `FX-001`
   - `FX-002`

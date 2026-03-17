@@ -10,8 +10,8 @@
 ### 81. What reverse proxy is used?
 **Decision:** Nginx.
 
-### 82. Is one backend instance assumed in v1?
-**Decision:** Yes. v1 assumes one backend instance, while still keeping correctness in DB-backed structures where needed and avoiding in-memory correctness dependencies where possible.
+### 82. Is one api instance assumed in v1?
+**Decision:** Yes. v1 assumes one api instance, while still keeping correctness in DB-backed structures where needed and avoiding in-memory correctness dependencies where possible.
 
 ### 83. Is extra infrastructure such as Redis or message brokers required in v1?
 **Decision:** No. v1 intentionally avoids Redis, brokers, worker services, and other extra runtime components. Redis may become relevant later as an implementation of the live-state adapter.
@@ -46,13 +46,13 @@
 **Decision:** Production uses the real identity-provider adapter, while local development can use a dev identity adapter or bypass mode so the team can work locally without depending on the real cloud identity service.
 
 ### 93. What test database is used?
-**Decision:** Backend integration tests use a real local Postgres test database, not SQLite.
+**Decision:** Api integration tests use a real local Postgres test database, not SQLite.
 
 ### 94. What repository strategy is used?
-**Decision:** The whole project uses a monorepo containing frontend, backend, committed API contract artifacts, frontend-generated API types, migrations, and deployment configuration.
+**Decision:** The whole project uses a monorepo containing frontend, api, committed API contract artifacts, frontend-generated API types, migrations, and deployment configuration.
 
 
-## 12. Backend stack, project structure, and developer tooling
+## 12. Api stack, project structure, and developer tooling
 ### 98. What local development database/auth setup is preferred?
 **Decision:** Use a plain local Postgres container plus the existing dev identity adapter. This keeps daily development light and avoids coupling local work to the full Supabase local stack.
 

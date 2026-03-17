@@ -69,17 +69,17 @@ Populate with the real team/person ownership.
 - **How to detect:**
   - user reports;
   - uptime/health failure;
-  - Nginx or backend process alerts.
+  - Nginx or api process alerts.
 - **Dashboards/logs/tools:**
   - reverse proxy logs;
-  - backend container logs;
+  - api container logs;
   - VPS process/container status.
 
 #### Likely causes
 
-- backend container/process crashed;
+- api container/process crashed;
 - Nginx misconfiguration or failed restart;
-- database connectivity failure causing backend startup failure.
+- database connectivity failure causing api startup failure.
 
 #### Immediate safety checks
 
@@ -89,13 +89,13 @@ Populate with the real team/person ownership.
 
 #### Mitigation steps
 
-1. Check container/process status for Nginx, backend, and database dependencies.
+1. Check container/process status for Nginx, api, and database dependencies.
 2. Restart only the failed component first if the cause is obvious.
 3. If the release caused the outage, consider rollback using `docs/ops/deploy.md`.
 
 #### Recovery steps
 
-1. Restore a healthy backend and reverse proxy state.
+1. Restore a healthy api and reverse proxy state.
 2. Re-verify public, admin, and maxi reachability.
 3. Confirm at least one safe authenticated read path works.
 
@@ -103,7 +103,7 @@ Populate with the real team/person ownership.
 
 - [ ] Public landing page loads.
 - [ ] Admin login page loads.
-- [ ] Backend health endpoint is healthy.
+- [ ] Api health endpoint is healthy.
 - [ ] Logs stop showing the original failure pattern.
 
 #### Escalation
@@ -146,7 +146,7 @@ Populate with the real team/person ownership.
   - operator comparison between admin and public views;
   - smoke check after completion or review-state change.
 - **Dashboards/logs/tools:**
-  - backend logs around projection recompute and public-read refresh;
+  - api logs around projection recompute and public-read refresh;
   - browser/network logs if realtime refresh is involved.
 
 #### Likely causes
@@ -165,7 +165,7 @@ Populate with the real team/person ownership.
 
 1. Verify whether the authoritative write committed successfully.
 2. Verify whether the public read model was recomputed.
-3. If the backend state is correct but clients are stale, force a safe refresh path.
+3. If the api state is correct but clients are stale, force a safe refresh path.
 4. If projections are actually stale, treat this as a correctness incident and escalate.
 
 #### Recovery steps
@@ -219,7 +219,7 @@ Populate with the real team/person ownership.
   - judge/operator reports during an in-progress ranking game;
   - abnormal realtime error volume.
 - **Dashboards/logs/tools:**
-  - backend realtime logs;
+  - api realtime logs;
   - client console/network traces;
   - current live-draft state inspection if available.
 
@@ -227,7 +227,7 @@ Populate with the real team/person ownership.
 
 - stuck or stale leases;
 - broken live revision handling;
-- backend restart/reconnect path not restoring expected state.
+- api restart/reconnect path not restoring expected state.
 
 #### Immediate safety checks
 
@@ -296,7 +296,7 @@ Populate with the real team/person ownership.
 - **Dashboards/logs/tools:**
   - deploy logs;
   - migration logs;
-  - backend startup logs.
+  - api startup logs.
 
 #### Likely causes
 

@@ -48,7 +48,7 @@ Read this file first when you need repo context.
 
 ### App roots
 - `apps/README.md` — runnable app-root overview
-- `apps/api/README.md` — backend scaffold details and commands
+- `apps/api/README.md` — api scaffold details and commands
 - `apps/web/README.md` — frontend scaffold details and commands
 
 ### Examples and source material

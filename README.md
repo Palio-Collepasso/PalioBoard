@@ -4,7 +4,7 @@ Open-source web application for configuring, running, and publishing the Collepa
 
 ## Current status
 
-This repository is currently an implementation baseline for v1 with the first backend and frontend scaffolds in place.
+This repository is currently an implementation baseline for v1 with the first api and frontend scaffolds in place.
 
 What is already in the repo:
 - approved product scope
@@ -12,15 +12,15 @@ What is already in the repo:
 - domain model and rules
 - testing strategy
 - milestone plan
-- backend FastAPI scaffold with explicit module facades and a minimal app factory
-- backend PostgreSQL + SQLAlchemy + Alembic baseline with an empty `palio_board` schema migration
-- backend unit and real-Postgres integration smoke harnesses under `apps/api/tests/`
+- api FastAPI scaffold with explicit module facades and a minimal app factory
+- api PostgreSQL + SQLAlchemy + Alembic baseline with an empty `palio_board` schema migration
+- api unit and real-Postgres integration smoke harnesses under `apps/api/tests/`
 - Angular 21 SPA scaffold under `apps/web/`
 - a committed OpenAPI export artifact at `docs/api/openapi.yaml`
 
 What is not in the repo yet:
 - `.env.example` files
-- real backend business workflows and domain tables
+- real api business workflows and domain tables
 - a production-ready end-to-end application stack
 
 That means the repository now has a baseline same-origin local stack for smoke checks, but most application behavior and deeper infrastructure concerns still land in later roadmap milestones.
@@ -61,7 +61,7 @@ The product is intentionally not a generic sports platform. Details live in [doc
 
 PalioBoard follows an approved modular-monolith baseline:
 - **Frontend:** Angular SPA
-- **Backend:** FastAPI
+- **API:** Python FastAPI
 - **Database:** PostgreSQL
 - **Identity provider:** Supabase Auth
 - **Edge:** Nginx
@@ -69,7 +69,7 @@ PalioBoard follows an approved modular-monolith baseline:
 Core architectural rules:
 - Python is the only business/data API
 - official state lives in PostgreSQL
-- standings logic lives in the backend, not in the frontend
+- standings logic lives in the api, not in the frontend
 - authoritative writes, audit, and projection updates succeed or fail together
 - realtime draft state is never official truth by itself
 
@@ -139,7 +139,7 @@ The active roadmap summary lives in [docs/product/roadmap.md](docs/product/roadm
 
 ## Quick start
 
-The repository now exposes the canonical top-level command names, and the backend/frontend scaffolds make a subset of them runnable today.
+The repository now exposes the canonical top-level command names, and the api/frontend scaffolds make a subset of them runnable today.
 
 ### Prerequisites
 
@@ -170,7 +170,7 @@ npm run e2e:install
 ### Native app loop
 
 ```bash
-make backend-dev
+make api-dev
 make web-dev
 ```
 
@@ -188,7 +188,7 @@ make down
 
 The Compose stack exposes one local origin at `http://127.0.0.1:8080`:
 - Nginx serves the built Angular SPA and falls back to `index.html` for `/`, `/admin`, `/public`, and `/maxi` client routes.
-- `/api/admin/...` and `/api/public/...` proxy to the backend through that same origin.
+- `/api/admin/...` and `/api/public/...` proxy to the api through that same origin.
 - `/realtime/...` is routed through Nginx with upgrade-friendly proxy settings so the placeholder health route and websocket path can use the same prefix.
 
 Migrations remain explicit by architecture rule and are not run automatically when `make up` starts the stack. Use the one-shot `migrate` Compose service before verification work that depends on the schema.
@@ -198,11 +198,11 @@ The Angular SPA currently exposes three lazy route areas:
 - `/public`
 - `/maxi`
 
-`make backend-dev` starts the placeholder FastAPI app. `make test-backend` runs the split backend harness: `apps/api/tests/unit/` first, then `apps/api/tests/integration/` against a real local Postgres database. By default the integration layer now reuses the database image and bootstrap settings defined in `infra/compose/docker-compose.yml`; set `PALIO_TEST_POSTGRES_URL` to reuse an existing local Postgres admin database instead. Alembic uses `PALIO_DB_MIGRATION_URL`, while runtime DB access uses `PALIO_DB_RUNTIME_URL`.
+`make api-dev` starts the placeholder FastAPI app. `make test-api` runs the split api harness: `apps/api/tests/unit/` first, then `apps/api/tests/integration/` against a real local Postgres database. By default the integration layer now reuses the database image and bootstrap settings defined in `infra/compose/docker-compose.yml`; set `PALIO_TEST_POSTGRES_URL` to reuse an existing local Postgres admin database instead. Alembic uses `PALIO_DB_MIGRATION_URL`, while runtime DB access uses `PALIO_DB_RUNTIME_URL`.
 
-Current backend operational baseline:
+Current api operational baseline:
 - typed env-based runtime settings via `PALIO_ENV`, `PALIO_LOG_LEVEL`, `PALIO_REQUEST_ID_HEADER`, `PALIO_BUILD_VERSION`, `PALIO_BUILD_COMMIT_SHA`, `PALIO_DB_RUNTIME_URL`, and `PALIO_DB_MIGRATION_URL`
-- backend integration-test settings via `PALIO_TEST_POSTGRES_URL` and `PALIO_TEST_POSTGRES_IMAGE`
+- api integration-test settings via `PALIO_TEST_POSTGRES_URL` and `PALIO_TEST_POSTGRES_IMAGE`
 - Loguru-backed structured JSON HTTP request logs with propagated `X-Request-ID` response headers by default
 - `/healthz`, `/readyz`, and `/version` endpoints for local smoke checks and future infra wiring
 
@@ -225,7 +225,7 @@ The repository-level quality-gate surface is stable and is what local hooks plus
 - `make build`
 - `make verify`
 
-`make format` applies the backend formatter, while `make verify` runs the full baseline gate set: formatting checks, linting, typing, architectural boundary checks, OpenAPI verification, tests, and frontend build validation. The installed Git hooks use `pre-commit` for fast local checks and `pre-push` for the heavier type/test/build/contract path.
+`make format` applies the api formatter, while `make verify` runs the full baseline gate set: formatting checks, linting, typing, architectural boundary checks, OpenAPI verification, tests, and frontend build validation. The installed Git hooks use `pre-commit` for fast local checks and `pre-push` for the heavier type/test/build/contract path.
 
 For the current local-development baseline, see [docs/ops/local-dev.md](docs/ops/local-dev.md).
 
@@ -321,7 +321,7 @@ uv run --group dev pre-commit install --hook-type pre-commit --hook-type pre-pus
 The stable top-level test entrypoints are:
 ```bash
 make test
-make test-backend
+make test-api
 make test-web
 make test-e2e
 ```

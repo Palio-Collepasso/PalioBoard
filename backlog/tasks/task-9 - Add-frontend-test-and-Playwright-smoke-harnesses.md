@@ -45,7 +45,7 @@ Draft plan pending user approval before coding.
 2. Replace the reserved frontend test target with a real Angular behavior-test harness that fits the current scaffold instead of introducing a parallel frontend toolchain.
 - Add a `test` target to `apps/web/angular.json` using the installed `@angular/build:unit-test` builder with its default Vitest runner.
 - Add the minimal supporting files and dev dependencies that builder expects (`vitest` plus a DOM environment such as `jsdom`), then point `apps/web/package.json` at the real Angular test entrypoint.
-- Keep the harness intentionally small and behavior-focused; do not add snapshot-heavy coverage or duplicate backend-owned business rules in Angular.
+- Keep the harness intentionally small and behavior-focused; do not add snapshot-heavy coverage or duplicate api-owned business rules in Angular.
 
 3. Seed the new frontend harness with a very small set of high-signal specs around the scaffolded shell behavior that already exists today.
 - Add focused specs for the current standalone shell pages/components so the suite proves route-level shell content and placeholder-card wiring actually render.

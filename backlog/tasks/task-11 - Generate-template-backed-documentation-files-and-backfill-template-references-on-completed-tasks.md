@@ -16,7 +16,7 @@ references:
     Bootstrap-the-monorepo-layout-and-top-level-make-workflow.md
   - >-
     backlog/tasks/task-2 -
-    Scaffold-the-FastAPI-backend-composition-root-and-module-facades.md
+    Scaffold-the-FastAPI-api-composition-root-and-module-facades.md
   - >-
     backlog/tasks/task-3 -
     Scaffold-the-Angular-SPA-with-admin-public-and-maxi-shells.md
@@ -34,7 +34,7 @@ references:
     Add-the-OpenAPI-export-and-frontend-type-generation-workflow.md
   - >-
     backlog/tasks/task-8 -
-    Add-backend-unit-and-integration-test-harnesses-against-real-Postgres.md
+    Add-api-unit-and-integration-test-harnesses-against-real-Postgres.md
   - backlog/tasks/task-9 - Add-frontend-test-and-Playwright-smoke-harnesses.md
 documentation:
   - templates.md

@@ -16,7 +16,7 @@ Status: Approved implementation baseline
 | Realtime | SSE for public/maxi live views, WebSockets for admin live entry, polling where acceptable. |
 | Live collaboration | Memory-first live draft state for ranking games only; persisted JSON snapshots for recovery. |
 | Audit | Single generic append-only audit table with full before/after snapshots per changed entity. |
-| Deployment | Single VPS, Docker Compose, one backend instance, same-origin reverse proxy. |
+| Deployment | Single VPS, Docker Compose, one api instance, same-origin reverse proxy. |
 
 ## 1. Purpose and scope
 
@@ -109,7 +109,7 @@ The architecture explicitly does **not** optimize for:
 - no global app-wide store in v1
 - separate frontend API layers for `admin`, `public`, and `realtime`
 
-### 4.2 Backend
+### 4.2 Api
 - FastAPI
 - Pydantic DTOs
 - SQLAlchemy 2.x
@@ -127,7 +127,7 @@ The architecture explicitly does **not** optimize for:
 - Docker + Docker Compose
 - single VPS
 - Nginx reverse proxy
-- one backend instance in v1
+- one api instance in v1
 - planned downtime deploys allowed
 - local development with plain Postgres in Docker, FastAPI/Angular run natively
 
@@ -135,7 +135,7 @@ The architecture explicitly does **not** optimize for:
 
 **Related ADRs:** ADR-0002
 
-The backend is a **modular monolith**. Each module exposes a small public facade. Other modules may not import its repositories, ORM models, or internal services.
+The api is a **modular monolith**. Each module exposes a small public facade. Other modules may not import its repositories, ORM models, or internal services.
 
 | Module | Ownership |
 |---|---|
@@ -322,7 +322,7 @@ States:
 
 - **1v1 bracket progression** lives in `tournaments`.
 - **Automatic 1v1 final ranking derivation** lives in `tournaments`, then materializes into canonical official entries.
-- **Prepalio aggregate ranking derivation** belongs in backend calculation code, not in UI, triggers, or ad hoc SQL.
+- **Prepalio aggregate ranking derivation** belongs in api calculation code, not in UI, triggers, or ad hoc SQL.
 - **Live provisional game view** belongs to `live_games` + `public_read` and is explicitly **not official standings logic**.
 
 ### 8.3 Forbidden ownership
@@ -465,8 +465,8 @@ A business command is considered successful only if **authoritative state, requi
 | A game is marked `under_examination` | Latest official result remains visible, but the game is excluded from leaderboard calculation. |
 | Draft cleanup fails after leaving `in_progress` | Business transaction still succeeds. Stale draft is harmless because `live_cycle` invalidates old draft state. |
 | Idempotent command is retried | Shared idempotency service returns the same logical outcome instead of applying the command twice. |
-| User provisioning creates IdP account but app-user creation fails | Backend attempts compensating delete in the IdP; if that fails, surface clear manual-recovery case. |
-| Backend restarts while a ranking game is in progress | Persisted draft snapshot is reloaded into memory on first access; active leases are not restored and must be reacquired. |
+| User provisioning creates IdP account but app-user creation fails | Api attempts compensating delete in the IdP; if that fails, surface clear manual-recovery case. |
+| Api restarts while a ranking game is in progress | Persisted draft snapshot is reloaded into memory on first access; active leases are not restored and must be reacquired. |
 
 ### 12.3 Special consistency notes
 
@@ -480,7 +480,7 @@ This section is normative for implementation.
 
 ### 13.1 Where business logic belongs
 
-**Must live in backend application/domain modules:**
+**Must live in api application/domain modules:**
 - state transitions
 - standings calculation
 - Jolly validation
@@ -536,7 +536,7 @@ A valid thin slice is a **vertical end-to-end implementation** that exercises th
 
 A thin slice is valid when it includes:
 - one API command or query
-- one orchestrated backend flow using real module boundaries
+- one orchestrated api flow using real module boundaries
 - real persistence in Postgres
 - audit if the change is authoritative
 - projection update if standings/public reads are affected
@@ -572,14 +572,14 @@ palio-board/
 ├─ Makefile
 ├─ docs/
 ├─ apps/
-│  ├─ backend/
+│  ├─ api/
 │  └─ web/
 ├─ infra/
 ├─ tools/
 └─ .github/workflows/
 ```
 
-### 14.2 Backend
+### 14.2 Api
 
 ```text
 apps/api/
@@ -648,7 +648,7 @@ infra/
 - one Angular SPA with three lazy shells
 - one FastAPI application serving REST, SSE, and WebSockets
 - one Postgres database
-- one backend instance in v1
+- one api instance in v1
 - Nginx same-origin reverse proxy
 - Docker Compose deploy
 - structured JSON logs with correlation id
@@ -664,7 +664,7 @@ infra/
 - pre-commit hooks before commit
 - automated CI + manual production deploy
 - OpenAPI spec committed; generated TS types not committed
-- backend module boundaries and frontend import boundaries enforced in CI
+- api module boundaries and frontend import boundaries enforced in CI
 
 ## 17. ADR governance
 
@@ -686,7 +686,7 @@ Examples:
 - adopting Redis for live state
 - adding a worker/outbox
 - changing official result persistence shape
-- moving from bearer-token SPA auth to backend session auth
+- moving from bearer-token SPA auth to api session auth
 - introducing multi-year support
 
 ### 17.2 What should not become an ADR

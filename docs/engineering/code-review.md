@@ -41,7 +41,7 @@ Check that:
 
 ### 5. Authorization and identity
 Check that:
-- the backend remains the authorization source of truth
+- the api remains the authorization source of truth
 - capabilities are enforced on the relevant actions
 - no frontend-only gate is relied on for protection
 - default role / user workflows stay constrained as intended

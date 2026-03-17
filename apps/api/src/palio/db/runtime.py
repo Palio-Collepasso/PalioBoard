@@ -19,7 +19,7 @@ type SessionFactory = sessionmaker[Session]
 
 @dataclass(frozen=True, slots=True)
 class ReadinessCheck:
-    """Represent the current backend readiness status."""
+    """Represent the current api readiness status."""
 
     is_ready: bool
     reason: str

@@ -39,7 +39,7 @@ Adopt the following core stack:
 
 ### Positive
 
-- One clear backend ownership boundary.
+- One clear api ownership boundary.
 - Simpler authorization model.
 - Better portability to self-hosted PostgreSQL later.
 - No duplicated logic between frontend, Supabase data APIs, and Python.

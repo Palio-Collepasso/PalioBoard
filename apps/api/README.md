@@ -1,6 +1,6 @@
 # API
 
-This directory is the canonical home for the FastAPI backend and backend test harness.
+This directory is the canonical home for `apps/api` and api test harness.
 
 Current baseline:
 - `pyproject.toml` with runtime dependencies for the FastAPI app plus a dev dependency group for tests, typing, formatting, and hook tooling used by the repo `Makefile`
@@ -9,7 +9,7 @@ Current baseline:
 - `src/palio/settings.py` for the typed env-based runtime settings used by the app/bootstrap and DB helpers
 - `src/palio/db/` for the runtime/migration DB configuration, SQLAlchemy runtime assembly, readiness probing, and the session-bound Unit of Work baseline
 - `src/palio/shared/` and `src/palio/modules/` for cross-cutting technical primitives and the documented modular-monolith package layout
-- `tests/unit/` for fast backend smoke/configuration checks and `tests/integration/` for real-Postgres migration/readiness coverage
+- `tests/unit/` for fast api smoke/configuration checks and `tests/integration/` for real-Postgres migration/readiness coverage
 - `tests/support/postgres.py` for the Postgres-backed integration harness, which can reuse an existing local server or start a disposable Postgres test container using the same image/bootstrap settings as `infra/compose/docker-compose.yml`
 
 Current local commands from this directory:
@@ -28,7 +28,7 @@ Current local commands from this directory:
 
 Contract workflow baseline:
 - FastAPI owns the committed OpenAPI artifact at `docs/api/openapi.yaml`
-- the export command runs from application code and does not require a running backend
+- the export command runs from application code and does not require a running api
 - frontend TypeScript types are generated from that committed spec and are not committed
 
 Runtime environment variables currently supported:

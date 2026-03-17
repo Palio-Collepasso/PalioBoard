@@ -34,5 +34,5 @@ Extend season setup so admins can define the season competitions and games, choo
 <!-- AC:BEGIN -->
 - [ ] #1 Admin-only APIs allow creating, editing, listing, and removing season competitions and games using only the allowed competition contexts and normalized formats from the product and domain docs.
 - [ ] #2 Game configuration supports seeded field-catalog selection and per-game points-table configuration with documented defaults and validation surfaced in the editor UI.
-- [ ] #3 The task adds backend and frontend coverage for create/edit validation and the documented admin flow, and updates the affected docs and committed API contracts.
+- [ ] #3 The task adds api and frontend coverage for create/edit validation and the documented admin flow, and updates the affected docs and committed API contracts.
 <!-- AC:END -->

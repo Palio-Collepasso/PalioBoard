@@ -1,4 +1,4 @@
-"""Palio backend package."""
+"""Palio api package."""
 
 __all__ = ["__version__"]
 
