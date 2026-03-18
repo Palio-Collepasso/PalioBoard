@@ -4,7 +4,7 @@
 
 ## Scope
 - [ ] Frontend only
-- [ ] Backend only
+- [ ] Api only
 - [ ] Full stack
 - [ ] Docs only
 - [ ] Infra / CI
@@ -29,7 +29,7 @@
 
 ## Owned paths touched
 - [ ] General frontend
-- [ ] General backend
+- [ ] General api
 - [ ] Core domain owned path
 - [ ] Security owned path
 - [ ] Architecture/API owned path

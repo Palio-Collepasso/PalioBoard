@@ -31,8 +31,8 @@ These areas require deeper validation than routine UI or presentation-only chang
 | Unit | Validate pure rules and calculations | placement validation, Jolly rules, projection helpers | deterministic domain logic |
 | Integration | Validate real orchestration with Postgres and module boundaries | official writes, transitions, audit, recompute | authoritative workflows |
 | Realtime integration | Validate collaboration semantics and conflict handling | lease acquisition, stale writes, reconnect recovery | WebSocket/SSE/live ranking |
-| API contract | Validate payload shape, status codes, and error semantics | REST/realtime response envelopes | backend/frontend compatibility |
-| E2E | Validate user-visible critical flows across UI + backend | ranking completion, tournament progression, public update | release confidence |
+| API contract | Validate payload shape, status codes, and error semantics | REST/realtime response envelopes | api/frontend compatibility |
+| E2E | Validate user-visible critical flows across UI + api | ranking completion, tournament progression, public update | release confidence |
 | Manual verification | Validate environment-specific or operational concerns | deploy smoke, browser quirks, operator checks | before release or when automation is not practical |
 
 ## Guiding principles
@@ -146,7 +146,7 @@ Prove live collaboration safety in ranking games.
 
 ### Purpose
 
-Prove that backend and frontend agree on status codes, error codes, and payload shapes.
+Prove that api and frontend agree on status codes, error codes, and payload shapes.
 
 ### Required when
 
@@ -165,7 +165,7 @@ Prove that backend and frontend agree on status codes, error codes, and payload 
 
 ### Purpose
 
-Protect release-critical user journeys that cross UI, backend, and persistence boundaries.
+Protect release-critical user journeys that cross UI, api, and persistence boundaries.
 
 ### Current critical E2E set for v1
 
@@ -214,9 +214,9 @@ Rules:
 
 Replace these placeholders with the real repo commands.
 
-- **Run all backend tests:** `<repo command>`
-- **Run backend unit tests:** `<repo command>`
-- **Run backend integration tests:** `<repo command>`
+- **Run all api tests:** `<repo command>`
+- **Run api unit tests:** `<repo command>`
+- **Run api integration tests:** `<repo command>`
 - **Run web tests:** `<repo command>`
 - **Run E2E tests:** `<repo command>`
 - **Run lint/type checks:** `<repo command>`
@@ -251,4 +251,4 @@ Minimum expected coverage:
 
 Minimum expected coverage:
 - frontend component/unit test or visual test if available;
-- no new backend integration coverage unless backend behavior changed.
+- no new api integration coverage unless api behavior changed.

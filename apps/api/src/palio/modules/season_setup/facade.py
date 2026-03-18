@@ -6,6 +6,7 @@ SeasonSetupFacade = ModuleFacade
 
 
 def build_season_setup_facade() -> SeasonSetupFacade:
+    """Build the public facade for the season setup module."""
     return ModuleFacade(
         module_name="season_setup",
         purpose=(

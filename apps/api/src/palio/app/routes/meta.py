@@ -9,7 +9,6 @@ from palio.app.bootstrap import ApplicationRuntime
 
 def create_meta_router(runtime: ApplicationRuntime) -> APIRouter:
     """Create the operational meta router."""
-
     router = APIRouter(tags=["meta"])
 
     @router.get("/healthz")
@@ -24,7 +23,7 @@ def create_meta_router(runtime: ApplicationRuntime) -> APIRouter:
         "/readyz",
         responses={
             status.HTTP_503_SERVICE_UNAVAILABLE: {
-                "description": "Backend runtime is not ready"
+                "description": "Api runtime is not ready"
             }
         },
     )

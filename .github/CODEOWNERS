@@ -6,22 +6,18 @@
 /.github/workflows/                         @Palio-Collepasso/palio-release
 /infra/                                     @Palio-Collepasso/palio-release
 
-# Architecture / API contract
-/docs/_raw/                                 @Palio-Collepasso/palio-doc
-/docs/architecture/                         @Palio-Collepasso/palio-doc
+# Documentation
+/docs/                                      @Palio-Collepasso/palio-doc
 /docs/domain/                               @Palio-Collepasso/palio-domain-owners
-/docs/product/                              @Palio-Collepasso/palio-doc
-/docs/qna/                                  @Palio-Collepasso/palio-doc
-/docs/testing/                              @Palio-Collepasso/palio-doc
-/docs/ui/                                   @Palio-Collepasso/palio-doc
+/docs/REDLINING.md                          @Palio-Collepasso/palio-approvers
 
 # Frontend
 /apps/web/                                  @Palio-Collepasso/palio-frontend
 
-# Backend general
-/apps/api/                                  @Palio-Collepasso/palio-backend
+# Api general
+/apps/api/                                  @Palio-Collepasso/palio-api
 
-# Backend critical domain paths
+# Api critical domain paths
 /apps/api/src/palio/modules/season_setup/            @Palio-Collepasso/palio-domain-owners
 /apps/api/src/palio/modules/event_operations/        @Palio-Collepasso/palio-domain-owners
 /apps/api/src/palio/modules/results/                 @Palio-Collepasso/palio-domain-owners

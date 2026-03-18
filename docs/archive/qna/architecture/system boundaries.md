@@ -16,8 +16,8 @@
 ### 5. Is portability to plain Postgres a hard requirement?
 **Decision:** Yes. The architecture must remain portable to self-hosted Postgres later, so Supabase-specific features must not become part of core business correctness.
 
-### 6. Should the backend connect to Supabase through Supabase data APIs?
+### 6. Should the api connect to Supabase through Supabase data APIs?
 **Decision:** No. Python connects directly to Postgres using standard database connectivity and treats Supabase as a hosted Postgres instance.
 
 ### 7. Should runtime authorization depend on Postgres RLS or user-level DB identities?
-**Decision:** No. Authorization stays in Python. The backend uses a single application DB user for runtime access rather than impersonating end users at the database level.
+**Decision:** No. Authorization stays in Python. The api uses a single application DB user for runtime access rather than impersonating end users at the database level.

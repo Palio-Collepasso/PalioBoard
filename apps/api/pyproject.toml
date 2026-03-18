@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "palio-api"
 version = "0.1.0"
-description = "FastAPI backend scaffold for the PalioBoard modular monolith."
+description = "FastAPI api scaffold for the PalioBoard modular monolith."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -48,27 +48,43 @@ markers = [
 src = ["src", "tests"]
 target-version = "py312"
 [tool.ruff.lint]
-select = [
-  "E",   # pycodestyle errors
+select = [  
+  "E",   # pycodestyle
   "F",   # pyflakes
-  "I",   # import sorting
-  "B",   # flake8-bugbear
-  "UP",  # pyupgrade
-  "C4",  # comprehensions
-  "SIM", # flake8-simplify
-  "RUF", # ruff-specific rules
   "W",   # pycodestyle warnings
-  "ANN", # (optional) enforce annotations; tune below
+  "I",   # import sorting
+  "B",   # bugbear
+  "UP",  # pyupgrade / modern Python
+  "C4",  # comprehensions
+  "SIM", # simplifications
+  "RUF", # ruff-specific rules
+  "ISC", # implicit string concatenation
+  "ARG", # unused arguments
+  "ANN", # annotation presence
+  "D",   # docstrings
+  "TID", # import conventions / banned APIs
 ]
+ignore = [
+  "D100", # undocumented public module
+  "D104", # undocumented public package
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["D"]
 
 # ----------
 # Type checker
 # ----------
 [tool.pyright]
-extraPaths = ["src"]
 include = ["src", "tests"]
+exclude = ["**/__pycache__", ".venv", "**/node_modules", "**/.*"]
 pythonVersion = "3.12"
-reportMissingTypeStubs = false
+reportMissingTypeStubs = "warning"
 typeCheckingMode = "strict"
 venv = ".venv"
 venvPath = "."

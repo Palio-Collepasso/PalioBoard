@@ -1,7 +1,7 @@
 # Module Boundaries
 
-## 3. Backend structure and module boundaries
-### 22. What backend architecture style should be used?
+## 3. Api structure and module boundaries
+### 22. What api architecture style should be used?
 **Decision:** A Python **modular monolith** with explicit bounded modules.
 
 ### 23. How are module boundaries enforced?
@@ -26,25 +26,25 @@
 **Decision:** Yes, but only for technical boundaries. Anything that is not business logic should sit behind an explicit adapter interface, such as identity, live-game state, clock, idempotency storage, and future notifications.
 
 
-## 12. Backend stack, project structure, and developer tooling
-### 95. What framework and core backend stack are standardized for v1?
+## 12. Api stack, project structure, and developer tooling
+### 95. What framework and core api stack are standardized for v1?
 **Decision:** Standardize on **FastAPI + Pydantic DTOs + SQLAlchemy 2.x + Alembic**. Keep API DTOs and persistence models separate so transport contracts do not leak into ORM internals.
 
 ### 96. What project structure should the monorepo use?
-**Decision:** Use a single monorepo with `apps/api`, `apps/web`, `infra`, `docs`, `tools`, and a top-level `Makefile` plus `.github/workflows`. The backend keeps bounded modules with `facade/application/domain/infrastructure`; the frontend keeps three lazy shells, `features/`, and one `shared/` root with subfolders.
+**Decision:** Use a single monorepo with `apps/api`, `apps/web`, `infra`, `docs`, `tools`, and a top-level `Makefile` plus `.github/workflows`. The api keeps bounded modules with `facade/application/domain/infrastructure`; the frontend keeps three lazy shells, `features/`, and one `shared/` root with subfolders.
 
-### 97. Should `event_operations` and `results` remain separate backend modules?
+### 97. Should `event_operations` and `results` remain separate api modules?
 **Decision:** Yes. `event_operations` should own lifecycle/state transitions, while `results` owns canonical official result persistence. That boundary will stay useful as live draft and review flows grow.
 
-### 103. Should backend architectural boundaries be enforced automatically?
-**Decision:** Yes. Add CI checks that fail when one backend module imports another module’s internals. Boundaries should be enforceable rules, not only code-review discipline.
+### 103. Should api architectural boundaries be enforced automatically?
+**Decision:** Yes. Add CI checks that fail when one api module imports another module’s internals. Boundaries should be enforceable rules, not only code-review discipline.
 
 ### 104. Should frontend architectural boundaries also be enforced automatically?
 **Decision:** Yes. Add CI checks so shells do not depend on each other casually, `shared/` stays generic, and feature imports respect the intended layering.
 
-### 105. What initial backend boundary-check mechanism should be used before CI wiring lands?
+### 105. What initial api boundary-check mechanism should be used before CI wiring lands?
 **Decision:** Use a lightweight Python import scan in `apps/api/src/palio/shared/module_boundaries.py`. Run it locally with `uv run python -m palio.shared.module_boundaries`; it fails when code under `palio.modules` imports another module anywhere except that module’s `facade.py`.
 
 ## 13. Runtime consistency, persistence conventions, and contracts
-### 112. How is dependency wiring handled inside the backend?
+### 112. How is dependency wiring handled inside the api?
 **Decision:** Keep wiring manual and explicit in the composition root. That is simpler than introducing a DI framework now, while still leaving room to adopt DI later if the graph grows.

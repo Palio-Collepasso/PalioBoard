@@ -4,7 +4,7 @@
 ### 74. What owns schema evolution?
 **Decision:** Alembic is the primary source of truth for schema evolution. Supabase is treated as a hosting platform, not the schema authority.
 
-### 75. Are schema changes run automatically on backend startup?
+### 75. Are schema changes run automatically on api startup?
 **Decision:** No. Migrations are an explicit deployment step.
 
 ### 76. Are runtime and migration DB credentials separated?

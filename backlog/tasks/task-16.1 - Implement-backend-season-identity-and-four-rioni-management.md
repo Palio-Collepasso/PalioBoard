@@ -1,6 +1,6 @@
 ---
 id: TASK-16.1
-title: Implement backend season identity and four-rioni management
+title: Implement api season identity and four-rioni management
 status: To Do
 assignee: []
 created_date: '2026-03-16 16:40'
@@ -24,12 +24,12 @@ priority: high
 ## Description
 
 <!-- SECTION:DESCRIPTION:BEGIN -->
-Build the backend slice of TASK-16 so admins can manage one active season and the four default rioni through backend-owned season-setup APIs and persistence.
+Build the api slice of TASK-16 so admins can manage one active season and the four default rioni through api-owned season-setup APIs and persistence.
 <!-- SECTION:DESCRIPTION:END -->
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [ ] #1 Season-setup services and persistence support one active season plus exactly four rioni with prefilled defaults, validation, and admin-only authorization.
-- [ ] #2 The backend exposes the commands and reads needed by `/admin/season`, including structured forbidden and validation errors for invalid or unauthorized changes.
-- [ ] #3 The task adds backend unit and integration coverage, updates affected docs, and updates committed API contracts for the season identity and rioni surface.
+- [ ] #2 The api exposes the commands and reads needed by `/admin/season`, including structured forbidden and validation errors for invalid or unauthorized changes.
+- [ ] #3 The task adds api unit and integration coverage, updates affected docs, and updates committed API contracts for the season identity and rioni surface.
 <!-- AC:END -->

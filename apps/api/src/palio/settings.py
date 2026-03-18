@@ -1,4 +1,4 @@
-"""Typed runtime settings for the Palio backend."""
+"""Typed runtime settings for the Palio api."""
 
 import os
 from collections.abc import Mapping
@@ -94,7 +94,6 @@ def _parse_environment(value: str | None) -> ApplicationEnvironment:
     Raises:
         ValueError: When the configured value is invalid.
     """
-
     if value is None:
         return ApplicationEnvironment.DEVELOPMENT
 
@@ -127,7 +126,6 @@ def _parse_log_level(value: str | None) -> LogLevel:
     Raises:
         ValueError: When the configured value is invalid.
     """
-
     if value is None:
         return LogLevel.INFO
 
@@ -152,7 +150,6 @@ def load_settings(
     Returns:
         The typed application settings object.
     """
-
     source = environment or os.environ
     request_id_header = (
         source.get(REQUEST_ID_HEADER_ENV_VAR, DEFAULT_REQUEST_ID_HEADER).strip()

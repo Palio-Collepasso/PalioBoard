@@ -14,7 +14,6 @@ DEFAULT_OUTPUT_PATH = REPOSITORY_ROOT / "docs" / "api" / "openapi.yaml"
 
 def export_openapi(output_path: Path = DEFAULT_OUTPUT_PATH) -> Path:
     """Write the current FastAPI OpenAPI schema to the requested path."""
-
     resolved_output_path = output_path.resolve()
     resolved_output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -37,7 +36,6 @@ def main(
     ] = DEFAULT_OUTPUT_PATH,
 ) -> None:
     """Run the OpenAPI export CLI."""
-
     typer.echo(export_openapi(output))
 
 

@@ -20,12 +20,12 @@ This document applies to all externally consumed API endpoints.
 
 - Error codes are stable and machine-readable once committed here.
 - Human-readable messages may evolve without breaking clients.
-- Domain conflicts and concurrency conflicts must be distinguishable when the backend starts exposing them.
+- Domain conflicts and concurrency conflicts must be distinguishable when the api starts exposing them.
 - Internal implementation details must not leak in API responses.
 
 ## Standard Error Envelope
 
-The current backend scaffolding has not yet ratified a custom machine-readable application error envelope. Use the structure below as the template for future committed error-contract updates.
+The current api scaffolding has not yet ratified a custom machine-readable application error envelope. Use the structure below as the template for future committed error-contract updates.
 
 ```json
 {

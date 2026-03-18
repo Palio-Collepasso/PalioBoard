@@ -1,6 +1,6 @@
 # Alembic migrations
 
-This directory owns database schema evolution for the backend.
+This directory owns database schema evolution for the api.
 
 Runtime application startup must never apply migrations automatically.
 

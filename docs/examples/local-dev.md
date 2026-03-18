@@ -7,7 +7,7 @@ Explain how to run PalioBoard locally for day-to-day development, debugging, and
 This starter is tailored to the approved architecture:
 - PostgreSQL runs locally in Docker;
 - FastAPI and Angular run natively during development;
-- the backend is the only business/data API;
+- the api is the only business/data API;
 - public/maxi/admin behavior should all be testable from the local environment.
 
 ## Audience
@@ -18,7 +18,7 @@ This starter is tailored to the approved architecture:
 
 ## Local architecture summary
 
-- **Backend:** FastAPI
+- **Api:** FastAPI
 - **Frontend:** Angular SPA with admin/public/maxi shells
 - **Database:** PostgreSQL
 - **Identity:** Supabase Auth in production; local development may use a local/dev-compatible auth setup
@@ -32,7 +32,7 @@ Replace the placeholder commands and paths in this file with the actual repo com
 ## Requirements
 
 - Docker and Docker Compose available locally
-- Python toolchain required by the backend
+- Python toolchain required by the api
 - Node.js toolchain required by the frontend
 - access to the required local environment variables/secrets for development
 
@@ -43,9 +43,9 @@ Replace the placeholder commands and paths in this file with the actual repo com
 3. Start PostgreSQL and any required support services in Docker.
 4. Apply database migrations.
 5. Seed the minimal local data needed to log in and exercise core flows.
-6. Start the FastAPI backend natively.
+6. Start the FastAPI api natively.
 7. Start the Angular frontend natively.
-8. Verify admin, public, and maxi routes load against the local backend.
+8. Verify admin, public, and maxi routes load against the local api.
 
 ## Environment variables
 
@@ -53,10 +53,10 @@ Populate this table with the real variables used by the repo.
 
 | Variable | Required | Default | Used by | Description |
 |---|---|---|---|---|
-| `DATABASE_URL` | yes | `<none>` | backend | Postgres connection string |
-| `APP_ENV` | yes | `local` | backend/web | Environment selector |
-| `AUTH_*` | maybe | `<repo-specific>` | backend/web | Local auth integration values |
-| `CORS_ORIGIN_*` | maybe | `<repo-specific>` | backend | Local web origin settings |
+| `DATABASE_URL` | yes | `<none>` | api | Postgres connection string |
+| `APP_ENV` | yes | `local` | api/web | Environment selector |
+| `AUTH_*` | maybe | `<repo-specific>` | api/web | Local auth integration values |
+| `CORS_ORIGIN_*` | maybe | `<repo-specific>` | api | Local web origin settings |
 
 ## Commands
 
@@ -65,7 +65,7 @@ Replace with the real repository commands.
 ### Install dependencies
 
 ```bash
-<repo command for backend install>
+<repo command for api install>
 <repo command for frontend install>
 ```
 
@@ -87,7 +87,7 @@ Replace with the real repository commands.
 <repo command>
 ```
 
-### Run backend
+### Run api
 
 ```bash
 <repo command>
@@ -119,7 +119,7 @@ Replace with the real repository commands.
 2. Start local Postgres.
 3. Apply migrations.
 4. Seed baseline data.
-5. Run backend and frontend.
+5. Run api and frontend.
 
 ### Reset local database
 
@@ -146,8 +146,8 @@ Replace with the real repository commands.
 
 ## Verification checklist
 
-- [ ] Backend starts and connects to Postgres.
-- [ ] Frontend starts and can reach the backend.
+- [ ] Api starts and connects to Postgres.
+- [ ] Frontend starts and can reach the api.
 - [ ] Admin routes load after login.
 - [ ] Public routes load without login.
 - [ ] A seeded ranking game can be completed locally.
@@ -157,11 +157,11 @@ Replace with the real repository commands.
 
 ### Database connection fails on startup
 
-- **Symptoms:** backend fails to boot or health checks fail because the database is unreachable.
+- **Symptoms:** api fails to boot or health checks fail because the database is unreachable.
 - **Likely cause:** Postgres container is not running, `DATABASE_URL` is wrong, or migrations have not been applied.
 - **How to diagnose:**
   - verify Docker containers are running;
-  - check backend logs for connection errors;
+  - check api logs for connection errors;
   - test DB connectivity with the repo’s normal database tooling.
 - **How to fix:**
   1. Start or restart the local Postgres container.
@@ -172,27 +172,27 @@ Replace with the real repository commands.
 ### Login works poorly or local auth is misconfigured
 
 - **Symptoms:** admin pages redirect repeatedly, API calls return 401, or local token validation fails.
-- **Likely cause:** missing local auth env vars or mismatch between frontend and backend auth configuration.
+- **Likely cause:** missing local auth env vars or mismatch between frontend and api auth configuration.
 - **How to diagnose:**
-  - inspect backend auth configuration logs;
+  - inspect api auth configuration logs;
   - verify frontend environment values;
   - reproduce with a known seeded local user.
 - **How to fix:**
   1. Restore the documented local auth variables.
   2. Recreate any required local auth seed data.
-  3. Restart both backend and frontend.
+  3. Restart both api and frontend.
 - **Prevention:** keep a minimal tested local-auth bootstrap path.
 
 ### Live ranking updates do not sync across two browser sessions
 
 - **Symptoms:** second editor does not see lease/conflict feedback or stale state persists.
-- **Likely cause:** realtime channel misconfiguration, backend not serving the live transport, or a stale local client build.
+- **Likely cause:** realtime channel misconfiguration, api not serving the live transport, or a stale local client build.
 - **How to diagnose:**
-  - inspect backend realtime logs;
+  - inspect api realtime logs;
   - verify the live connection is established in both sessions;
   - test with a known in-progress ranking fixture.
 - **How to fix:**
-  1. Restart backend and frontend.
+  1. Restart api and frontend.
   2. Clear stale client state.
   3. Recreate the in-progress ranking fixture and retry.
 - **Prevention:** keep a reproducible live-collaboration fixture and smoke test.

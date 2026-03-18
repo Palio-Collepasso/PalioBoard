@@ -17,8 +17,7 @@ from palio.app.routes import (
 
 
 def create_app(runtime: ApplicationRuntime | None = None) -> FastAPI:
-    """Create the backend FastAPI application with explicit runtime wiring."""
-
+    """Create the api FastAPI application with explicit runtime wiring."""
     runtime = runtime or build_runtime()
     configure_logging(runtime.settings.logging)
     app = FastAPI(

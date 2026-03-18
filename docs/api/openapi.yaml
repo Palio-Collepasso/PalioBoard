@@ -31,7 +31,7 @@ paths:
             application/json:
               schema: {}
         '503':
-          description: Backend runtime is not ready
+          description: Api runtime is not ready
   /version:
     get:
       tags:

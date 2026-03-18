@@ -17,11 +17,11 @@ These flows protect trust-critical behavior, not general feature coverage. They 
 
 | Flow ID | Title | Priority | Cadence | Owner |
 |---|---|---|---|---|
-| `E2E-001` | Complete a ranking game | critical | per PR | backend + web |
-| `E2E-002` | Public standings/results update after ranking completion | critical | per PR | backend + web |
-| `E2E-003` | Progress and complete a 1v1 tournament | critical | per PR | backend + web |
-| `E2E-004` | Edit completed result and resolve admin review | critical | per PR | backend + web |
-| `E2E-005` | Concurrent live ranking updates with field lock behavior | critical | per PR or nightly, depending on stability | backend + web |
+| `E2E-001` | Complete a ranking game | critical | per PR | api + web |
+| `E2E-002` | Public standings/results update after ranking completion | critical | per PR | api + web |
+| `E2E-003` | Progress and complete a 1v1 tournament | critical | per PR | api + web |
+| `E2E-004` | Edit completed result and resolve admin review | critical | per PR | api + web |
+| `E2E-005` | Concurrent live ranking updates with field lock behavior | critical | per PR or nightly, depending on stability | api + web |
 
 ---
 
@@ -32,7 +32,7 @@ These flows protect trust-critical behavior, not general feature coverage. They 
 - **Status:** `active`
 - **Priority:** `critical`
 - **Cadence:** `per PR`
-- **Owner:** `backend + web`
+- **Owner:** `api + web`
 - **Business value protected:** Judges must be able to complete a normal ranking game and produce authoritative, auditable, standings-affecting results.
 
 #### Preconditions
@@ -83,7 +83,7 @@ These flows protect trust-critical behavior, not general feature coverage. They 
 - **Status:** `active`
 - **Priority:** `critical`
 - **Cadence:** `per PR`
-- **Owner:** `backend + web`
+- **Owner:** `api + web`
 - **Business value protected:** Official changes must become visible to the public/maxi surfaces immediately after authoritative save.
 
 #### Preconditions
@@ -131,7 +131,7 @@ These flows protect trust-critical behavior, not general feature coverage. They 
 - **Status:** `active`
 - **Priority:** `critical`
 - **Cadence:** `per PR`
-- **Owner:** `backend + web`
+- **Owner:** `api + web`
 - **Business value protected:** Tournament progression and final official ranking must remain trustworthy.
 
 #### Preconditions
@@ -180,7 +180,7 @@ These flows protect trust-critical behavior, not general feature coverage. They 
 - **Status:** `active`
 - **Priority:** `critical`
 - **Cadence:** `per PR`
-- **Owner:** `backend + web`
+- **Owner:** `api + web`
 - **Business value protected:** Post-completion corrections must preserve latest official truth, review state semantics, and auditability.
 
 #### Preconditions
@@ -230,7 +230,7 @@ These flows protect trust-critical behavior, not general feature coverage. They 
 - **Status:** `active`
 - **Priority:** `critical`
 - **Cadence:** `per PR or nightly, depending on stability`
-- **Owner:** `backend + web`
+- **Owner:** `api + web`
 - **Business value protected:** Multiple judges must not silently overwrite each other during live ranking entry.
 
 #### Preconditions

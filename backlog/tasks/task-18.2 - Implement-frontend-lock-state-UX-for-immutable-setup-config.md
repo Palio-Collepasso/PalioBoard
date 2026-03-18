@@ -31,7 +31,7 @@ Build the frontend slice of TASK-18 so season and game setup screens explain imm
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Season and game setup screens surface backend lock-state reasons inline before submit and disable destructive or invalid actions that would break official history.
-- [ ] #2 The client consumes backend lock-state information instead of inferring immutability rules locally, and handles forbidden or conflict responses clearly in the UI.
+- [ ] #1 Season and game setup screens surface api lock-state reasons inline before submit and disable destructive or invalid actions that would break official history.
+- [ ] #2 The client consumes api lock-state information instead of inferring immutability rules locally, and handles forbidden or conflict responses clearly in the UI.
 - [ ] #3 The task adds frontend integration coverage and updates any affected UI documentation or local setup notes for immutable setup behavior.
 <!-- AC:END -->

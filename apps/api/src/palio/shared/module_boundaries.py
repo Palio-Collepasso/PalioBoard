@@ -1,4 +1,4 @@
-"""Check that backend modules import each other through `facade.py` only."""
+"""Check that api modules import each other through `facade.py` only."""
 
 import argparse
 import ast
@@ -24,7 +24,6 @@ def check_module_boundaries(
     modules_root: Path = DEFAULT_MODULES_ROOT,
 ) -> list[BoundaryViolation]:
     """Return every forbidden cross-module import under `palio.modules`."""
-
     violations: list[BoundaryViolation] = []
 
     for file_path in _iter_python_files(modules_root):
@@ -66,11 +65,8 @@ def check_module_boundaries(
 
 def main(argv: Sequence[str] | None = None) -> int:
     """CLI entrypoint for local and CI boundary checks."""
-
     parser = argparse.ArgumentParser(
-        description=(
-            "Validate that backend modules import each other via facade.py only."
-        ),
+        description=("Validate that api modules import each other via facade.py only."),
     )
     parser.add_argument(
         "modules_root",
@@ -83,7 +79,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     modules_root = Path(args.modules_root).resolve()
     violations = check_module_boundaries(modules_root)
     if not violations:
-        print("Backend module boundary check passed.")
+        print("Api module boundary check passed.")
         return 0
 
     for violation in violations:

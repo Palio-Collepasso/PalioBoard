@@ -19,7 +19,7 @@ type SessionFactory = sessionmaker[Session]
 
 @dataclass(frozen=True, slots=True)
 class ReadinessCheck:
-    """Represent the current backend readiness status."""
+    """Represent the current api readiness status."""
 
     is_ready: bool
     reason: str
@@ -44,7 +44,6 @@ class DatabaseRuntime:
     @property
     def is_configured(self) -> bool:
         """Report whether the runtime can open DB sessions."""
-
         return self.engine is not None and self.session_factory is not None
 
     def create_session(self) -> Session:
@@ -56,7 +55,6 @@ class DatabaseRuntime:
         Raises:
             DatabaseNotConfiguredError: When no runtime DB URL is configured.
         """
-
         if self.session_factory is None:
             raise DatabaseNotConfiguredError(
                 "Database runtime is not configured. Set PALIO_DB_RUNTIME_URL "
@@ -71,7 +69,6 @@ class DatabaseRuntime:
         Returns:
             A SQLAlchemy-backed Unit of Work.
         """
-
         return SqlAlchemyUnitOfWork(self.create_session)
 
     def check_readiness(self) -> ReadinessCheck:
@@ -80,7 +77,6 @@ class DatabaseRuntime:
         Returns:
             The current readiness result.
         """
-
         if not self.is_configured or self.engine is None:
             return ReadinessCheck(
                 is_ready=False,
@@ -109,7 +105,6 @@ def build_database_runtime(*, dsn: str | None = None) -> DatabaseRuntime:
         A configured runtime when a runtime DB URL is available, otherwise an
         inert runtime descriptor that preserves the scaffold boot path.
     """
-
     if dsn is None:
         return DatabaseRuntime()
 

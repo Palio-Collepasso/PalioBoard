@@ -8,7 +8,7 @@ This starter reflects the approved v1 operational shape:
 - single VPS;
 - Docker Compose deployment;
 - Nginx reverse proxy;
-- one backend instance;
+- one api instance;
 - manual production deploys;
 - planned downtime allowed.
 
@@ -84,12 +84,12 @@ Important v1 rule:
 
 1. Update the running Docker Compose application on the VPS.
 2. Restart or recreate services as required by the release.
-3. Confirm Nginx and the backend process are healthy.
+3. Confirm Nginx and the api process are healthy.
 
 ### 5. Post-deploy verification
 
 1. Verify the application is reachable.
-2. Verify backend health endpoints/logs.
+2. Verify api health endpoints/logs.
 3. Verify admin login works.
 4. Verify public standings/results pages load.
 5. Verify maxi-screen route loads.
@@ -104,7 +104,7 @@ Important v1 rule:
 ## Verification checklist
 
 - [ ] Nginx serves the application correctly.
-- [ ] Backend process is healthy.
+- [ ] Api process is healthy.
 - [ ] Database migrations completed successfully.
 - [ ] Public standings page loads.
 - [ ] Admin login works.

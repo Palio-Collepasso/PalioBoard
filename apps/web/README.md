@@ -20,7 +20,7 @@ Current command surface:
 
 Contract workflow baseline:
 - generated API types live under `src/app/shared/api/generated/`
-- generated API types are derived from the committed backend spec and are not committed
+- generated API types are derived from the committed api spec and are not committed
 - Angular services under `src/app/shared/api/` remain hand-written
 
 The scaffold is intentionally thin: shells are reachable, shared code is generic, and feature state stays local until real product slices land.

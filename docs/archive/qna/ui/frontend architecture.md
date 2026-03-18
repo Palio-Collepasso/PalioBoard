@@ -20,7 +20,7 @@
 **Decision:** Yes. It should have explicit internal boundaries, using separate shell areas, features, and a single `shared/` root with subfolders such as `shared/ui` and `shared/api`.
 
 ### 71. How is frontend API access organized?
-**Decision:** Separate Angular API service layers exist for each backend surface: admin, public, and realtime.
+**Decision:** Separate Angular API service layers exist for each api surface: admin, public, and realtime.
 
 ### 72. Is realtime handling global in the SPA?
 **Decision:** No. Realtime handling is feature-scoped per shell/feature, not managed through one global application-wide store or bus.

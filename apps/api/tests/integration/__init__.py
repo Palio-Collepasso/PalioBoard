@@ -1,1 +1,1 @@
-"""Postgres-backed backend integration tests."""
+"""Postgres-backed api integration tests."""

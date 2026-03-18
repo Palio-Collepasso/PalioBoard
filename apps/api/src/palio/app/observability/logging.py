@@ -10,7 +10,6 @@ from palio.settings import LoggingSettings
 
 def configure_logging(settings: LoggingSettings) -> None:
     """Configure Loguru for JSON output."""
-
     logger.remove()
     logger.add(
         sys.stdout,

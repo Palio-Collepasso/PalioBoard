@@ -32,6 +32,6 @@ Build the frontend slice of TASK-17 so admins can create and edit competitions a
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [ ] #1 The admin UI implements the documented game create and edit experience with the allowed competition and format choices, seeded field selection, and points-table editing surfaces.
-- [ ] #2 The client reads and writes backend-owned competition and game configuration through the authenticated admin session and surfaces validation or forbidden errors without re-owning business rules.
+- [ ] #2 The client reads and writes api-owned competition and game configuration through the authenticated admin session and surfaces validation or forbidden errors without re-owning business rules.
 - [ ] #3 The task adds frontend integration coverage and updates any affected UI documentation or local setup notes for game configuration.
 <!-- AC:END -->

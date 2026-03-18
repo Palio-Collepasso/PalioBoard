@@ -1,7 +1,6 @@
 # Roadmap
 
 ## Purpose
-
 Provide the maintained high-level roadmap summary for the active documentation set.
 
 Use this document for:
@@ -9,7 +8,7 @@ Use this document for:
 - short milestone summaries
 - links from onboarding and repo-level docs
 
-Use `docs/_raw/milestones.md` as the long-form source record for detailed dependencies, exit criteria, and risks.
+This file is the active concise roadmap. Historical planning notes belong in archive or task-specific planning docs only when they are still useful.
 
 ## Milestone Index
 
@@ -24,6 +23,7 @@ Use `docs/_raw/milestones.md` as the long-form source record for detailed depend
 | `m-6` | Trust and exception workflows | Add post-completion review, under-examination handling, audit visibility, and the related trust-protection flows. |
 | `m-7` | Public or maxi completion and release hardening | Complete read-only experiences, tighten operations, and finish the acceptance-level release pass. |
 
-## Source Note
-
-Keep this summary concise. If milestone ordering, dependencies, exit criteria, or risks change materially, update the long-form source in `docs/_raw/milestones.md` and then refresh this summary.
+## How to maintain
+- Keep this file short.
+- Update it when milestone order or milestone meaning changes.
+- Put task-level execution detail, dependencies, and one-off planning notes outside the active roadmap surface.
