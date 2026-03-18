@@ -19,25 +19,21 @@ _request_id_context: ContextVar[str | None] = ContextVar(
 
 def get_request_id() -> str | None:
     """Read the current request identifier from context."""
-
     return _request_id_context.get()
 
 
 def bind_request_id(request_id: str) -> Token[str | None]:
     """Bind one request identifier to the current context."""
-
     return _request_id_context.set(request_id)
 
 
 def reset_request_id(token: Token[str | None]) -> None:
     """Reset the request identifier context to the previous state."""
-
     _request_id_context.reset(token)
 
 
 def generate_request_id() -> str:
     """Generate one UUIDv7 request identifier."""
-
     return str(uuid7())
 
 

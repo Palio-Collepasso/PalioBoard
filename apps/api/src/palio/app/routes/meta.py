@@ -9,7 +9,6 @@ from palio.app.bootstrap import ApplicationRuntime
 
 def create_meta_router(runtime: ApplicationRuntime) -> APIRouter:
     """Create the operational meta router."""
-
     router = APIRouter(tags=["meta"])
 
     @router.get("/healthz")

@@ -7,6 +7,7 @@ from palio.app.bootstrap import ApplicationRuntime
 
 
 def create_public_router(runtime: ApplicationRuntime) -> APIRouter:
+    """Create the public API router."""
     router = APIRouter(prefix="/api/public", tags=["public"])
 
     @router.get("/health")

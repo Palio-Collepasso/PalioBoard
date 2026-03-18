@@ -6,6 +6,7 @@ EventOperationsFacade = ModuleFacade
 
 
 def build_event_operations_facade() -> EventOperationsFacade:
+    """Build the public facade for the event operations module."""
     return ModuleFacade(
         module_name="event_operations",
         purpose="Game lifecycle, state transitions, and review flows.",

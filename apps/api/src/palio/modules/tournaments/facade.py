@@ -6,6 +6,7 @@ TournamentsFacade = ModuleFacade
 
 
 def build_tournaments_facade() -> TournamentsFacade:
+    """Build the public facade for the tournaments module."""
     return ModuleFacade(
         module_name="tournaments",
         purpose="Bracket progression and tournament result materialization.",

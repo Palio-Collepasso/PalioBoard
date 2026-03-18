@@ -24,7 +24,6 @@ def check_module_boundaries(
     modules_root: Path = DEFAULT_MODULES_ROOT,
 ) -> list[BoundaryViolation]:
     """Return every forbidden cross-module import under `palio.modules`."""
-
     violations: list[BoundaryViolation] = []
 
     for file_path in _iter_python_files(modules_root):
@@ -66,7 +65,6 @@ def check_module_boundaries(
 
 def main(argv: Sequence[str] | None = None) -> int:
     """CLI entrypoint for local and CI boundary checks."""
-
     parser = argparse.ArgumentParser(
         description=("Validate that api modules import each other via facade.py only."),
     )

@@ -49,6 +49,7 @@ class ModuleFacades:
     audit: AuditFacade
 
     def names(self) -> tuple[str, ...]:
+        """Return module names in composition-root registration order."""
         return (
             self.identity.module_name,
             self.authorization.module_name,
@@ -75,7 +76,6 @@ class ApplicationRuntime:
 
 def build_module_facades() -> ModuleFacades:
     """Assemble module facades explicitly so wiring stays visible."""
-
     return ModuleFacades(
         identity=build_identity_facade(),
         authorization=build_authorization_facade(),
@@ -93,7 +93,6 @@ def build_module_facades() -> ModuleFacades:
 
 def build_runtime() -> ApplicationRuntime:
     """Build the minimal api runtime used by the scaffold."""
-
     settings = load_settings()
     return ApplicationRuntime(
         settings=settings,

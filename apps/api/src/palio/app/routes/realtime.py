@@ -7,6 +7,7 @@ from palio.app.bootstrap import ApplicationRuntime
 
 
 def create_realtime_router(runtime: ApplicationRuntime) -> APIRouter:
+    """Create the realtime HTTP and WebSocket router."""
     router = APIRouter(prefix="/realtime", tags=["realtime"])
 
     @router.get("/health")

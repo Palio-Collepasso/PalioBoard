@@ -14,7 +14,6 @@ type RequestHandler = Callable[[Request], Awaitable[Response]]
 
 def _elapsed_ms(started_at: float) -> float:
     """Calculate elapsed time in milliseconds since the given start time."""
-
     return round((perf_counter() - started_at) * 1000, 3)
 
 

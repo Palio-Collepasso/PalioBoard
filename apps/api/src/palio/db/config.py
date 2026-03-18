@@ -24,7 +24,6 @@ def require_migration_database_url(
     Raises:
         DatabaseConfigurationError: When no migration DB URL is configured.
     """
-
     if explicit_url is not None:
         return explicit_url
 

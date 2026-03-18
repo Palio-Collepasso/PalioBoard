@@ -7,6 +7,7 @@ from palio.app.bootstrap import ApplicationRuntime
 
 
 def create_admin_router(runtime: ApplicationRuntime) -> APIRouter:
+    """Create the admin API router."""
     router = APIRouter(prefix="/api/admin", tags=["admin"])
 
     @router.get("/health")
