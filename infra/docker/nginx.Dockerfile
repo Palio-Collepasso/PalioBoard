@@ -1,4 +1,4 @@
-FROM node:24-bookworm-slim AS web-build
+FROM node:25-bookworm-slim AS web-build
 
 WORKDIR /app/apps/web
 
