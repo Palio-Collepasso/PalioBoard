@@ -13,7 +13,7 @@ Adopt a simple v1 deployment model:
 
 - one VPS
 - Docker Compose
-- one FastAPI api instance
+- one FastAPI backend instance
 - Angular SPA
 - Nginx reverse proxy
 - same-origin routing

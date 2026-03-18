@@ -1,211 +1,133 @@
 # Local Development
 
 ## Purpose
+Document the canonical local developer workflow: setup, common commands, environment variables, and high-signal troubleshooting.
 
-Explain how to set up, run, and troubleshoot the project locally.
+## Document boundary
+This file owns **local setup and commands**.
+It does not own architecture rules, test-depth policy, or deployment procedure.
+- Architecture rules live in `docs/architecture/*`.
+- Test-depth policy lives in `docs/testing/test-strategy.md`.
+- Deployment procedure lives in `docs/ops/deploy.md`.
 
-## Audience
+## Most common commands
+Use these first before digging into the longer sections:
 
-- new contributors
-- regular developers
-- reviewers reproducing a change locally
+- bootstrap local dependencies: `make up`
+- stop local dependencies: `make down`
+- reset local dependencies and volumes: `make reset`
+- apply migrations: `make migrate`
+- backend dev server: `make api-dev`
+- frontend dev server: `make web-dev`
+- repo quality gates: `make lint`, `make typecheck`, `make test`, `make verify`
+- export OpenAPI: `make openapi-export`
+- verify contract drift: `make check-openapi`
 
 ## Requirements
+- Docker and Docker Compose support
+- Python and `uv` for backend development
+- Node.js and npm for frontend development
+- repo `.env` values required by the current stack
 
-- **OS:** Linux or macOS are the current baseline; other environments are not yet documented.
-- **Runtime(s):** Python 3.12+, Node.js LTS, Docker Engine with Compose v2
-- **Package manager(s):** `uv`, `npm`
-- **Database/services:** PostgreSQL via Docker or the same-origin Compose stack
-- **Other tools:** `make`, `curl`, `pre-commit`
+## Quick start
+1. Start local infrastructure with `make up`.
+2. Apply migrations with `make migrate`.
+3. Start the backend with `make api-dev`.
+4. Start the frontend with `make web-dev`.
+5. Verify the stack with `/healthz`, `/readyz`, `/version`, `/api/public/health`, and `/realtime/health`.
 
-## Quick Start
+## Environment variables
+Keep the authoritative local values in the repo `.env` and compose files.
+Document at least these variables when they change:
+- database connection values
+- frontend origin / backend API origin
+- Supabase Auth integration values used locally
+- build/version metadata used by `/version`
 
-1. Open the repo and inspect the stable command surface with `make help`.
-2. Install frontend dependencies with `cd apps/web && npm install`.
-3. Install Git hooks from `apps/api` with `uv run --group dev pre-commit install --hook-type pre-commit --hook-type pre-push`.
-4. Install the Playwright Chromium browser once from `apps/web` with `npm run e2e:install`.
-5. Configure api env vars only when you need non-default runtime or test DB settings.
-6. Start the api with `make api-dev` and the frontend with `make web-dev` for the native hot-reload loop, or use `make up` for the same-origin smoke stack.
-7. Apply migrations explicitly before workflows that need the schema.
-8. Verify health with `curl http://127.0.0.1:8080/healthz` or the equivalent api-local endpoint.
+## Command reference
+### Backend
+- unit tests: `make test-api-unit`
+- integration tests: `make test-api-integration`
+- run git hooks manually: `cd apps/api && uv run --group dev pre-commit run --all-files --hook-stage pre-commit`
+- pre-push equivalent: `cd apps/api && uv run --group dev pre-commit run --all-files --hook-stage pre-push`
 
-## Environment Variables
+### Frontend
+- unit/component tests: `make test-web`
+- browser E2E: `make test-e2e`
 
-| Variable | Required | Default | Used by | Description |
-|---|---|---|---|---|
-| `PALIO_ENV` | no | `development` | api runtime | Selects typed runtime settings |
-| `PALIO_LOG_LEVEL` | no | app default | api runtime | Controls JSON log verbosity |
-| `PALIO_REQUEST_ID_HEADER` | no | `X-Request-ID` | api runtime | Overrides the propagated request-id header name |
-| `PALIO_BUILD_VERSION` | no | app default | api runtime | Overrides `/version` output |
-| `PALIO_BUILD_COMMIT_SHA` | no | unset | api runtime | Adds build metadata to `/version` |
-| `PALIO_DB_RUNTIME_URL` | yes for DB-backed runtime paths | unset | api runtime | Runtime database connection string |
-| `PALIO_DB_MIGRATION_URL` | yes for migrations | unset | Alembic and migrate workflow | Admin/migration database connection string |
-| `PALIO_TEST_POSTGRES_URL` | no | disposable Postgres test container matching `infra/compose/docker-compose.yml` | api integration tests | Reuses an existing local admin database for integration tests |
-| `PALIO_TEST_POSTGRES_IMAGE` | no | DB image from `infra/compose/docker-compose.yml` | api integration tests | Overrides the image used by the disposable integration-test database |
+### Repo-level verification
+- `make format`
+- `make format-check`
+- `make lint`
+- `make typecheck`
+- `make check-boundaries`
+- `make check-openapi`
+- `make test`
+- `make build`
+- `make verify`
 
-## Commands
-
-### Install
-
-```bash
-cd apps/web && npm install
-cd ../api && uv run --group dev pre-commit install --hook-type pre-commit --hook-type pre-push
-cd ../web && npm run e2e:install
-```
-
-### Start dependencies
-
-```bash
-make up
-docker compose -f infra/compose/docker-compose.yml --profile ops run --rm migrate
-```
-
-### Run api
-
-```bash
-make api-dev
-```
-
-### Run frontend
-
-```bash
-make web-dev
-```
-
-### Run tests
-
-```bash
-make test
-```
-
-### Run quality gates
-
-```bash
-make format
-make lint
-make typecheck
-make check-boundaries
-make check-openapi
-make build
-make verify
-```
-
-## Common Workflows
-
+## Common workflows
 ### Start from scratch
+1. `make down`
+2. `make reset`
+3. `make up`
+4. `make migrate`
+5. start the app processes with `make api-dev` and `make web-dev`
 
-1. Follow [Quick Start](#quick-start)
-2. Choose either:
-  - the native loop: `make api-dev`, `make web-dev`, or
-  - the same-origin smoke path: `make up` plus the one-shot `migrate` service.
+### Apply a schema change locally
+1. update the migration
+2. run `make migrate`
+3. run the relevant backend integration tests
+4. run `make check-openapi` if the API contract changed
 
-### Reset local database
+### Verify a PR before review
+1. run the narrowest honest tests for the change
+2. run `make lint`, `make typecheck`, and `make check-openapi` when relevant
+3. run `make verify` before opening or updating the PR when the change is broad enough to justify it
 
-1. Stop the stack with `make down`.
-2. Recreate the stack with `make up`, then rerun `docker compose -f infra/compose/docker-compose.yml --profile ops run --rm migrate`.
-
-### Apply migrations
-
-1. Set `PALIO_DB_MIGRATION_URL` for the target database when running locally without Compose.
-2. Run `cd apps/api && uv run alembic upgrade head` or use the profiled Compose `migrate` service.
-
-### Seed local data
-
-1. No shared seed workflow is documented yet.
-2. Until a shared seed workflow is established, keep data setup local to the change and document reusable scenarios in `docs/testing/fixtures.md`.
-
-### Run a specific test
-
-1. Use `cd apps/api && uv run --group dev pytest tests/unit` or `cd apps/api && uv run --group dev pytest tests/integration` for api layers.
-2. Use `cd apps/web && npm test -- --watch=false` for frontend behavior tests or `cd apps/web && npm run e2e` for the browser smoke suite.
-
-### Run the Git hooks manually
-
-1. Use `cd apps/api && uv run --group dev pre-commit run --all-files --hook-stage pre-commit` for the fast local hooks.
-2. Use `cd apps/api && uv run --group dev pre-commit run --all-files --hook-stage pre-push` for the heavier type/test/build/OpenAPI path.
-
-## Verification Checklist
-
-- [ ] App starts successfully
-- [ ] DB/services reachable
-- [ ] Health endpoint works
-- [ ] Frontend loads
-- [ ] `make verify` passes
-- [ ] Tests can run locally
+## Verification checklist
+- [ ] `/healthz` responds
+- [ ] `/readyz` is healthy after migrations
+- [ ] `/version` reports build metadata
+- [ ] frontend shell loads through the same-origin path
+- [ ] `/api/public/health` and `/realtime/health` respond
+- [ ] required tests for the change pass
 
 ## Troubleshooting
+### Backend readiness stays unhealthy
+Check:
+1. the migration state with `make migrate`
+2. backend logs from the running process or compose stack
+3. DB connectivity and credentials in the local environment
+4. whether the latest schema matches the code expectations
 
-Template for each troubleshooting entry: `docs/templates/ops/local-dev-troubleshooting-item.template.md`
+### Protected admin routes keep returning `401`
+Check:
+1. whether the bearer token is present
+2. whether the local auth values are configured correctly
+3. whether the identity resolves to a linked application user
+4. `docs/api/error-contract.md` for `unauthenticated` semantics
 
-### API readiness stays unhealthy
+### Browser smoke tests cannot reach the shell routes
+Check:
+1. frontend dev server availability
+2. same-origin proxy wiring in the local stack
+3. backend/public health endpoints
+4. the E2E flow notes in `docs/testing/critical-e2e-flows.md`
 
-- **Symptoms:**
-  - `/readyz` returns `503`
-- **Likely cause:** The runtime DB is unavailable or migrations have not been applied.
-- **How to diagnose:**
-  - Check `PALIO_DB_RUNTIME_URL`
-  - Run the one-shot migrate command and inspect api logs
-- **How to fix:**
-  1. Ensure the DB service is reachable.
-  2. Apply migrations explicitly before retrying readiness checks.
-- **Prevention:** Keep the migration step explicit in local verification notes.
-
-### Playwright smoke tests cannot reach the shell routes
-
-- **Symptoms:**
-  - `npm run e2e` fails on `/`, `/admin`, `/public`, or `/maxi`
-- **Likely cause:** The same-origin stack is not up or the SPA build/proxy path is stale.
-- **How to diagnose:**
-  - Confirm `make up` succeeded
-  - Curl `/healthz` and open the shell routes manually
-- **How to fix:**
-  1. Restart the stack.
-  2. Rebuild or rerun the smoke path after the proxy and SPA are healthy.
-- **Prevention:** Keep local stack verification tied to `docs/testing/critical-e2e-flows.md`.
-
-### Git hooks fail because `pre-commit` is unavailable or not installed
-
-- **Symptoms:**
-  - `.git/hooks/pre-commit` or `.git/hooks/pre-push` exits immediately
-  - `uv run --group dev pre-commit ...` fails before the repo checks run
-- **Likely cause:** The api dev tooling group was not installed through `uv run`, or the hooks were never installed for this clone/worktree.
-- **How to diagnose:**
-  - Re-run `cd apps/api && uv run --group dev pre-commit --version`
-  - Check whether `.git/hooks/pre-commit` and `.git/hooks/pre-push` exist
-- **How to fix:**
-  1. Run `cd apps/api && uv run --group dev pre-commit install --hook-type pre-commit --hook-type pre-push`.
-  2. Re-run the desired hook stage with `uv run --group dev pre-commit run --all-files --hook-stage ...`.
-- **Prevention:** Install the hooks as part of the initial local bootstrap.
-
-### `make check-openapi` fails after api or contract changes
-
-- **Symptoms:**
-  - `make check-openapi` exits non-zero
-  - `docs/api/openapi.yaml` changes unexpectedly after export
-- **Likely cause:** The committed OpenAPI artifact is stale, or frontend type generation cannot complete from the committed spec.
-- **How to diagnose:**
-  - Run `make openapi-export`
-  - Inspect `git diff -- docs/api/openapi.yaml`
-  - Re-run `make openapi-types`
-- **How to fix:**
-  1. Regenerate the spec with `make openapi-export` and review the diff.
-  2. Ensure `cd apps/web && npm install` has been run, then rerun `make openapi-types`.
-- **Prevention:** Keep contract changes and `docs/api/openapi.yaml` updates in the same change.
-
----
+### `make check-openapi` fails
+Check:
+1. whether the backend endpoint/status shape changed
+2. whether `make openapi-export` was run after the change
+3. whether generated consumer types need regeneration
+4. `docs/api/README.md` for contract workflow expectations
 
 ## FAQ
-
-Template for each FAQ entry: `docs/templates/ops/local-dev-faq-item.template.md`
-
-### Should I use Docker Compose for daily frontend and api coding?
-
-Use native `make api-dev` and `make web-dev` for the normal hot-reload loop. Keep full Compose runs for same-origin verification and production-like smoke checks.
+### Which commands are the canonical entrypoints?
+Use the repo `make` targets first. Drop to app-level commands only when you need a narrower loop.
 
 ### Are migrations run automatically by `make up`?
-
-No. The architecture keeps migrations explicit, so run the profiled `migrate` service or `alembic upgrade head` yourself.
+No. Keep migrations explicit with `make migrate` so failures stay visible.
 
 ### Which command should I run before opening a PR?
-
-Run `make verify` from the repo root. That matches the full local quality-gate baseline behind the installed Git hooks and CI workflow.
+Run the narrowest honest checks for the change, then the repo-level verification steps needed by that risk, ending with `make verify` for broader changes.

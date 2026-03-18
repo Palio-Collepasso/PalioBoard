@@ -1,53 +1,45 @@
 # Repository Guidelines
 
-## Project summary
-- PalioBoard is a monorepo to manage the [Palio](docs/domain/palio.md) event.
-- Core stack: Angular SPA + FastAPI + PostgreSQL.
-- The architecture baseline is a modular monolith with strict module ownership.
-- The main correctness risks are official result persistence, standings/projections, tournament progression, live ranking entry, authorization, migrations, and deploy/workflow changes.
-- `make` is the stable top-level command surface. Prefer repo `make` targets over ad hoc commands when they exist.
+## Purpose
+PalioBoard is a monorepo for managing the Palio event.
+This file defines **repo-wide working rules** for coding agents.
 
-## Rules
-### Use Backlog.md
-Read the workflow overview (`backlog://workflow/overview`), before creating or updating tasks, or when you're unsure whether to track work.
+For documentation source precedence, reading sets, archive policy, and UI proposal status, read `docs/README.md`.
 
-### Use the nearest `AGENTS.md` for stack-specific commands and conventions
-- API work: `apps/api/AGENTS.md`
+## Start sequence
+1. Read `docs/README.md`.
+2. Read the nearest scope-specific `AGENTS.md`.
+3. Read only the smallest relevant authoritative doc set.
+4. If code, migrations, or committed API contracts disagree with docs, treat code and committed contracts as current behavior and update docs in the same change.
+5. Flag contradictions instead of guessing.
+
+## Scope-specific AGENTS files
+- Backend/API work: `apps/api/AGENTS.md`
 - Frontend/web work: `apps/web/AGENTS.md`
-- Do not mix api and frontend conventions in one change unless the task is explicitly full-stack.
 
-## Implementation plan
-When asked to write an implementation plan for a task:
+## Stable command surface
+Use repo `make` targets when they exist.
 
-1. Read the relevant [docs](`docs/README.md`).
-2. Identify documents that need to be updated as part of the task (`docs/engineering/documentation-impact-matrix.md`).
-3. Update documents and ask the user to accept the changes before moving to the implementation.
+- Repo quality gates: `make format`, `make format-check`, `make lint`, `make typecheck`, `make check-boundaries`, `make check-openapi`, `make test`, `make build`, `make verify`
+- API contract workflow: `make openapi-export`, `make openapi-types`, `make check-openapi`
+- Backend local tests: `make test-api-unit`, `make test-api-integration`
+- Web local tests: `make test-web`, `make test-e2e`
+- Local environment details: `docs/ops/local-dev.md`
 
-- If unsure whether a document is affected, **ask** to the user.
-- If an **uncertainty** is still material after reading the docs, **ask** to the user and **record** the clarifications in the proper docs.
+## Repo-wide working rules
+- Keep business logic in backend application or domain layers, not in the frontend, database views, triggers, or migrations.
+- Preserve module boundaries; use public facades and explicit orchestrators for cross-module workflows.
+- Treat the write model as authoritative and read models or projections as derived data.
+- Keep changes narrowly scoped; do not mix unrelated refactors into correctness-sensitive work.
+- Flag documentation that became contradictory, redundant, or too large to navigate quickly.
 
-## Task implementation
-When a plan is approved and you work on the task:
+## Documentation update rule
+Update the authoritative docs in the same change when behavior, schema, API contracts, architecture, operations, or an implemented UI workflow changes.
 
-- Ensure you are on task branch: `tasks/task-<task-id>-<title>`.
-- Ensure any doubt is clarified.
-- Update documentation when behavior, schema, API contracts, architecture, or operational truth changes.
-- **Flag** contradictions between docs, code, tests, and generated contracts instead of silently choosing one interpretation.
-
-## Review behavior
-- Follow `docs/engineering/code-review.md` when reviewing or responding to review comments.
-
-## Done criteria
-- relevant lint, typecheck, and tests pass
-- docs and contracts are updated
-- assumptions, risk, and follow-up work are stated in the PR
-- any material conflict is flagged
-- any document or folder that became unmanageably large is flagged
-
-## Git Workflow
-- **Branching**: Use feature branches when working on tasks (e.g. tasks/task-123-feature-name)
-- **Committing**: Use the following format: TASK-123 - Title of the task
-- **PR**: 
-    - title: {taskId} - {taskTitle} (e.g. TASK-123 - Title of the task)
-    - template: `.github/pull_request_template.md`
-- **Github CLI**: Use gh whenever possible for PRs and issues
+## Stop and flag
+Stop and flag the issue when:
+- two authoritative docs disagree
+- a required rule is missing
+- a Q&A answer appears to override an authoritative doc
+- the task depends on behavior that is still open or ambiguous
+- the relevant doc is too large or too scattered to navigate safely

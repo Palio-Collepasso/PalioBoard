@@ -1,154 +1,136 @@
 # Deploy
 
 ## Purpose
+Describe the release procedure for the current v1 deployment model: one production host, Docker Compose, one backend instance, same-origin proxy, and explicit migration step.
 
-Describe how changes move to deployed environments safely and repeatably.
+## Document boundary
+This file owns **release steps, verification, and rollback**.
+It does not own architecture rationale or generic incident policy.
+- Architecture rationale lives in ADR-0008 and `docs/architecture/architecture.md`.
+- Incident recovery playbooks live in `docs/ops/runbook.md`.
 
-## Scope
+## Deployment model summary
+- target: one production VPS/VM
+- stack: Nginx + backend + database-dependent services via Docker Compose
+- release style: manual deploy in a planned maintenance window
+- migrations: explicit step before app start
 
-Covers build, migration, release, verification, rollback, and communication steps.
+## Required operator variables
+Set these once for the environment and reuse them in the commands below:
 
-## Environments
+```bash
+export DEPLOY_HOST="<ssh-host>"
+export APP_DIR="<deploy-directory-on-host>"
+export COMPOSE_FILE="<compose-file-path>"
+```
 
-| Environment | Purpose | URL/Location | Owner | Notes |
-|---|---|---|---|---|
-| local | dev | `http://127.0.0.1:8080` | repo contributors | Same-origin Docker Compose smoke stack |
-| production | live | single VPS/VM, configured per operator | deployment owner | Docker Compose + Nginx, one api instance, and planned downtime |
-
-## Release Principles
-
-- Prefer reversible, low-risk releases.
-- Separate schema-risk from app-risk when possible.
-- Validate before and after deployment.
-- Keep rollback instructions explicit.
+## Artifact locations
+Document or keep stable references for:
+- backend image or build ref used by the release
+- Nginx image or build ref used by the release
+- committed API contract: `docs/api/openapi.yaml`
+- migration head expected by the release
 
 ## Preconditions
+- [ ] merged change set identified
+- [ ] required checks passed
+- [ ] release ref identified
+- [ ] migration risk reviewed
+- [ ] rollback decision owner identified
+- [ ] maintenance window confirmed when needed
 
-- [ ] Required PRs merged
-- [ ] Required checks passed
-- [ ] Release notes prepared
-- [ ] Migration impact reviewed
-- [ ] Backward compatibility reviewed
-- [ ] Rollback plan ready
+## Standard release commands
+### 1. Connect and update release input
+```bash
+ssh "$DEPLOY_HOST"
+cd "$APP_DIR"
+git rev-parse HEAD
+```
 
-## Release Input
+### 2. Pull or prepare the release artifacts
+```bash
+docker compose -f "$COMPOSE_FILE" pull
+```
 
-> Record the release input used for each deployment:
-- git SHA or release tag;
-- Docker image reference(s) if applicable;
-- migration version(s);
-- operator name;
-- deploy timestamp.
+### 3. Apply migrations explicitly
+```bash
+docker compose -f "$COMPOSE_FILE" run --rm backend alembic upgrade head
+```
 
-## Deployment Procedure
+### 4. Restart the app stack
+```bash
+docker compose -f "$COMPOSE_FILE" up -d --force-recreate nginx backend
+```
 
-### 1. Prepare release
+### 5. Verify the release locally on the host
+```bash
+curl -fsS http://127.0.0.1/healthz
+curl -fsS http://127.0.0.1/readyz
+curl -fsS http://127.0.0.1/version
+curl -fsS http://127.0.0.1/api/public/health
+curl -fsS http://127.0.0.1/realtime/health
+```
 
-1. Confirm the change matches the current single-VPS, Docker Compose deployment baseline from `ADR-0008`.
-2. Review whether the release changes migrations, env vars, proxy routes, or the OpenAPI contract.
+## Post-deploy verification checklist
+- [ ] `/healthz` responds successfully
+- [ ] `/readyz` reports ready after migrations
+- [ ] `/version` reports the expected build/release metadata
+- [ ] same-origin shell and proxy routing still work
+- [ ] `/api/admin/health` and `/api/public/health` behave as expected
+- [ ] backend and Nginx logs show no new startup or routing errors
+- [ ] any release-specific manual smoke checks passed
 
-### 2. Build artifacts
+## Rollback decision tree
+### Use application rollback only when all are true
+- the failure is in the new app/proxy build
+- migrations were backward-compatible
+- the previous images are still available
 
-1. Build the api and Nginx images from `infra/docker/`.
-2. Confirm the committed `docs/api/openapi.yaml` and any generated frontend types are up to date if the release changed the contract.
+### Use incident handling instead of simple rollback when any are true
+- the migration was risky or not backward-compatible
+- data was already transformed in a way the old app cannot read safely
+- the issue is operational/environmental rather than release-code specific
+- verification cannot tell whether rollback is safe
 
-### 3. Apply migrations
+## Standard rollback commands
+### Roll back application or proxy build
+```bash
+cd "$APP_DIR"
+docker compose -f "$COMPOSE_FILE" up -d --force-recreate nginx backend
+```
 
-1. Run the explicit migration step before starting the new app version.
-2. Do not hide migrations inside api startup; the same explicit rule used in local smoke checks applies to deployment.
+Follow with the same verification commands used after deploy.
 
-### 4. Deploy application
+### Inspect logs during rollback decision
+```bash
+docker compose -f "$COMPOSE_FILE" logs --tail=200 backend nginx
+```
 
-1. Update the Compose-managed api and Nginx images on the target host.
-2. Restart the stack in the smallest acceptable maintenance window for the single-instance v1 deployment model.
-
-### 5. Post-deploy verification
-
-1. Check `/healthz`, `/readyz`, and `/version`.
-2. Verify the same-origin proxy still serves `/`, `/api/admin/health`, `/api/public/health`, and `/realtime/health`.
-
-Future note:
-- add admin, public, and maxi workflow smoke checks here when those surfaces expose stable business behavior beyond the current scaffold and health-path baseline
-
-### 6. Communicate completion
-
-1. Record the deployed ref, operator, and verification result.
-2. Share any residual manual follow-up or rollback watch items with the operators.
-
-## Verification Checklist
-
-- [ ] Service is reachable
-- [ ] Health checks pass
-- [ ] Critical API endpoints respond correctly
-- [ ] Critical user journey verified
-- [ ] Logs/metrics look healthy
-- [ ] No migration errors
-- [ ] No unexpected permission/auth failures
-
-## Rollback Scenarios
-
-Template for each rollback scenario: `docs/templates/ops/deploy-rollback-scenario.template.md`
-
-### Application or proxy deploy regression
-
-- **Trigger:** Health endpoints fail, the same-origin shell smoke fails, or the API/proxy route split is broken after release.
-- **Risk:** The single production stack is partially or fully unavailable.
-- **Decision owner:** Deployment owner on duty
-- **Rollback steps:**
-  1. Revert to the previous known-good api and Nginx image set.
-  2. Restart the Compose-managed stack with the previous release ref.
-- **Data considerations:**
-  - If migrations already ran, confirm the schema remains backward-compatible before rolling back application code.
-- **Post-rollback verification:**
-  - Repeat the standard post-deploy verification checklist.
-- **Follow-up actions:**
-  - Capture the failure mode in `docs/ops/runbook.md` if it becomes a recurring operational issue.
-
----
-
-## Deployment Scenarios
-
-Template for each deployment scenario: `docs/templates/ops/deploy-scenario.template.md`
-
+## Release scenarios
 ### Standard application-only deploy
-
-- **Use when:** No schema change is required.
-- **Procedure:** Build new images, deploy them during the planned window, and run the post-deploy checks.
-- **Extra checks:** Confirm `/version` reports the expected build metadata.
+Use when no schema change is required.
+- pull new artifacts
+- restart backend and Nginx
+- run the verification checklist
 
 ### Deploy with backward-compatible migration
-
-- **Use when:** The schema change can be applied before the app restart without breaking the previous version.
-- **Procedure:** Run the explicit migration step first, then deploy the new images.
-- **Extra checks:** Validate readiness after migrations and before traffic is considered healthy.
+Use when the migration can run before app restart without breaking the previous version.
+- run migration first
+- restart app services
+- verify readiness and public/admin health endpoints
 
 ### Deploy with risky migration
+Use when the migration is not clearly backward-compatible or not safely reversible.
+- treat as a planned maintenance event
+- require explicit operator sign-off before app restart
+- keep the rollback decision point separate from the app restart step
+- if verification fails, switch to `docs/ops/runbook.md` instead of improvising
 
-- **Use when:** The schema or data move is not safely reversible or backward-compatible.
-- **Procedure:** Treat as a planned maintenance event with an explicit rollback decision point before application restart.
-- **Extra checks:** Require manual review of migration impact and follow the incident hooks if verification fails.
-- **Approval required from:** Deployment owner and the maintainer responsible for the risky migration
-
-## Release History
-
-Template for each release-history row: `docs/templates/ops/deploy-release-history-row.template.md`
-
-> The record in this section is illustrative only. Remove it as soon as the first real release-history row is documented here.
-
-| Date | Version/Ref | Environment | Operator | Result | Notes |
-|---|---|---|---|---|---|
-| `2026-03-15` | `example-ref` | `production` | `example-operator` | success | Example row showing the expected release-history format. |
-
-
-## Repo-specific TODOs
-
-Replace placeholders with:
-- exact VPS access method;
-- exact Docker Compose commands;
-- exact health-check endpoints;
-- exact smoke-test sequence;
-- exact backup/restore references if any.
-
-## Incident Handoff
-
-If deployment fails or causes degraded service, continue in `docs/ops/runbook.md`.
+## Release record
+Capture at least:
+- deployed ref or tag
+- operator
+- date/time
+- migration head applied
+- verification result
+- rollback decision if one was needed

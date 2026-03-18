@@ -11,11 +11,11 @@ The system serves three interaction modes:
 - anonymous public reads
 - realtime delivery and collaboration
 
-Frontend and api live in one monorepo and evolve together.
+Frontend and backend live in one monorepo and evolve together.
 
 ## Decision
 
-Use a REST API with explicit command/query endpoints and three api surfaces:
+Use a REST API with explicit command/query endpoints and three backend surfaces:
 
 - `/api/admin/...`
 - `/api/public/...`
@@ -39,7 +39,7 @@ Public read rule:
 ### Positive
 
 - Clear separation of authenticated commands, anonymous reads, and realtime transport.
-- Low frontend/api contract drift.
+- Low frontend/backend contract drift.
 - No need for generated runtime clients.
 
 ### Negative

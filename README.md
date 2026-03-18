@@ -322,6 +322,8 @@ The stable top-level test entrypoints are:
 ```bash
 make test
 make test-api
+make test-api-unit
+make test-api-integration
 make test-web
 make test-e2e
 ```

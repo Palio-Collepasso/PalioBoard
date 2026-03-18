@@ -1,6 +1,18 @@
-# Functional requirements — updated
+# Functional Requirements
 
-This document replaces the previous functional requirements where they conflict with the latest clarified decisions.
+## Purpose
+Capture the supported product behavior by feature surface.
+Use this document when deciding whether a feature, workflow, or user-facing capability is in scope for v1.
+
+## Document boundary
+This file owns **what the product must support**.
+It does **not** own:
+- low-level domain invariants or trust rules — see `docs/domain/business-rules.md`
+- seeded per-game setup interpretation — see `docs/domain/game-catalog.md`
+- acceptance examples or thin-slice scenarios — see `docs/product/acceptance-scenarios.md`
+- test depth or automation policy — see `docs/testing/*`
+
+When this file and `docs/domain/business-rules.md` touch the same area, read this file for feature intent and the business-rules file for the stricter invariant.
 
 ## 0. Scope and boundaries
 
@@ -187,7 +199,7 @@ The system shall support reconnect/conflict recovery by restoring the latest ser
 
 When a ranking game enters in progress, the system shall initialize the live draft from the current official result state.
 
-The system shall support recovery of in-progress draft state after reconnect or api restart.
+The system shall support recovery of in-progress draft state after reconnect or backend restart.
 
 The system shall not update the leaderboard from ranking in-progress draft data.
 
@@ -345,7 +357,7 @@ The system shall prevent silent overwrite of concurrent live-result edits.
 
 The system shall return machine-readable error codes and structured data to the client.
 
-The frontend shall be able to translate api error codes into user-friendly messages.
+The frontend shall be able to translate backend error codes into user-friendly messages.
 
 ## 16. E2E-critical behaviors
 

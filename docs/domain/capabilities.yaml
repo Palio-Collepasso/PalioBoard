@@ -1,0 +1,75 @@
+capabilities:
+  - name: manage_season_config
+    description: Manage season configuration and setup workflows.
+    owning_module: season_setup
+    common_surfaces:
+      - admin setup screens
+      - protected setup endpoints
+
+  - name: manage_tournament_pairings
+    description: Manage 1v1 tournament pairings before the tournament game starts.
+    owning_module: tournaments
+    common_surfaces:
+      - tournament setup workflow
+
+  - name: start_game
+    description: Start a configured game and move it into in-progress execution.
+    owning_module: event_operations
+    common_surfaces:
+      - game lifecycle commands
+
+  - name: complete_game
+    description: Complete a game after official validation passes.
+    owning_module: event_operations
+    common_surfaces:
+      - game completion workflow
+
+  - name: mark_under_examination
+    description: Mark a game under examination so it remains visible but stops counting.
+    owning_module: event_operations
+    common_surfaces:
+      - review and trust workflows
+
+  - name: resolve_under_examination
+    description: Resolve the under-examination state and restore normal counting behavior.
+    owning_module: event_operations
+    common_surfaces:
+      - review and trust workflows
+
+  - name: enter_and_edit_results
+    description: Enter or edit official result data for ranking games and tournaments.
+    owning_module: results
+    common_surfaces:
+      - result entry screens
+      - protected result endpoints
+
+  - name: set_jolly_usage
+    description: Record Jolly usage as part of official Palio result entry.
+    owning_module: results
+    common_surfaces:
+      - Palio result workflows
+
+  - name: apply_manual_standings_adjustments
+    description: Apply manual signed point adjustments with auditability.
+    owning_module: leaderboard_projection
+    common_surfaces:
+      - admin standings adjustment workflow
+
+  - name: view_audit_log
+    description: Read audit history for administrative or review workflows.
+    owning_module: audit
+    common_surfaces:
+      - audit screens
+      - review workflows
+
+  - name: review_post_completion_edits
+    description: Review and resolve edits made after a result was already completed.
+    owning_module: event_operations
+    common_surfaces:
+      - pending-admin-review workflow
+
+  - name: manage_users
+    description: Create and manage application users in the minimal superadmin flow.
+    owning_module: users
+    common_surfaces:
+      - user management
