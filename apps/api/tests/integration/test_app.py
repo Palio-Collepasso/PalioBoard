@@ -2,7 +2,7 @@ import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
 
-from palio.app import create_app
+from palio.bootstrap import create_app
 from palio.settings import APPLICATION_ENV_ENV_VAR, RUNTIME_DATABASE_URL_ENV_VAR
 from tests.support.postgres import MigratedPostgresDatabase
 

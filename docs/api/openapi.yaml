@@ -8,6 +8,7 @@ paths:
       tags:
       - meta
       summary: Healthcheck
+      description: Return the basic process health payload.
       operationId: healthcheck_healthz_get
       responses:
         '200':
@@ -23,6 +24,7 @@ paths:
       tags:
       - meta
       summary: Readiness
+      description: Return runtime readiness based on database availability.
       operationId: readiness_readyz_get
       responses:
         '200':
@@ -37,6 +39,7 @@ paths:
       tags:
       - meta
       summary: Version
+      description: Return build and environment metadata for the running API.
       operationId: version_version_get
       responses:
         '200':
@@ -52,6 +55,7 @@ paths:
       tags:
       - admin
       summary: Admin Health
+      description: Return a placeholder health payload for the admin surface.
       operationId: admin_health_api_admin_health_get
       responses:
         '200':
@@ -67,6 +71,7 @@ paths:
       tags:
       - public
       summary: Public Health
+      description: Return a placeholder health payload for the public surface.
       operationId: public_health_api_public_health_get
       responses:
         '200':
@@ -82,6 +87,7 @@ paths:
       tags:
       - realtime
       summary: Realtime Health
+      description: Return a placeholder health payload for the realtime surface.
       operationId: realtime_health_realtime_health_get
       responses:
         '200':

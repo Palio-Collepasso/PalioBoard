@@ -5,12 +5,12 @@ import pytest
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
-from palio.db.config import (
+from palio.infrastructure.db.config import (
     DatabaseConfigurationError,
     require_migration_database_url,
 )
-from palio.db.runtime import (
-    DatabaseNotConfiguredError,
+from palio.infrastructure.db.runtime import (
+    DatabaseRuntime,
     ReadinessCheck,
     SessionFactory,
     build_database_runtime,
@@ -18,22 +18,13 @@ from palio.db.runtime import (
 from palio.settings import APPLICATION_SCHEMA
 
 
-def test_build_database_runtime_is_inert_without_runtime_url() -> None:
-    runtime = build_database_runtime()
-
-    assert runtime.is_configured is False
-    assert runtime.schema == APPLICATION_SCHEMA
-    with pytest.raises(DatabaseNotConfiguredError):
-        runtime.create_session()
-
-
 def test_build_database_runtime_uses_postgres_runtime_url() -> None:
     runtime_url = "postgresql+psycopg://palio_runtime:secret@localhost:5432/palio_dev"
 
     runtime = build_database_runtime(dsn=runtime_url)
 
-    assert runtime.is_configured is True
     assert runtime.dsn == runtime_url
+    assert runtime.schema == APPLICATION_SCHEMA
     assert runtime.engine is not None
     assert runtime.engine.dialect.name == "postgresql"
     assert runtime.engine.url.render_as_string(hide_password=False) == runtime_url
@@ -42,25 +33,6 @@ def test_build_database_runtime_uses_postgres_runtime_url() -> None:
     assert isinstance(session, Session)
     assert session.bind is runtime.engine
     session.close()
-
-
-def test_unit_of_work_opens_a_session_without_connecting() -> None:
-    runtime = build_database_runtime(
-        dsn="postgresql+psycopg://palio_runtime:secret@localhost:5432/palio_dev"
-    )
-
-    with runtime.create_unit_of_work() as unit_of_work:
-        assert unit_of_work.session is not None
-        assert unit_of_work.session.bind is runtime.engine
-
-
-def test_database_runtime_reports_not_ready_without_runtime_url() -> None:
-    runtime = build_database_runtime()
-
-    assert runtime.check_readiness() == ReadinessCheck(
-        is_ready=False,
-        reason="database_not_configured",
-    )
 
 
 def test_database_runtime_reports_ready_when_ping_succeeds() -> None:
@@ -81,7 +53,7 @@ def test_database_runtime_reports_ready_when_ping_succeeds() -> None:
     runtime = build_database_runtime(
         dsn="postgresql+psycopg://palio_runtime:secret@localhost:5432/palio_dev",
     )
-    runtime = runtime.__class__(
+    runtime = DatabaseRuntime(
         dsn=runtime.dsn,
         schema=runtime.schema,
         engine=cast(Engine, FakeEngine()),
@@ -102,7 +74,7 @@ def test_database_runtime_reports_not_ready_when_ping_fails() -> None:
     runtime = build_database_runtime(
         dsn="postgresql+psycopg://palio_runtime:secret@localhost:5432/palio_dev",
     )
-    runtime = runtime.__class__(
+    runtime = DatabaseRuntime(
         dsn=runtime.dsn,
         schema=runtime.schema,
         engine=cast(Engine, FakeEngine()),

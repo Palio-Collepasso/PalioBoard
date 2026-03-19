@@ -38,6 +38,10 @@ class LogLevel(StrEnum):
     CRITICAL = "CRITICAL"
 
 
+class DatabaseNotConfiguredError(RuntimeError):
+    """Raised when DB helpers are used without a configured runtime URL."""
+
+
 @dataclass(frozen=True, slots=True)
 class DatabaseSettings:
     """Database-specific settings loaded from the environment."""
@@ -45,6 +49,16 @@ class DatabaseSettings:
     runtime_url: str | None
     migration_url: str | None
     schema: str = APPLICATION_SCHEMA
+
+    def require_runtime_url(self) -> str:
+        """Return the runtime DB URL or raise when startup config is incomplete."""
+        if self.runtime_url is None:
+            raise DatabaseNotConfiguredError(
+                "Database runtime is not configured. Set PALIO_DB_RUNTIME_URL "
+                "before starting the API application."
+            )
+
+        return self.runtime_url
 
 
 @dataclass(frozen=True, slots=True)

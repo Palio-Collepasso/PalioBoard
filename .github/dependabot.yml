@@ -10,6 +10,15 @@ updates:
     directory: "/apps/web"
     schedule:
       interval: "daily"
+    groups:
+      angular:
+          patterns:
+            - "@angular/*"
+            - "rxjs"
+        angular-dev:
+          patterns:
+            - "@angular-devkit/*"
+            - "@angular/cli"
 
   - package-ecosystem: "uv"
     directory: "/apps/api"
