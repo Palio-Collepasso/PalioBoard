@@ -27,7 +27,7 @@ DEFAULT_OUTPUT_PATH = (
 
 
 def generate_typescript_error_artifact(catalog: ErrorCatalog) -> str:
-    """Render the committed frontend error catalog artifact."""
+    """Render the frontend error catalog artifact."""
     module_names = catalog.module_names
     errors_by_module = {
         module_name: catalog.errors_for_module(module_name)

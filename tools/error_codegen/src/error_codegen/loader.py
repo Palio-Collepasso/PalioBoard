@@ -1,4 +1,4 @@
-"""Load and validate the committed API error catalog."""
+"""Load and validate the API error catalog."""
 
 # pyright: reportUnknownVariableType=false, reportUnknownArgumentType=false, reportUnknownMemberType=false
 
@@ -40,7 +40,7 @@ def load_error_catalog(
     catalog_path: Path = DEFAULT_CATALOG_INDEX_PATH,
     schema_path: Path = DEFAULT_SCHEMA_PATH,
 ) -> ErrorCatalog:
-    """Load, validate, and merge the committed error catalog."""
+    """Load, validate, and merge the error catalog."""
     schema = _load_schema(schema_path)
     index_validator = _build_validator(schema)
     fragment_validator = _build_validator(_build_fragment_schema(schema))

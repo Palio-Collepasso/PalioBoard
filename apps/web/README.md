@@ -21,7 +21,7 @@ Current command surface:
 Contract workflow baseline:
 - generated API types live under `src/app/shared/api/generated/`
 - committed generated frontend API artifacts include `src/app/shared/api/generated/openapi.d.ts` from `make api-contract`
-- committed generated frontend API artifacts include `src/app/shared/api/generated/error-codes.generated.ts` from `make errors`
+- local generated frontend error artifacts include `src/app/shared/api/generated/error-codes.generated.ts` from `make errors`
 - generated API artifacts are derived from the committed API spec and error catalog; do not hand-edit them
 - Angular services under `src/app/shared/api/` remain hand-written
 - use repo-level `make errors`, `make api-contract`, and `make contracts` for the canonical contract workflow

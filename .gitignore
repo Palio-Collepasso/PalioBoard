@@ -4,4 +4,4 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 generated/
-error_codes_generated.py
+apps/api/src/palio/modules/*/error_defs_gen.py

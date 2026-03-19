@@ -1,46 +1,3 @@
-# API Error Contract
-
-This document is generated from `docs/api/errors/index.yaml` and imported catalog files.
-
-## Contract summary
-
-The API returns errors as `application/problem+json`.
-
-Clients must treat these fields as stable:
-
-- `type`: stable problem type URI
-- `code`: stable symbolic application error code
-- `status`: HTTP status
-- `title`: short human-readable summary
-- `context`: structured machine-readable error context
-
-Clients must **not** branch on `title` or any free-text detail.
-
-## Frontend rendering
-
-Frontend templates are owned by the frontend.
-
-Frontend code should:
-
-- match on stable `code`
-- read structured values from `context`
-- render localized copy in the frontend/i18n layer
-
-The backend catalog provides transport metadata and the shape of exposed context.
-It does not own final user-facing message text.
-
-## Source of truth
-
-- Error definitions: `docs/api/errors/*.yaml`
-- Endpoint-to-error mapping: `docs/api/openapi.yaml`
-- This document: generated from the catalog
-
-## Common wire shape
-
-```json
-{{ common_wire_shape_json }}
-```
-
 # Error Catalog
 
 The sections below are generated from the validated module-aligned catalog in import order.
@@ -55,31 +12,3 @@ _No error codes are currently defined in this module yet._
 {% endif %}
 
 {% endfor %}
-# Stability rules
-
-## Stable
-
-These are part of the client contract:
-
-* symbolic `code`
-* problem `type`
-* `http_status` as transport metadata
-* `context` field names and types
-
-## Not stable
-
-These may evolve without changing the error identity:
-
-* wording of `title`
-* explanatory prose in this document
-* ordering of fields in examples
-
-# For implementers
-When adding a new error:
-
-1. Add it to the correct catalog file in `docs/api/errors/`
-2. Validate the catalog
-3. Regenerate Python, TypeScript, and docs artifacts
-4. Keep handwritten module-owned exception classes in `apps/api/src/palio/modules/<module>/errors.py`
-5. Add or update frontend templates that consume `code + context`
-6. Add or update tests for emitted error code and context

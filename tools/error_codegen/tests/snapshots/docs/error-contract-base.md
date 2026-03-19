@@ -54,51 +54,7 @@ It does not own final user-facing message text.
 
 # Error Catalog
 
-The sections below are generated from the validated module-aligned catalog in import order.
-
-## Audit
-
-_No error codes are currently defined in this module yet._
-
-## Authorization
-
-_No error codes are currently defined in this module yet._
-
-## Event Operations
-
-_No error codes are currently defined in this module yet._
-
-## Identity
-
-_No error codes are currently defined in this module yet._
-
-## Leaderboard Projection
-
-_No error codes are currently defined in this module yet._
-
-## Live Games
-
-_No error codes are currently defined in this module yet._
-
-## Public Read
-
-_No error codes are currently defined in this module yet._
-
-## Results
-
-_No error codes are currently defined in this module yet._
-
-## Season Setup
-
-_No error codes are currently defined in this module yet._
-
-## Tournaments
-
-_No error codes are currently defined in this module yet._
-
-## Users
-
-_No error codes are currently defined in this module yet._
+This placeholder section should be replaced by the generator.
 
 # Stability rules
 

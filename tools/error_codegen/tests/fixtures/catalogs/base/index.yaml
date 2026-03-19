@@ -1,0 +1,23 @@
+catalog_version: 1
+namespace: palioboard
+base_type_uri: https://api.palioboard.local/problems/
+schema_dialect: https://json-schema.org/draft/2020-12/schema
+default_media_type: application/problem+json
+
+imports:
+  - audit.yaml
+  - authorization.yaml
+  - event_operations.yaml
+  - identity.yaml
+  - leaderboard_projection.yaml
+  - live_games.yaml
+  - public_read.yaml
+  - results.yaml
+  - season_setup.yaml
+  - tournaments.yaml
+  - users.yaml
+
+shared_context_schemas:
+  UuidRef:
+    type: string
+    format: uuid

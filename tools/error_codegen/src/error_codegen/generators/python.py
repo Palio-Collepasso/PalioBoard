@@ -1,4 +1,4 @@
-"""Generate committed Python error-definition artifacts from the catalog."""
+"""Generate Python error-definition artifacts from the catalog."""
 
 import shutil
 import subprocess

@@ -1,0 +1,32 @@
+errors:
+  JOLLY_ALREADY_USED:
+    type_slug: jolly-already-used
+    http_status: 409
+    title: Jolly already used
+    description: >
+      The selected team has already consumed its Jolly in a previous game,
+      so the current result cannot be accepted as submitted.
+    category: business_rule
+    retry_policy: never
+    safe_to_expose: true
+    context_schema:
+      type: object
+      additionalProperties: false
+      properties:
+        team_id:
+          $ref: "#/shared_context_schemas/UuidRef"
+          description: Team using the Jolly
+          required: true
+        game_id:
+          $ref: "#/shared_context_schemas/UuidRef"
+          description: Current game being saved
+          required: true
+        previous_game_id:
+          $ref: "#/shared_context_schemas/UuidRef"
+          description: Earlier game where the Jolly was already used
+          required: false
+    example:
+      context:
+        team_id: "01956c9f-6f7e-7b42-a4b0-2d21d920c001"
+        game_id: "01956ca0-0c77-7b98-a328-39c9f8a31002"
+        previous_game_id: "01956ca0-53dd-7162-b78a-4bdb9368b003"

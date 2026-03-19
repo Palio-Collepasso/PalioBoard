@@ -20,7 +20,7 @@ from error_codegen import (
 app = typer.Typer(
     add_completion=False,
     no_args_is_help=True,
-    help="Validate and generate committed API error-catalog artifacts.",
+    help="Validate and generate API error-catalog artifacts.",
 )
 
 CATALOG_ARGUMENT = typer.Argument(

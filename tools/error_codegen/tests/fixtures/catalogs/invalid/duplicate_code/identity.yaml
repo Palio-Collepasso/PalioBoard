@@ -1,0 +1,11 @@
+errors:
+  USER_MISSING:
+    type_slug: identity-missing
+    http_status: 404
+    title: Identity missing
+    category: not_found
+    retry_policy: never
+    safe_to_expose: true
+    context_schema:
+      type: object
+      properties: {}

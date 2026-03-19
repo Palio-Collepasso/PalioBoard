@@ -53,18 +53,17 @@ openapi-types: ## Generate committed frontend TS declarations from the committed
 	$(call require_file,docs/api/openapi.yaml,the committed OpenAPI spec)
 	cd $(WEB_DIR) && npm run generate:api-types
 
-validate-error-catalog: ## Validate the committed error catalog
+validate-error-catalog: ## Validate the error catalog
 	$(call require_file,$(ERROR_CODEGEN_DIR)/pyproject.toml,the error-codegen tool)
-	$(call require_file,docs/api/errors/index.yaml,the committed error catalog)
+	$(call require_file,docs/api/errors/index.yaml,the error catalog)
 	cd $(ERROR_CODEGEN_DIR) && uv run error-codegen validate ../../docs/api/errors/index.yaml
 
-generate-error-artifacts: ## Generate committed backend/frontend/docs error artifacts
+generate-error-artifacts: ## Generate local backend/frontend error artifacts and refresh docs output
 	$(call require_file,$(ERROR_CODEGEN_DIR)/pyproject.toml,the error-codegen tool)
-	$(call require_file,docs/api/errors/index.yaml,the committed error catalog)
+	$(call require_file,docs/api/errors/index.yaml,the error catalog)
 	cd $(ERROR_CODEGEN_DIR) && uv run error-codegen generate ../../docs/api/errors/index.yaml --ts-output ../../apps/web/src/app/shared/api/generated/error-codes.generated.ts --docs-output ../../docs/api/error-contract.md
 
 errors: validate-error-catalog generate-error-artifacts ## Run the grouped error-catalog workflow
-	$(call require_clean_paths,apps/api/src/palio/modules/*/error_defs_gen.py apps/web/src/app/shared/api/generated/error-codes.generated.ts docs/api/error-contract.md)
 
 api-contract: check-openapi ## Run the grouped API contract workflow
 

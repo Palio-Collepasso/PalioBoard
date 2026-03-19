@@ -19,7 +19,7 @@ Use these first before digging into the longer sections:
 - apply migrations: `make migrate`
 - backend dev server: `make api-dev`
 - frontend dev server: `make web-dev`
-- regenerate committed error artifacts: `make errors`
+- regenerate local error artifacts: `make errors`
 - validate the composed API contract: `make api-contract`
 - run the full contract workflow: `make contracts`
 - run the standalone error-codegen test suite: `make test-error-codegen`

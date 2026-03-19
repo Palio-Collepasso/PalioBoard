@@ -1,0 +1,3 @@
+- Review Makefile, local-dev and whoever use commands. Maybe commands need to be reorganized
+- pre-push and pre-commit should run tests and whatever only on changed files, not over all. actions over all
+- split palio and tools makefile. Create two in-project Makefiles and one repo-level Makefile

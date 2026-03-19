@@ -44,9 +44,9 @@ The toolchain derives:
 - `code` from the `errors` map key
 - `type` from `base_type_uri + type_slug`, unless overridden
 - the default `translation_key`, unless overridden
-- per-module backend artifacts at `apps/api/src/palio/modules/<module>/error_defs_gen.py`
+- local per-module backend artifacts at `apps/api/src/palio/modules/<module>/error_defs_gen.py`
   consumed by handwritten module `errors.py` classes
-- merged frontend artifacts under `apps/web/src/app/shared/api/generated/`
+- local merged frontend artifacts under `apps/web/src/app/shared/api/generated/`
 - generated human-readable docs such as `docs/api/error-contract.md`
 
 Frontend message templates remain handwritten and frontend-owned.

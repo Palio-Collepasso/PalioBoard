@@ -57,7 +57,7 @@ def validate_error_catalog(
     catalog_path: Path = DEFAULT_CATALOG_INDEX_PATH,
     schema_path: Path = DEFAULT_SCHEMA_PATH,
 ) -> str:
-    """Validate the committed catalog and return a concise summary."""
+    """Validate the catalog and return a concise summary."""
     catalog = load_error_catalog(catalog_path=catalog_path, schema_path=schema_path)
     error_count = len(catalog.errors)
     return (
@@ -83,7 +83,7 @@ def generate_ts_errors(
     schema_path: Path = DEFAULT_SCHEMA_PATH,
     output_path: Path = DEFAULT_TS_OUTPUT_PATH,
 ) -> Path:
-    """Generate the frontend error artifact from the committed catalog."""
+    """Generate the frontend error artifact from the catalog."""
     catalog = load_error_catalog(catalog_path=catalog_path, schema_path=schema_path)
     return write_typescript_error_artifact(catalog, output_path=output_path)
 
@@ -106,7 +106,7 @@ def generate_error_artifacts(
     typescript_output_path: Path = DEFAULT_TS_OUTPUT_PATH,
     docs_output_path: Path = DEFAULT_DOCS_OUTPUT_PATH,
 ) -> tuple[Path, ...]:
-    """Generate the committed Python, TypeScript, and docs artifacts."""
+    """Generate the Python, TypeScript, and docs artifacts."""
     catalog = load_error_catalog(catalog_path=catalog_path, schema_path=schema_path)
     python_paths = write_python_error_module_artifacts(
         catalog,

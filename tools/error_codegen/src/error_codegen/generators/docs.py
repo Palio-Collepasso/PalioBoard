@@ -1,6 +1,7 @@
 """Render human-readable API error documentation from the validated catalog."""
 
 import json
+import re
 from pathlib import Path
 
 from error_codegen.common import (
@@ -12,13 +13,28 @@ from error_codegen.generators.common import render_template
 from error_codegen.models import ErrorCatalog, ErrorCatalogEntry
 
 DEFAULT_OUTPUT_PATH = REPOSITORY_ROOT / "docs" / "api" / "error-contract.md"
+ERROR_CATALOG_HEADING = "# Error Catalog"
+TOP_LEVEL_HEADING_PATTERN = re.compile(r"(?m)^# ")
 
 
-def render_error_contract(catalog: ErrorCatalog) -> str:
-    """Render the committed API error-contract document."""
+def render_error_contract(
+    catalog: ErrorCatalog,
+    *,
+    base_document: str | None = None,
+) -> str:
+    """Render the full markdown document by injecting the generated section."""
+    if base_document is None:
+        base_document = DEFAULT_OUTPUT_PATH.read_text(encoding="utf-8")
+    return inject_error_catalog_section(
+        base_document,
+        render_error_catalog_section(catalog),
+    )
+
+
+def render_error_catalog_section(catalog: ErrorCatalog) -> str:
+    """Render the generated `# Error Catalog` section."""
     return render_template(
         "error_contract.md.j2",
-        common_wire_shape_json=json.dumps(_render_problem_example_template(), indent=2),
         module_sections=[
             {
                 "title": display_module_name(fragment.module_name),
@@ -28,37 +44,37 @@ def render_error_contract(catalog: ErrorCatalog) -> str:
             }
             for fragment in catalog.fragments
         ],
+    ).rstrip()
+
+
+def inject_error_catalog_section(
+    document: str,
+    rendered_section: str,
+) -> str:
+    """Replace only the `# Error Catalog` section in a markdown document."""
+    section_start = re.search(
+        rf"(?m)^{re.escape(ERROR_CATALOG_HEADING)}\s*$",
+        document,
+    )
+    if section_start is None:
+        raise ValueError(
+            "The target markdown document must contain a `# Error Catalog` heading."
+        )
+
+    remaining_document = document[section_start.end() :]
+    section_end_match = TOP_LEVEL_HEADING_PATTERN.search(remaining_document)
+    section_end = (
+        section_start.end() + section_end_match.start()
+        if section_end_match is not None
+        else len(document)
     )
 
-
-def render_error_catalog_section(catalog: ErrorCatalog) -> str:
-    """Render the generated `# Error Catalog` section."""
-    return "\n".join(
-        [
-            "# Error Catalog",
-            "",
-            (
-                "The sections below are generated from the validated "
-                "module-aligned catalog in import order."
-            ),
-            "",
-            *[
-                "\n".join(
-                    [
-                        f"## {display_module_name(fragment.module_name)}",
-                        "",
-                        "_No error codes are currently defined in this module yet._"
-                        if not fragment.errors
-                        else "\n\n".join(
-                            render_error_entry(catalog, entry)
-                            for entry in fragment.errors
-                        ),
-                    ]
-                )
-                for fragment in catalog.fragments
-            ],
-        ]
-    ).rstrip()
+    prefix = document[: section_start.start()].rstrip("\n")
+    suffix = document[section_end:].lstrip("\n")
+    rendered_parts = [prefix, rendered_section.rstrip()]
+    if suffix:
+        rendered_parts.append(suffix)
+    return "\n\n".join(part for part in rendered_parts if part).rstrip("\n") + "\n"
 
 
 def render_error_entry(catalog: ErrorCatalog, entry: ErrorCatalogEntry) -> str:
@@ -107,8 +123,18 @@ def write_error_contract(
     catalog: ErrorCatalog,
     output_path: Path = DEFAULT_OUTPUT_PATH,
 ) -> Path:
-    """Write the generated error contract document to disk."""
-    return write_text_artifact(output_path, render_error_contract(catalog))
+    """Write the error-contract document with only the catalog section refreshed."""
+    resolved_output_path = output_path.resolve()
+    base_document_path = (
+        resolved_output_path if resolved_output_path.exists() else DEFAULT_OUTPUT_PATH
+    )
+    return write_text_artifact(
+        output_path,
+        render_error_contract(
+            catalog,
+            base_document=base_document_path.read_text(encoding="utf-8"),
+        ),
+    )
 
 
 def _render_context_schema_table(

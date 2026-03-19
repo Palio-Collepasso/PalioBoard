@@ -20,7 +20,7 @@ Use this matrix during planning and before merge for every non-trivial change.
 | `docs/api/README.md` | API entrypoint guidance, stable surfaces, generation workflow changed | human contract guide |
 | `docs/api/openapi.yaml` | committed request/response/status contract changed | generated/committed artifact |
 | `docs/api/errors/*.yaml` | stable machine-readable API error identity or metadata changed | endpoint-independent error catalog |
-| `docs/api/error-contract.md` | commited machine-readable error semantics changed | generated/committed errors only |
+| `docs/api/error-contract.md` | machine-readable error semantics changed | generated error-contract output only |
 | `docs/testing/test-strategy.md` | required test layers, quality gates, change-type matrix, ownership changed | test-depth policy |
 | `docs/testing/critical-e2e-flows.md` | browser-critical flows, owners, spec mappings, promotion criteria changed | small automated shortlist |
 | `docs/testing/fixtures.md` | shared fixtures, reusable scenario seeds, fixture owners or lifecycle changed | fixture inventory only |
@@ -34,4 +34,4 @@ Use this matrix during planning and before merge for every non-trivial change.
 
 ## Rule
 If a behavior change touches more than one row, update all affected docs in the same change or explicitly flag why a row was intentionally left unchanged.
-Generated documents should not be hand-edited. Regenerate the committed artifact instead.
+Generated documents should not be hand-edited. Regenerate the artifact instead.
