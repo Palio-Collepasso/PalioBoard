@@ -44,6 +44,11 @@ def test_generate_typescript_error_artifact_renders_typed_context_helpers() -> N
     assert "isCatalogErrorCode(code)" in rendered
     assert 'typeof record["title"] === "string"' in rendered
     assert 'typeof record["status"] === "number"' in rendered
+    assert (
+        "export function getCatalogTranslationKey(code: ErrorCode): string {"
+        in rendered
+    )
+    assert "return getCatalogErrorMetadata(code).translationKey;" in rendered
 
 
 def test_generate_ts_errors_writes_the_committed_artifact_shape(tmp_path: Path) -> None:
@@ -91,6 +96,17 @@ errors:
     assert "SharedContextUuidRef" in rendered
     assert "ERROR_CODES_BY_MODULE" in rendered
     assert resolved_output.name == GENERATED_FILENAME
+
+
+def test_generate_typescript_error_artifact_documents_frontend_template_contract() -> (
+    None
+):
+    rendered = generate_typescript_error_artifact(_make_catalog())
+
+    assert (
+        "Frontend-owned templates should render messages from stable `code + context`."
+        in rendered
+    )
 
 
 def _make_catalog() -> ErrorCatalog:

@@ -104,3 +104,12 @@ def test_render_error_contract_matches_committed_document() -> None:
     )
 
     assert render_error_contract(load_error_catalog()) == committed_doc
+
+
+def test_render_error_contract_describes_frontend_template_ownership() -> None:
+    rendered = render_error_contract(load_error_catalog())
+
+    assert "## Frontend rendering" in rendered
+    assert "- match on stable `code`" in rendered
+    assert "- read structured values from `context`" in rendered
+    assert "It does not own final user-facing message text." in rendered

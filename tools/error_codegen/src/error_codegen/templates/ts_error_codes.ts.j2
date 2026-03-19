@@ -1,5 +1,6 @@
 /**
  * Generated from docs/api/errors/index.yaml and imported module fragments.
+ * Frontend-owned templates should render messages from stable `code + context`.
  * Do not edit by hand.
  */
 
@@ -101,6 +102,10 @@ export function getCatalogErrorMetadata(
   code: ErrorCode,
 ): ErrorMetadataByCode[ErrorCode] {
   return ERROR_METADATA_BY_CODE[code];
+}
+
+export function getCatalogTranslationKey(code: ErrorCode): string {
+  return getCatalogErrorMetadata(code).translationKey;
 }
 
 export function matchesCatalogErrorCode(

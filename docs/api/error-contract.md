@@ -16,6 +16,19 @@ Clients must treat these fields as stable:
 
 Clients must **not** branch on `title` or any free-text detail.
 
+## Frontend rendering
+
+Frontend templates are owned by the frontend.
+
+Frontend code should:
+
+- match on stable `code`
+- read structured values from `context`
+- render localized copy in the frontend/i18n layer
+
+The backend catalog provides transport metadata and the shape of exposed context.
+It does not own final user-facing message text.
+
 ## Source of truth
 
 - Error definitions: `docs/api/errors/*.yaml`
@@ -111,4 +124,6 @@ When adding a new error:
 1. Add it to the correct catalog file in `docs/api/errors/`
 2. Validate the catalog
 3. Regenerate Python, TypeScript, and docs artifacts
-4. Add or update tests for emitted error code and context
+4. Keep handwritten module-owned exception classes in `apps/api/src/palio/modules/<module>/errors.py`
+5. Add or update frontend templates that consume `code + context`
+6. Add or update tests for emitted error code and context

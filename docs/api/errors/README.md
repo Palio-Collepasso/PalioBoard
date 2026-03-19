@@ -49,6 +49,9 @@ The toolchain derives:
 - merged frontend artifacts under `apps/web/src/app/shared/api/generated/`
 - generated human-readable docs such as `docs/api/error-contract.md`
 
+Frontend message templates remain handwritten and frontend-owned.
+They consume stable `code + context` from API problem responses.
+
 ## Working rules
 - Keep the catalog endpoint-independent.
 - Do not duplicate endpoint ownership or routing here.
@@ -56,6 +59,7 @@ The toolchain derives:
 - Keep one top-level fragment file per backend module under `apps/api/src/palio/modules/`.
 - Keep context schemas minimal and stable.
 - Keep handwritten runtime exception classes in the owning backend module.
+- Keep frontend copy out of the catalog; frontend templates render from `code + context`.
 - Prefer shared context schemas in `index.yaml` when the same shape recurs.
 
 ## Adding or changing an error
@@ -64,7 +68,9 @@ The toolchain derives:
 3. Reuse shared context schemas where possible.
 4. Add an example when the context shape is non-trivial.
 5. Run `make errors`.
-6. Update endpoint-level OpenAPI documentation separately when endpoint-to-error mapping changed.
+6. Update handwritten module exceptions if backend runtime behavior changed.
+7. Update frontend templates that render the affected `code`.
+8. Update endpoint-level OpenAPI documentation separately when endpoint-to-error mapping changed.
 
 ## Example entry
 ```yaml
