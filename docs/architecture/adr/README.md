@@ -23,3 +23,4 @@ Each ADR uses the same format:
 - [ADR-0007 — API Surfaces and OpenAPI Contract Strategy](ADR-0007-api-and-contract-strategy.md)
 - [ADR-0008 — Deployment and Operational Model](ADR-0008-deployment-and-operational-model.md)
 - [ADR-0009 — Testing and Quality Gates](ADR-0009-testing-and-quality-gates.md)
+- [ADR-0010 — Error Catalog and Problem Details Contract](ADR-0010-error-catalog-and-problem-details.md)

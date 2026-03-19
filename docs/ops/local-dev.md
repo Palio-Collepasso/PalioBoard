@@ -33,6 +33,14 @@ Use these first before digging into the longer sections:
 - Node.js and npm for frontend development
 - repo `.env` values required by the current stack
 
+## Repo Python environment
+Create the repo-level Python development environment with:
+- `uv sync`
+
+That creates a root `.venv/` with:
+- the editable `palio-api` package from `apps/api`
+- the editable `palio-error-codegen` package from `tools/error_codegen`
+
 ## Quick start
 1. Start local infrastructure with `make up`.
 2. Apply migrations with `make migrate`.

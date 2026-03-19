@@ -44,11 +44,12 @@ Always also read:
 - Repositories and query services may use raw SQL, but ownership still follows the module map.
 
 ## Python conventions
+Whenever you create or update python code, follow these rules:
 - no `from __future__ import annotations` unless necessary
 - prefer PEP 695 modern typing
 - prefer `Annotated`
 - prefer `typer` over `argparse`
-- update related docstrings with Google style when code changes
+- ensure related Google docstrings is up to date
 - use `is` for enum identity comparisons; use `==` only when intentional value-level comparisons
 - prefer `Sequence[T]` to `tuple[T, ...]`
 
@@ -56,7 +57,7 @@ Always also read:
 - Pure domain logic: add or update unit tests.
 - DB-backed behavior, projections, or transactions: add or update integration tests against real PostgreSQL.
 - Live entry or realtime behavior: add or update targeted integration coverage where the state and conflict semantics live.
-- API contract change: update committed OpenAPI, generated client types, and any affected API docs.
+- API contract change: update the relevant error catalog fragment, update committed OpenAPI, generated client types, and any affected API docs.
 - Critical user-visible flow change: update the relevant acceptance scenario and, if automated in browser, the relevant E2E flow.
 
 ## Backend-specific stop rules

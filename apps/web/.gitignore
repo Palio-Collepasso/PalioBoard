@@ -4,4 +4,6 @@
 /coverage/
 /playwright-report/
 /test-results/
-/src/app/shared/api/generated/
+/src/app/shared/api/generated/*
+!/src/app/shared/api/generated/openapi.d.ts
+!/src/app/shared/api/generated/error-codes.generated.ts

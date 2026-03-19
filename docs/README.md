@@ -26,6 +26,9 @@ When multiple documents touch the same topic, use this order:
 If two sources disagree, do not silently choose one. Flag the conflict.
 
 ## Read by task type
+
+Track task changes in `docs/REDLINING.md`.
+
 ### Backend feature or bug fix
 Read:
 1. `docs/architecture/architecture.md`
@@ -34,6 +37,7 @@ Read:
    - `docs/product/functional-requirements.md`
    - `docs/domain/business-rules.md`
    - `docs/domain/er-schema.md`
+   - `docs/api/errors/README.md`
    - `docs/api/error-contract.md`
    - `docs/testing/test-strategy.md`
 
@@ -111,7 +115,8 @@ Read:
 ### API
 - `docs/api/README.md` — human guide to API ownership, generation, and stable surfaces
 - `docs/api/openapi.yaml` — committed HTTP contract
-- `docs/api/error-contract.md` — stable machine error codes and semantics currently emitted by the backend
+- `docs/api/errors/README.md` — guide to the error catalog
+- `docs/api/error-contract.md` — generated human-readable overview of the errors
 
 ### Testing
 - `docs/testing/test-strategy.md` — required test depth by change type
@@ -153,10 +158,9 @@ Do not read these unless the task explicitly needs them:
 ## Documentation maintenance rules
 When a change affects behavior, architecture, schema, contracts, operations, or an implemented UI workflow:
 1. update the authoritative document first
-2. update `docs/ui/*` only as proposals or implementation starting points
-3. update Q&A only if the answer is still temporary
-4. archive outdated examples or migrated notes instead of keeping two active sources
-5. flag any document that became contradictory, redundant, or too large to navigate quickly
+2. update Q&A only if the answer is still temporary
+3. archive outdated examples or migrated notes instead of keeping two active sources
+4. flag any document that became contradictory, redundant, or too large to navigate quickly
 
 ## When to stop and ask or flag
 Stop and flag the issue when:
@@ -166,6 +170,3 @@ Stop and flag the issue when:
 - a UI proposal implies behavior not supported by authoritative docs
 - the task depends on behavior that is still open or ambiguous
 - the relevant doc is too large or too scattered to navigate safely
-
-## Track changes
-Tracked changes in `docs/REDLINING.md`

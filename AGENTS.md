@@ -43,3 +43,11 @@ Stop and flag the issue when:
 - a Q&A answer appears to override an authoritative doc
 - the task depends on behavior that is still open or ambiguous
 - the relevant doc is too large or too scattered to navigate safely
+
+## Git Workflow
+- **Branching**: Use feature branches when working on tasks (e.g. tasks/task-123-feature-name)
+- **Committing**: Use the following format: TASK-123 - Title of the task
+- **PR**: 
+    - title: {taskId} - {taskTitle} (e.g. TASK-123 - Title of the task)
+    - template: `.github/pull_request_template.md`
+- **Github CLI**: Use gh whenever possible for PRs and issues
