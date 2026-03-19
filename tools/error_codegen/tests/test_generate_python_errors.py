@@ -51,7 +51,7 @@ def test_generate_python_errors_emits_module_constants_and_metadata(
 errors:
   USER_MISSING:
     type_slug: user-missing
-    recommended_http_status: 404
+    http_status: 404
     title: User missing
     description: The requested user does not exist.
     category: not_found
@@ -76,16 +76,13 @@ errors:
     generate_python_errors(catalog_path=catalog_path, output_root=output_root)
     module = load_module_from_path(
         output_root / "users" / GENERATED_FILENAME,
-        module_name="generated_users_error_codes",
+        module_name="generated_users_error_defs",
     )
 
     assert module.MODULE_NAME == "users"
     assert module.ERROR_CODES == ("USER_MISSING",)
-    assert module.USER_MISSING == "USER_MISSING"
-    assert module.USER_MISSING_METADATA.code == "USER_MISSING"
-    assert module.USER_MISSING_METADATA.title == "User missing"
-    assert module.ERROR_BY_CODE["USER_MISSING"] is module.USER_MISSING_METADATA
-    assert module.get_error("USER_MISSING") is module.USER_MISSING_METADATA
-    assert module.ERROR_BY_TYPE_URI[module.USER_MISSING_METADATA.type_uri] is (
-        module.USER_MISSING_METADATA
-    )
+    assert module.USER_MISSING.code == "USER_MISSING"
+    assert module.USER_MISSING.title == "User missing"
+    assert module.USER_MISSING.http_status == 404
+    assert module.ERROR_DEFINITIONS == (module.USER_MISSING,)
+    assert module.ERROR_DEFINITIONS_BY_CODE["USER_MISSING"] is module.USER_MISSING

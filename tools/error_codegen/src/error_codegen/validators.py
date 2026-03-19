@@ -116,12 +116,25 @@ def normalize_context_schema(schema: object) -> object:
 
         normalized[key] = value
 
+    if _is_object_schema(normalized) and "additionalProperties" not in normalized:
+        normalized["additionalProperties"] = False
+
     if isinstance(existing_required, list):
         normalized["required"] = existing_required
     elif required_fields:
         normalized["required"] = required_fields
 
     return normalized
+
+
+def _is_object_schema(schema: dict[str, Any]) -> bool:
+    """Return whether one schema node explicitly describes an object shape."""
+    if "properties" in schema:
+        return True
+    schema_type = schema.get("type")
+    if schema_type == "object":
+        return True
+    return isinstance(schema_type, list) and "object" in schema_type
 
 
 def validate_context_references(

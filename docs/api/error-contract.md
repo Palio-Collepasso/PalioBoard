@@ -1,156 +1,114 @@
 # API Error Contract
 
-## Purpose
+This document is generated from `docs/api/errors/index.yaml` and imported catalog files.
 
-Define the stable error contract exposed by the API:
+## Contract summary
 
-- HTTP status usage
-- machine-readable error codes
-- response payload shape
-- field-level validation format
-- concurrency/conflict semantics
-- authorization/authentication semantics
-- retry guidance for clients
+The API returns errors as `application/problem+json`.
 
-## Scope
+Clients must treat these fields as stable:
 
-This document applies to all externally consumed API endpoints.
+- `type`: stable problem type URI
+- `code`: stable symbolic application error code
+- `status`: HTTP status
+- `title`: short human-readable summary
+- `context`: structured machine-readable error context
 
-## Principles
+Clients must **not** branch on `title` or any free-text detail.
 
-- Error codes are stable and machine-readable once committed here.
-- Human-readable messages may evolve without breaking clients.
-- Domain conflicts and concurrency conflicts must be distinguishable when the api starts exposing them.
-- Internal implementation details must not leak in API responses.
+## Source of truth
 
-## Standard Error Envelope
+- Error definitions: `docs/api/errors/*.yaml`
+- Endpoint-to-error mapping: `docs/api/openapi.yaml`
+- This document: generated from the catalog
 
-The current api scaffolding has not yet ratified a custom machine-readable application error envelope. Use the structure below as the template for future committed error-contract updates.
+## Common wire shape
 
 ```json
 {
-  "error": {
-    "code": "string",
-    "message": "string",
-    "details": {},
-    "request_id": "string"
+  "type": "https://api.palioboard.local/problems/jolly-already-used",
+  "code": "JOLLY_ALREADY_USED",
+  "title": "Jolly already used",
+  "status": 409,
+  "context": {
+    "team_id": "01956c9f-6f7e-7b42-a4b0-2d21d920c001",
+    "game_id": "01956ca0-0c77-7b98-a328-39c9f8a31002",
+    "previous_game_id": "01956ca0-53dd-7162-b78a-4bdb9368b003"
   }
 }
 ```
 
-## Field Validation Error Envelope
+# Error Catalog
 
-Use this template when a future task commits stable field-level validation semantics:
+The sections below are generated from the validated module-aligned catalog in import order.
 
-```json
-{
-  "error": {
-    "code": "validation_error",
-    "message": "Validation failed",
-    "details": {
-      "fields": [
-        {
-          "field": "string",
-          "reason": "string",
-          "code": "string"
-        }
-      ]
-    },
-    "request_id": "string"
-  }
-}
-```
+## Audit
 
-## Concurrency / Conflict Error Envelope
+_No error codes are currently defined in this module yet._
 
-Use this template when a future task commits stable optimistic-concurrency or stale-write handling:
+## Authorization
 
-```json
-{
-  "error": {
-    "code": "version_conflict",
-    "message": "The resource was modified by another user",
-    "details": {
-      "resource_type": "string",
-      "resource_id": "string",
-      "current_version": 0,
-      "provided_version": 0
-    },
-    "request_id": "string"
-  }
-}
-```
+_No error codes are currently defined in this module yet._
 
-## Error Code Index
+## Event Operations
 
-> The records in this section are illustrative examples only. Remove them as soon as the first real error definition is documented here.
+_No error codes are currently defined in this module yet._
 
-| Error code | HTTP status | Category | Retryable | Notes |
-|---|---:|---|---|---|
-| `validation_error` | 400 | validation | no | Input is malformed or missing required fields. |
-| `unauthenticated` | 401 | auth | maybe | Authentication is missing or invalid. |
+## Identity
 
----
+_No error codes are currently defined in this module yet._
 
-## Error Definitions
+## Leaderboard Projection
 
-Template for each error definition: `docs/templates/api/error-definition.template.md`
+_No error codes are currently defined in this module yet._
 
-> The record in this section is illustrative only. Remove it as soon as the first real error definition is documented here.
+## Live Games
 
-### `validation_error`
+_No error codes are currently defined in this module yet._
 
-- **Status:** `400`
-- **Category:** `validation`
-- **Retryable:** `no`
-- **Client action:** Correct the request payload and retry.
-- **Meaning:** The request payload is malformed, incomplete, or structurally invalid.
-- **When returned:**
-  - A required field is missing.
-  - A field value fails request validation.
-- **Must not be used for:**
-  - authentication or authorization failures
-- **Payload details:**
-  - `fields`: optional list of failing fields
-  - `request_id`: correlation id for debugging
-- **Security/privacy notes:** Validation responses must not leak internal implementation details.
-- **Example response:**
+## Public Read
 
-```json
-{
-  "error": {
-    "code": "validation_error",
-    "message": "Validation failed",
-    "details": {
-      "fields": []
-    },
-    "request_id": "req_123"
-  }
-}
-```
+_No error codes are currently defined in this module yet._
 
-- **Related endpoints:**
-  - `POST /example`
-- **Related domain rules:**
-  - none yet
+## Results
 
----
+_No error codes are currently defined in this module yet._
 
-## Endpoint-Specific Deviations
+## Season Setup
 
-Template for each endpoint-specific deviation: `docs/templates/api/endpoint-deviation.template.md`
+_No error codes are currently defined in this module yet._
 
-> Use this section only when an endpoint intentionally deviates from the common contract.
+## Tournaments
 
-### Current baseline
+_No error codes are currently defined in this module yet._
 
-- **Deviation:** No endpoint-specific deviations are documented yet.
-- **Why:** The completed work to date exposes operational and scaffold endpoints, but has not standardized custom business-error handling.
-- **Approved by:** Pending a future task that commits the first client-facing error semantics.
+## Users
 
----
+_No error codes are currently defined in this module yet._
 
-## Open Questions
+# Stability rules
 
-- Which first business workflows will define the initial stable machine-readable error codes?
-- Will FastAPI default validation responses be wrapped or left as-is when the first custom error contract lands?
+## Stable
+
+These are part of the client contract:
+
+* symbolic `code`
+* problem `type`
+* `http_status` as transport metadata
+* `context` field names and types
+
+## Not stable
+
+These may evolve without changing the error identity:
+
+* wording of `title`
+* explanatory prose in this document
+* ordering of fields in examples
+
+# For implementers
+When adding a new error:
+
+1. Add it to the correct catalog file in `docs/api/errors/`
+2. Validate the catalog
+3. Regenerate Python, TypeScript, and docs artifacts
+4. Add or update tests for emitted error code and context

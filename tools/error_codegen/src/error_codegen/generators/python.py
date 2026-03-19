@@ -1,4 +1,4 @@
-"""Generate committed Python error-code artifacts from the validated catalog."""
+"""Generate committed Python error-definition artifacts from the catalog."""
 
 import shutil
 import subprocess
@@ -11,12 +11,12 @@ from error_codegen.generators.common import render_template
 from error_codegen.models import ErrorCatalog, ErrorCatalogEntry
 
 DEFAULT_OUTPUT_ROOT = REPOSITORY_ROOT / "apps" / "api" / "src" / "palio" / "modules"
-GENERATED_FILENAME = "error_codes_generated.py"
+GENERATED_FILENAME = "error_defs_gen.py"
 
 
 @dataclass(frozen=True, slots=True)
 class GeneratedPythonModuleArtifact:
-    """One generated Python error-code artifact for a backend module."""
+    """One generated Python error-definition artifact for a backend module."""
 
     module_name: str
     output_path: Path
@@ -27,7 +27,7 @@ def build_python_error_module_artifacts(
     catalog: ErrorCatalog,
     output_root: Path = DEFAULT_OUTPUT_ROOT,
 ) -> tuple[GeneratedPythonModuleArtifact, ...]:
-    """Render one generated module artifact per imported backend module."""
+    """Render one generated definition module per imported backend module."""
     artifacts: list[GeneratedPythonModuleArtifact] = []
     for fragment in catalog.fragments:
         artifacts.append(
@@ -44,7 +44,7 @@ def write_python_error_module_artifacts(
     catalog: ErrorCatalog,
     output_root: Path = DEFAULT_OUTPUT_ROOT,
 ) -> tuple[Path, ...]:
-    """Write generated Python error-code modules to disk."""
+    """Write generated Python error-definition modules to disk."""
     written_paths = tuple(
         write_text_artifact(artifact.output_path, artifact.content)
         for artifact in build_python_error_module_artifacts(
@@ -60,27 +60,20 @@ def _render_module_source(
     module_name: str,
     entries: Sequence[ErrorCatalogEntry],
 ) -> str:
-    code_constant_names = [entry.code for entry in entries]
-    metadata_constant_names = [f"{entry.code}_METADATA" for entry in entries]
     uppercase_exports = sorted(
         [
-            "ERRORS",
-            "ERROR_BY_CODE",
-            "ERROR_BY_TRANSLATION_KEY",
-            "ERROR_BY_TYPE_URI",
+            "ERROR_DEFINITIONS",
+            "ERROR_DEFINITIONS_BY_CODE",
             "ERROR_CODES",
             "MODULE_NAME",
-            *code_constant_names,
-            *metadata_constant_names,
+            *[entry.code for entry in entries],
         ]
     )
-    export_names = [*uppercase_exports, "ErrorCodeMetadata", "get_error"]
+    export_names = [*uppercase_exports, "ErrorDefinition"]
     return render_template(
         "python_errors.py.j2",
         module_name=module_name,
         entries=entries,
-        code_constant_names=code_constant_names,
-        metadata_constant_names=metadata_constant_names,
         export_names=export_names,
     )
 

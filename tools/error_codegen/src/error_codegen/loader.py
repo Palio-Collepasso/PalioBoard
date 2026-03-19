@@ -185,31 +185,38 @@ def load_error_catalog(
                 issues=issues,
             )
 
-            entry = ErrorCatalogEntry(
-                code=code,
-                module_name=module_name,
+            entry = _parse_document(
+                ErrorCatalogEntry,
+                {
+                    "code": code,
+                    "module_name": module_name,
+                    "source_path": fragment_path,
+                    "type_slug": parsed_entry.type_slug,
+                    "type_uri": derived_type_uri,
+                    "http_status": parsed_entry.http_status,
+                    "title": parsed_entry.title,
+                    "description": parsed_entry.description,
+                    "category": parsed_entry.category,
+                    "retry_policy": parsed_entry.retry_policy,
+                    "safe_to_expose": parsed_entry.safe_to_expose,
+                    "translation_key": _derive_translation_key(
+                        code,
+                        parsed_entry.translation_key_override,
+                    ),
+                    "raw_context_schema": parsed_entry.context_schema,
+                    "normalized_context_schema": normalized_context_schema,
+                    "type_uri_override": parsed_entry.type_uri_override,
+                    "translation_key_override": parsed_entry.translation_key_override,
+                    "log_level": parsed_entry.log_level,
+                    "severity": parsed_entry.severity,
+                    "example": _model_dump(parsed_entry.example),
+                    "notes_for_operators": parsed_entry.notes_for_operators,
+                },
                 source_path=fragment_path,
-                type_slug=parsed_entry.type_slug,
-                type_uri=derived_type_uri,
-                recommended_http_status=parsed_entry.recommended_http_status,
-                title=parsed_entry.title,
-                description=parsed_entry.description,
-                category=parsed_entry.category,
-                retry_policy=parsed_entry.retry_policy,
-                safe_to_expose=parsed_entry.safe_to_expose,
-                translation_key=_derive_translation_key(
-                    code,
-                    parsed_entry.translation_key_override,
-                ),
-                raw_context_schema=parsed_entry.context_schema,
-                normalized_context_schema=normalized_context_schema,
-                type_uri_override=parsed_entry.type_uri_override,
-                translation_key_override=parsed_entry.translation_key_override,
-                log_level=parsed_entry.log_level,
-                severity=parsed_entry.severity,
-                example=_model_dump(parsed_entry.example),
-                notes_for_operators=parsed_entry.notes_for_operators,
+                issues=issues,
             )
+            if entry is None:
+                continue
             merged_errors[code] = entry
             entries.append(entry)
 

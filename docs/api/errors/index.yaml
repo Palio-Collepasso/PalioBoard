@@ -1,0 +1,66 @@
+catalog_version: 1
+namespace: palioboard
+base_type_uri: https://api.palioboard.local/problems/
+schema_dialect: https://json-schema.org/draft/2020-12/schema
+default_media_type: application/problem+json
+
+imports:
+  - audit.yaml
+  - authorization.yaml
+  - event_operations.yaml
+  - identity.yaml
+  - leaderboard_projection.yaml
+  - live_games.yaml
+  - public_read.yaml
+  - results.yaml
+  - season_setup.yaml
+  - tournaments.yaml
+  - users.yaml
+
+shared_context_schemas:
+  UuidRef:
+    type: string
+    format: uuid
+
+  ErrorCodeRef:
+    type: string
+    pattern: '^[A-Z][A-Z0-9_]*$'
+
+  CapabilityRef:
+    type: string
+    minLength: 1
+
+  GameStateRef:
+    type: string
+    enum:
+      - draft
+      - in_progress
+      - completed
+      - pending_admin_review
+      - under_examination
+
+  TeamRef:
+    type: object
+    additionalProperties: false
+    properties:
+      team_id:
+        $ref: '#/shared_context_schemas/UuidRef'
+      team_name:
+        type: string
+        minLength: 1
+    required:
+      - team_id
+
+  PaginationRef:
+    type: object
+    additionalProperties: false
+    properties:
+      limit:
+        type: integer
+        minimum: 1
+      offset:
+        type: integer
+        minimum: 0
+    required:
+      - limit
+      - offset

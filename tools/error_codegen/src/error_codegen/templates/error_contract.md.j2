@@ -50,7 +50,7 @@ These are part of the client contract:
 
 * symbolic `code`
 * problem `type`
-* `recommended_http_status` as generator metadata
+* `http_status` as transport metadata
 * `context` field names and types
 
 ## Not stable
@@ -66,6 +66,5 @@ When adding a new error:
 
 1. Add it to the correct catalog file in `docs/api/errors/`
 2. Validate the catalog
-3. Regenerate Python, TypeScript, OpenAPI, and docs artifacts
-4. Reference the error from the relevant OpenAPI endpoint definition
-5. Add or update tests for emitted error code and context
+3. Regenerate Python, TypeScript, and docs artifacts
+4. Add or update tests for emitted error code and context

@@ -138,7 +138,7 @@ def test_load_error_catalog_reports_unknown_shared_context_reference(
 errors:
   USER_MISSING:
     type_slug: user-missing
-    recommended_http_status: 404
+    http_status: 404
     title: User missing
     category: not_found
     retry_policy: never
@@ -169,7 +169,7 @@ def test_load_error_catalog_reports_invalid_example_context(tmp_path: Path) -> N
 errors:
   USER_MISSING:
     type_slug: user-missing
-    recommended_http_status: 404
+    http_status: 404
     title: User missing
     category: not_found
     retry_policy: never
@@ -206,7 +206,7 @@ def test_load_error_catalog_reports_invalid_fragment_entry_without_crashing(
 errors:
   USER_MISSING:
     type_slug: user-missing
-    recommended_http_status: 404
+    http_status: 404
     category: not_found
     retry_policy: never
     safe_to_expose: true
@@ -233,7 +233,7 @@ def test_load_error_catalog_normalizes_required_field_extension(tmp_path: Path) 
 errors:
   USER_MISSING:
     type_slug: user-missing
-    recommended_http_status: 404
+    http_status: 404
     title: User missing
     category: not_found
     retry_policy: never
@@ -266,3 +266,102 @@ errors:
         },
         "required": ["user_id"],
     }
+
+
+def test_load_error_catalog_defaults_context_objects_to_closed_shapes(
+    tmp_path: Path,
+) -> None:
+    catalog_path = write_catalog(
+        tmp_path,
+        imports=["users.yaml"],
+        fragments={
+            "users.yaml": """
+errors:
+  USER_MISSING:
+    type_slug: user-missing
+    http_status: 404
+    title: User missing
+    category: not_found
+    retry_policy: never
+    safe_to_expose: true
+    context_schema:
+      type: object
+      properties:
+        user_id:
+          type: string
+          required: true
+""".strip()
+            + "\n"
+        },
+    )
+
+    entry = load_error_catalog(catalog_path=catalog_path).errors["USER_MISSING"]
+
+    assert entry.normalized_context_schema == {
+        "type": "object",
+        "additionalProperties": False,
+        "properties": {
+            "user_id": {"type": "string"},
+        },
+        "required": ["user_id"],
+    }
+
+
+def test_load_error_catalog_rejects_open_context_bags(tmp_path: Path) -> None:
+    catalog_path = write_catalog(
+        tmp_path,
+        imports=["users.yaml"],
+        fragments={
+            "users.yaml": """
+errors:
+  USER_MISSING:
+    type_slug: user-missing
+    http_status: 404
+    title: User missing
+    category: not_found
+    retry_policy: never
+    safe_to_expose: true
+    context_schema:
+      type: object
+      additionalProperties: true
+      properties: {}
+""".strip()
+            + "\n"
+        },
+    )
+
+    with pytest.raises(CatalogValidationError) as error:
+        load_error_catalog(catalog_path=catalog_path)
+
+    assert "must not use `additionalProperties: true`" in str(error.value)
+
+
+def test_load_error_catalog_rejects_translation_override_for_hidden_errors(
+    tmp_path: Path,
+) -> None:
+    catalog_path = write_catalog(
+        tmp_path,
+        imports=["users.yaml"],
+        fragments={
+            "users.yaml": """
+errors:
+  USER_MISSING:
+    type_slug: user-missing
+    http_status: 404
+    title: User missing
+    category: not_found
+    retry_policy: never
+    safe_to_expose: false
+    translation_key_override: errors.userMissing
+    context_schema:
+      type: object
+      properties: {}
+""".strip()
+            + "\n"
+        },
+    )
+
+    with pytest.raises(CatalogValidationError) as error:
+        load_error_catalog(catalog_path=catalog_path)
+
+    assert "must not declare `translation_key_override`" in str(error.value)

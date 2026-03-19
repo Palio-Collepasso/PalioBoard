@@ -64,7 +64,7 @@ generate-error-artifacts: ## Generate committed backend/frontend/docs error arti
 	cd $(ERROR_CODEGEN_DIR) && uv run error-codegen generate ../../docs/api/errors/index.yaml --ts-output ../../apps/web/src/app/shared/api/generated/error-codes.generated.ts --docs-output ../../docs/api/error-contract.md
 
 errors: validate-error-catalog generate-error-artifacts ## Run the grouped error-catalog workflow
-	$(call require_clean_paths,apps/api/src/palio/modules/*/error_codes_generated.py apps/web/src/app/shared/api/generated/error-codes.generated.ts docs/api/error-contract.md)
+	$(call require_clean_paths,apps/api/src/palio/modules/*/error_defs_gen.py apps/web/src/app/shared/api/generated/error-codes.generated.ts docs/api/error-contract.md)
 
 api-contract: check-openapi ## Run the grouped API contract workflow
 

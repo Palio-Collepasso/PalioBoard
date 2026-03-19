@@ -112,7 +112,7 @@ def _render_error_metadata(entry: ErrorCatalogEntry) -> str:
         "moduleName": entry.module_name,
         "code": entry.code,
         "type": entry.type_uri,
-        "status": entry.recommended_http_status,
+        "status": entry.http_status,
         "title": entry.title,
         "category": entry.category,
         "retryPolicy": entry.retry_policy,

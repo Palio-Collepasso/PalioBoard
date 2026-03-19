@@ -1,17 +1,16 @@
-"""Generated Python error-code metadata for the `{{ module_name }}` module."""
+"""Generated Python error definitions for the `{{ module_name }}` module."""
 
-from palio.shared.error_code import ErrorCodeMetadata
+from palio.shared.error_code import ErrorDefinition
 
 MODULE_NAME = {{ module_name | python_literal }}
 
 {% for entry in entries %}
-{{ entry.code }} = {{ entry.code | python_literal }}
-{{ entry.code }}_METADATA = ErrorCodeMetadata(
-    code={{ entry.code }},
+{{ entry.code }} = ErrorDefinition(
+    code={{ entry.code | python_literal }},
     module_name=MODULE_NAME,
     type_slug={{ entry.type_slug | python_literal }},
     type_uri={{ entry.type_uri | python_literal }},
-    recommended_http_status={{ entry.recommended_http_status | python_literal }},
+    http_status={{ entry.http_status | python_literal }},
     title={{ entry.title | python_literal }},
     description={{ entry.description | python_literal }},
     category={{ entry.category | python_literal }},
@@ -25,27 +24,19 @@ MODULE_NAME = {{ module_name | python_literal }}
 )
 
 {% endfor %}
-ERROR_CODES: tuple[str, ...] = ({{ render_name_tuple(code_constant_names) }})
-ERRORS: tuple[ErrorCodeMetadata, ...] = ({{ render_name_tuple(metadata_constant_names) }})
-ERROR_BY_CODE: dict[str, ErrorCodeMetadata] = {
+ERROR_DEFINITIONS: tuple[ErrorDefinition, ...] = (
 {% for entry in entries %}
-    {{ entry.code }}: {{ entry.code }}_METADATA,
+    {{ entry.code }},
+{% endfor %}
+)
+ERROR_DEFINITIONS_BY_CODE: dict[str, ErrorDefinition] = {
+{% for entry in entries %}
+    {{ entry.code }}.code: {{ entry.code }},
 {% endfor %}
 }
-ERROR_BY_TYPE_URI: dict[str, ErrorCodeMetadata] = {
-{% for entry in entries %}
-    {{ entry.code }}_METADATA.type_uri: {{ entry.code }}_METADATA,
-{% endfor %}
-}
-ERROR_BY_TRANSLATION_KEY: dict[str, ErrorCodeMetadata] = {
-{% for entry in entries %}
-    {{ entry.code }}_METADATA.translation_key: {{ entry.code }}_METADATA,
-{% endfor %}
-}
-
-def get_error(code: str) -> ErrorCodeMetadata | None:
-    """Return generated metadata for one catalog-defined error code."""
-    return ERROR_BY_CODE.get(code)
+ERROR_CODES: tuple[str, ...] = tuple(
+    error_definition.code for error_definition in ERROR_DEFINITIONS
+)
 
 __all__ = [
 {% for name in export_names %}

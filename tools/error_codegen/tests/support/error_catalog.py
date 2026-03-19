@@ -82,7 +82,7 @@ def fragment_with_error(
     title: str | None = None,
     description: str | None = None,
     category: str = "conflict",
-    recommended_http_status: int = 409,
+    http_status: int = 409,
     retry_policy: str = "never",
     safe_to_expose: bool = True,
     type_uri_override: str | None = None,
@@ -98,7 +98,7 @@ def fragment_with_error(
         f"  {code}:\n"
         f"    type_slug: {type_slug}\n"
         f"{override}"
-        f"    recommended_http_status: {recommended_http_status}\n"
+        f"    http_status: {http_status}\n"
         f"    title: {title or code.replace('_', ' ').title()}\n"
         f"{description_line}"
         f"    category: {category}\n"

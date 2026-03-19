@@ -1,0 +1,453 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://palioboard.local/schemas/error-catalog.schema.json",
+  "title": "PalioBoard error catalog",
+  "description": "Schema for the root error catalog index.yaml. Imported YAML files can reuse the same structural shapes for their `errors` maps.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "catalog_version",
+    "namespace",
+    "base_type_uri",
+    "schema_dialect",
+    "default_media_type"
+  ],
+  "anyOf": [
+    {
+      "required": [
+        "imports"
+      ]
+    },
+    {
+      "required": [
+        "shared_context_schemas"
+      ]
+    },
+    {
+      "required": [
+        "errors"
+      ]
+    }
+  ],
+  "properties": {
+    "catalog_version": {
+      "type": "integer",
+      "const": 1,
+      "description": "Version of the catalog format, not the API version."
+    },
+    "namespace": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_.-]*$",
+      "description": "Stable namespace used by generators."
+    },
+    "base_type_uri": {
+      "type": "string",
+      "format": "uri",
+      "pattern": ".*/$",
+      "description": "Base URI used to derive RFC 9457 `type` values from `type_slug`. Must end with a trailing slash."
+    },
+    "schema_dialect": {
+      "type": "string",
+      "const": "https://json-schema.org/draft/2020-12/schema"
+    },
+    "default_media_type": {
+      "type": "string",
+      "const": "application/problem+json"
+    },
+    "imports": {
+      "type": "array",
+      "description": "Relative YAML files that contribute additional `errors` maps.",
+      "items": {
+        "type": "string",
+        "pattern": "^[^\\0]+\\.ya?ml$"
+      },
+      "uniqueItems": true,
+      "minItems": 1
+    },
+    "shared_context_schemas": {
+      "$ref": "#/$defs/sharedContextSchemas"
+    },
+    "errors": {
+      "$ref": "#/$defs/errorMap"
+    }
+  },
+  "$defs": {
+    "errorMap": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[A-Z][A-Z0-9_]*$"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/errorEntry"
+      }
+    },
+    "sharedContextSchemas": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[A-Z][A-Za-z0-9_]*$"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/contextSchema"
+      }
+    },
+    "errorEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type_slug",
+        "http_status",
+        "title",
+        "category",
+        "retry_policy",
+        "safe_to_expose",
+        "context_schema"
+      ],
+      "properties": {
+        "type_slug": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$",
+          "description": "Slug appended to `base_type_uri` to derive the RFC 9457 `type` URI."
+        },
+        "type_uri_override": {
+          "type": "string",
+          "format": "uri",
+          "description": "Optional override when the derived `base_type_uri + type_slug` form is not suitable."
+        },
+        "http_status": {
+          "type": "integer",
+          "minimum": 400,
+          "maximum": 599,
+          "description": "HTTP status that FastAPI uses when this problem type is returned."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Stable default human-readable title for the problem type."
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Human-readable explanation of when this problem occurs. Used by generated docs and operator-facing artifacts."
+        },
+        "category": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+          "description": "Catalog metadata used for grouping, tooling, and docs."
+        },
+        "retry_policy": {
+          "type": "string",
+          "enum": [
+            "never",
+            "immediate",
+            "after_refresh",
+            "after_reauth",
+            "after_delay"
+          ]
+        },
+        "safe_to_expose": {
+          "type": "boolean",
+          "description": "Whether the symbolic code and declared context are safe to send to clients."
+        },
+        "translation_key_override": {
+          "type": "string",
+          "pattern": "^[a-z][A-Za-z0-9]*(?:\\.[A-Za-z0-9]+)*$",
+          "description": "Optional override when the default derived translation key is not suitable."
+        },
+        "context_schema": {
+          "$ref": "#/$defs/contextSchema"
+        },
+        "log_level": {
+          "type": "string",
+          "enum": [
+            "DEBUG",
+            "INFO",
+            "WARNING",
+            "ERROR",
+            "CRITICAL"
+          ]
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ]
+        },
+        "example": {
+          "$ref": "#/$defs/errorExample"
+        },
+        "notes_for_operators": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "errorExample": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "context"
+      ],
+      "properties": {
+        "detail": {
+          "type": "string",
+          "minLength": 1
+        },
+        "context": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/jsonValue"
+          }
+        }
+      },
+      "description": "Example authored at catalog level. Generators can wrap it into the full RFC 9457 envelope."
+    },
+    "jsonValue": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/jsonValue"
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/jsonValue"
+          }
+        }
+      ]
+    },
+    "stringType": {
+      "type": "string",
+      "enum": [
+        "null",
+        "boolean",
+        "object",
+        "array",
+        "number",
+        "string",
+        "integer"
+      ]
+    },
+    "typeKeyword": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/stringType"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/stringType"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      ]
+    },
+    "schemaArray": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/contextSchema"
+      },
+      "minItems": 1
+    },
+    "contextSchema": {
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "$ref": {
+              "type": "string"
+            },
+            "$id": {
+              "type": "string",
+              "format": "uri-reference"
+            },
+            "$anchor": {
+              "type": "string"
+            },
+            "title": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "type": {
+              "$ref": "#/$defs/typeKeyword"
+            },
+            "format": {
+              "type": "string"
+            },
+            "enum": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/jsonValue"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            },
+            "const": {
+              "$ref": "#/$defs/jsonValue"
+            },
+            "default": {
+              "$ref": "#/$defs/jsonValue"
+            },
+            "examples": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/jsonValue"
+              }
+            },
+            "properties": {
+              "type": "object",
+              "propertyNames": {
+                "pattern": "^[A-Za-z_][A-Za-z0-9_:-]*$"
+              },
+              "additionalProperties": {
+                "$ref": "#/$defs/contextSchema"
+              }
+            },
+            "required": {
+              "oneOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                {
+                  "type": "boolean",
+                  "description": "Catalog authoring extension. Only meaningful for schemas nested under an object `properties` map, where it marks that property as explicitly optional or required."
+                }
+              ]
+            },
+            "additionalProperties": {
+              "$ref": "#/$defs/contextSchema"
+            },
+            "propertyNames": {
+              "$ref": "#/$defs/contextSchema"
+            },
+            "items": {
+              "$ref": "#/$defs/contextSchema"
+            },
+            "prefixItems": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/contextSchema"
+              }
+            },
+            "contains": {
+              "$ref": "#/$defs/contextSchema"
+            },
+            "minItems": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "maxItems": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "uniqueItems": {
+              "type": "boolean"
+            },
+            "minLength": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "maxLength": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "pattern": {
+              "type": "string"
+            },
+            "minimum": {
+              "type": "number"
+            },
+            "maximum": {
+              "type": "number"
+            },
+            "exclusiveMinimum": {
+              "type": "number"
+            },
+            "exclusiveMaximum": {
+              "type": "number"
+            },
+            "multipleOf": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "minProperties": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "maxProperties": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "dependentRequired": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "uniqueItems": true
+              }
+            },
+            "allOf": {
+              "$ref": "#/$defs/schemaArray"
+            },
+            "anyOf": {
+              "$ref": "#/$defs/schemaArray"
+            },
+            "oneOf": {
+              "$ref": "#/$defs/schemaArray"
+            },
+            "not": {
+              "$ref": "#/$defs/contextSchema"
+            },
+            "if": {
+              "$ref": "#/$defs/contextSchema"
+            },
+            "then": {
+              "$ref": "#/$defs/contextSchema"
+            },
+            "else": {
+              "$ref": "#/$defs/contextSchema"
+            },
+            "deprecated": {
+              "type": "boolean"
+            },
+            "readOnly": {
+              "type": "boolean"
+            },
+            "writeOnly": {
+              "type": "boolean"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

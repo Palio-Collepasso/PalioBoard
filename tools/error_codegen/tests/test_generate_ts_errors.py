@@ -54,7 +54,7 @@ def test_generate_ts_errors_writes_the_committed_artifact_shape(tmp_path: Path) 
 errors:
   USER_MISSING:
     type_slug: user-missing
-    recommended_http_status: 404
+    http_status: 404
     title: User missing
     description: The selected user does not exist.
     category: not_found
@@ -100,7 +100,7 @@ def _make_catalog() -> ErrorCatalog:
         source_path=Path("docs/api/errors/users.yaml"),
         type_slug="user-missing",
         type_uri="https://api.palioboard.local/problems/user-missing",
-        recommended_http_status=404,
+        http_status=404,
         title="User missing",
         description="The selected user does not exist.",
         category="not_found",

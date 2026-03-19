@@ -1,0 +1,109 @@
+# Error fragment file for one owning backend module.
+# Purpose:
+# - define catalog entries for one module-aligned API/domain area
+# - contain only an `errors:` map
+
+errors:
+  EXAMPLE_ERROR_CODE:
+    type_slug: example-error-code
+    # Required.
+    # Stable kebab-case slug used to derive RFC 9457 `type`.
+    # Derived type = base_type_uri + type_slug
+
+    type_uri_override: https://api.palioboard.local/problems/custom/example-error-code
+    # Optional.
+    # Use only if this error must not use the normal derived type URI.
+
+    http_status: 409
+    # Required.
+    # HTTP status returned when this problem type is emitted.
+
+    title: Example error title
+    # Required.
+    # Stable short summary shown in problem responses.
+
+    description: >
+      Human-readable explanation of what this error means and when it is used.
+    # Optional but strongly recommended.
+    # Used to generate the "Meaning" section in human docs.
+
+    category: business_rule
+    # Required.
+    # Stable internal grouping for generators/docs.
+    # Examples: authorization, authentication, validation, business_rule, conflict
+
+    retry_policy: never
+    # Required.
+    # One of:
+    # - never
+    # - immediate
+    # - after_refresh
+    # - after_reauth
+    # - after_delay
+
+    safe_to_expose: true
+    # Required.
+    # Whether this error is safe to return with its intended public semantics.
+
+    log_level: WARNING
+    # Optional.
+    # Suggested backend log level when this error is emitted.
+    # Typical values:
+    # - DEBUG
+    # - INFO
+    # - WARNING
+    # - ERROR
+    # - CRITICAL
+
+    severity: medium
+    # Optional.
+    # Operational/business seriousness of the error.
+    # Typical values:
+    # - low
+    # - medium
+    # - high
+    # - critical
+
+    translation_key_override: errors.exampleErrorCode
+    # Optional.
+    # Use only if generated translation key is not acceptable.
+    # Normally derived from the symbolic code.
+
+    context_schema:
+      type: object
+      additionalProperties: false
+      properties:
+        entity_id:
+          $ref: "#/shared_context_schemas/UuidRef"
+          description: Entity involved in the error.
+          required: true
+        related_id:
+          $ref: "#/shared_context_schemas/UuidRef"
+          description: Related entity, if available.
+          required: false
+        reason:
+          type: string
+          description: Short machine-readable reason.
+          required: false
+      # Optional standard JSON Schema `required: [...]` array may also be supported,
+      # but prefer per-field `required: true|false` in authoring for readability.
+    # Required.
+    # JSON Schema-like shape for `context`.
+    # Used by generators for typed code, docs, and validation.
+
+    example:
+      detail: Optional extra sentence for example output.
+      context:
+        entity_id: "01956c9f-6f7e-7b42-a4b0-2d21d920c001"
+        related_id: "01956ca0-0c77-7b98-a328-39c9f8a31002"
+        reason: "already_exists"
+    # Optional but strongly recommended.
+    # Example payload pieces used for generated docs/examples.
+    # `context` should match `context_schema`.
+
+    notes_for_operators: |
+      Optional internal note for maintainers.
+      Useful when the error has operational caveats.
+    # Optional.
+    # Internal-only explanatory text.
+    # Not part of the API wire contract.

@@ -68,7 +68,7 @@ def render_error_entry(catalog: ErrorCatalog, entry: ErrorCatalogEntry) -> str:
         "",
         f"* **Type**: `{entry.type_uri}`",
         f"* **Category**: `{entry.category}`",
-        f"* **Recommended HTTP status**: `{entry.recommended_http_status}`",
+        f"* **HTTP status**: `{entry.http_status}`",
         f"* **Retry policy**: `{entry.retry_policy}`",
         f"* **Safe to expose**: `{str(entry.safe_to_expose).lower()}`",
         f"* **Translation key**: `{entry.translation_key}`",
@@ -214,7 +214,7 @@ def _render_problem_example(entry: ErrorCatalogEntry) -> str:
         "type": entry.type_uri,
         "code": entry.code,
         "title": entry.title,
-        "status": entry.recommended_http_status,
+        "status": entry.http_status,
     }
     detail = example.get("detail")
     if isinstance(detail, str):

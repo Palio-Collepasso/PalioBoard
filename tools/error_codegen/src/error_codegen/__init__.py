@@ -73,7 +73,7 @@ def generate_python_errors(
     schema_path: Path = DEFAULT_SCHEMA_PATH,
     output_root: Path = DEFAULT_OUTPUT_ROOT,
 ) -> tuple[Path, ...]:
-    """Generate the per-module Python error-code artifacts."""
+    """Generate the per-module Python error-definition artifacts."""
     catalog = load_error_catalog(catalog_path=catalog_path, schema_path=schema_path)
     return write_python_error_module_artifacts(catalog, output_root=output_root)
 
@@ -83,7 +83,7 @@ def generate_ts_errors(
     schema_path: Path = DEFAULT_SCHEMA_PATH,
     output_path: Path = DEFAULT_TS_OUTPUT_PATH,
 ) -> Path:
-    """Generate the frontend error-code artifact from the committed catalog."""
+    """Generate the frontend error artifact from the committed catalog."""
     catalog = load_error_catalog(catalog_path=catalog_path, schema_path=schema_path)
     return write_typescript_error_artifact(catalog, output_path=output_path)
 
