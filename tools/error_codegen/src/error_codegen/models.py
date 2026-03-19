@@ -43,6 +43,7 @@ class ErrorCatalogEntry(BaseModel):
     translation_key: str
     raw_context_schema: object
     normalized_context_schema: object
+    resolved_context_schema: object
     type_uri_override: str | None
     translation_key_override: str | None
     log_level: str | None
@@ -84,9 +85,9 @@ class ErrorCatalogEntry(BaseModel):
             raise ValueError("String should match the dotted translation-key format.")
         return value
 
-    @field_validator("normalized_context_schema")
+    @field_validator("normalized_context_schema", "resolved_context_schema")
     @classmethod
-    def validate_normalized_context_schema(cls, value: object) -> object:
+    def validate_runtime_context_schema(cls, value: object) -> object:
         """Ensure exposed runtime context is always described as a closed object."""
         _validate_runtime_context_schema(value)
         return value

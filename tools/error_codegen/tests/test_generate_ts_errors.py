@@ -131,6 +131,21 @@ def _make_catalog() -> ErrorCatalog:
             },
             "required": ["user_id"],
         },
+        resolved_context_schema={
+            "type": "object",
+            "additionalProperties": False,
+            "properties": {
+                "reason": {
+                    "type": "string",
+                    "enum": ["missing", "inactive"],
+                },
+                "user_id": {
+                    "type": "string",
+                    "format": "uuid",
+                },
+            },
+            "required": ["user_id"],
+        },
         type_uri_override=None,
         translation_key_override=None,
         log_level="WARNING",

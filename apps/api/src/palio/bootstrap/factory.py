@@ -15,6 +15,7 @@ from palio.api.routes import (
 from palio.bootstrap.logging import configure_logging
 from palio.bootstrap.runtime import ApplicationRuntime
 from palio.bootstrap.wiring import build_runtime
+from palio.shared.errors.handlers import register_error_handlers
 
 
 def create_app(runtime: ApplicationRuntime | None = None) -> FastAPI:
@@ -27,6 +28,7 @@ def create_app(runtime: ApplicationRuntime | None = None) -> FastAPI:
         version=settings.build.version,
     )
     app.state.runtime = runtime
+    register_error_handlers(app)
     app.middleware("http")(create_request_logging_middleware())
     app.middleware("http")(create_request_context_middleware(settings.request_context))
     app.include_router(meta_router)

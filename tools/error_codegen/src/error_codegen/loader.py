@@ -29,6 +29,7 @@ from error_codegen.models import (
 from error_codegen.validators import (
     CatalogValidationError,
     normalize_context_schema,
+    resolve_context_schema_references,
     validate_context_references,
     validate_example_context,
     validate_import_alignment,
@@ -169,6 +170,10 @@ def load_error_catalog(
             normalized_context_schema = normalize_context_schema(
                 parsed_entry.context_schema
             )
+            resolved_context_schema = resolve_context_schema_references(
+                normalized_context_schema,
+                shared_context_schemas=shared_context_schemas,
+            )
             validate_context_references(
                 normalized_context_schema,
                 shared_context_schemas=shared_context_schemas,
@@ -205,6 +210,7 @@ def load_error_catalog(
                     ),
                     "raw_context_schema": parsed_entry.context_schema,
                     "normalized_context_schema": normalized_context_schema,
+                    "resolved_context_schema": resolved_context_schema,
                     "type_uri_override": parsed_entry.type_uri_override,
                     "translation_key_override": parsed_entry.translation_key_override,
                     "log_level": parsed_entry.log_level,

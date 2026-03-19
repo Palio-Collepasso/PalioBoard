@@ -84,5 +84,16 @@ errors:
     assert module.USER_MISSING.code == "USER_MISSING"
     assert module.USER_MISSING.title == "User missing"
     assert module.USER_MISSING.http_status == 404
+    assert module.USER_MISSING.context_schema == {
+        "type": "object",
+        "additionalProperties": False,
+        "properties": {
+            "user_id": {
+                "type": "string",
+                "format": "uuid",
+            }
+        },
+        "required": ["user_id"],
+    }
     assert module.ERROR_DEFINITIONS == (module.USER_MISSING,)
     assert module.ERROR_DEFINITIONS_BY_CODE["USER_MISSING"] is module.USER_MISSING

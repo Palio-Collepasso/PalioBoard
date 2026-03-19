@@ -1,6 +1,6 @@
 """Generated Python error definitions for the `{{ module_name }}` module."""
 
-from palio.shared.error_code import ErrorDefinition
+from palio.shared.errors.base import ErrorDefinition
 
 MODULE_NAME = {{ module_name | python_literal }}
 
@@ -19,7 +19,7 @@ MODULE_NAME = {{ module_name | python_literal }}
     translation_key={{ entry.translation_key | python_literal }},
     log_level={{ entry.log_level | python_literal }},
     severity={{ entry.severity | python_literal }},
-{{ render_python_field("context_schema", entry.normalized_context_schema) }}
+{{ render_python_field("context_schema", entry.resolved_context_schema) }}
     notes_for_operators={{ entry.notes_for_operators | python_literal }},
 )
 

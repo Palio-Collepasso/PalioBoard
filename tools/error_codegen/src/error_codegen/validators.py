@@ -173,6 +173,45 @@ def validate_context_references(
             )
 
 
+def resolve_context_schema_references(
+    schema: object,
+    *,
+    shared_context_schemas: dict[str, object],
+) -> object:
+    """Inline shared context-schema references for runtime validation/generation."""
+    if isinstance(schema, bool):
+        return schema
+    if isinstance(schema, list):
+        return [
+            resolve_context_schema_references(
+                item,
+                shared_context_schemas=shared_context_schemas,
+            )
+            for item in schema
+        ]
+    if not isinstance(schema, dict):
+        return schema
+
+    reference = schema.get("$ref")
+    if isinstance(reference, str) and reference.startswith("#/shared_context_schemas/"):
+        shared_name = reference.removeprefix("#/shared_context_schemas/")
+        resolved_schema = shared_context_schemas.get(shared_name)
+        if resolved_schema is None:
+            return schema
+        return resolve_context_schema_references(
+            resolved_schema,
+            shared_context_schemas=shared_context_schemas,
+        )
+
+    return {
+        key: resolve_context_schema_references(
+            value,
+            shared_context_schemas=shared_context_schemas,
+        )
+        for key, value in schema.items()
+    }
+
+
 def validate_example_context(
     *,
     code: str,
