@@ -4,6 +4,7 @@ title: Implement api immutability and deletion guards for setup config
 status: To Do
 assignee: []
 created_date: '2026-03-16 16:40'
+updated_date: '2026-03-18 21:09'
 labels:
   - api
   - season-setup
@@ -14,6 +15,8 @@ dependencies:
 references:
   - apps/api/src/palio/modules/season_setup/
   - apps/api/src/palio/modules/results/
+  - apps/api/src/palio/modules/results/facade.py
+  - apps/api/src/palio/modules/season_setup/facade.py
 documentation:
   - docs/qna/data/result model and invariants.md
   - docs/domain/game-catalog.md
@@ -36,3 +39,11 @@ Build the api slice of TASK-18 so result-affecting setup cannot be edited or del
 - [ ] #2 The api exposes enough lock-state information for the admin UI to explain why a field or action is disabled before submit.
 - [ ] #3 The task adds api unit and integration coverage, plus any minimal schema, contract, and documentation updates needed to detect official-result presence in the same change.
 <!-- AC:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Architecture constraint: any cross-module official-result presence check should go through a typed `results` facade contract instead of direct internal imports, and this task should replace placeholder facade metadata where it touches those boundaries.
+
+Wiring constraint: keep UnitOfWork creation in outer wiring and pass the UnitOfWork into the relevant services/orchestrators; do not add a `UnitOfWorkFactory`.
+<!-- SECTION:NOTES:END -->

@@ -1,0 +1,16 @@
+[project]
+name = "palioboard-dev"
+version = "0.1.0"
+description = "Repo-level development environment for PalioBoard."
+requires-python = ">=3.12"
+dependencies = [
+  "palio-api",
+  "palio-error-codegen",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+palio-api = { path = "apps/api", editable = true }
+palio-error-codegen = { path = "tools/error_codegen", editable = true }

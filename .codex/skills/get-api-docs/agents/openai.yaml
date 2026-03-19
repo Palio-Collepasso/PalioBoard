@@ -1,0 +1,6 @@
+interface:
+  display_name: "Get API Docs"
+  short_description: "Fetch current third-party library docs"
+
+policy:
+  allow_implicit_invocation: true

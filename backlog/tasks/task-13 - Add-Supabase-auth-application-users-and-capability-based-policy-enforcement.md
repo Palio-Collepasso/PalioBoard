@@ -4,16 +4,21 @@ title: 'Add Supabase auth, application users, and capability-based policy enforc
 status: To Do
 assignee: []
 created_date: '2026-03-16 16:33'
-updated_date: '2026-03-16 16:38'
+updated_date: '2026-03-18 21:09'
 labels:
   - api
   - auth
 milestone: m-1
-dependencies: []
+dependencies:
+  - TASK-20
 references:
   - apps/api/src/palio/modules/identity/
   - apps/api/src/palio/modules/authorization/
   - apps/api/src/palio/modules/users/
+  - apps/api/src/palio/modules/identity/facade.py
+  - apps/api/src/palio/modules/authorization/facade.py
+  - apps/api/src/palio/modules/users/facade.py
+  - apps/api/src/palio/shared/module_facade.py
 documentation:
   - docs/architecture/adr/ADR-0006-identity-and-authorization.md
   - docs/qna/architecture/authorization.md
@@ -35,3 +40,11 @@ Introduce the api identity and authorization foundation for m-1 so protected API
 - [ ] #2 The application schema and seed workflow provide a code-defined capability vocabulary, roles, role-capability mappings, user-role assignments, and the default Superadmin/Admin/Judge bundles plus a documented bootstrap path for the first superadmin.
 - [ ] #3 Capability-based policy helpers return structured unauthorized and forbidden errors, and the task updates the affected tests, docs, and committed API contracts.
 <!-- AC:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Architecture constraint: replace the current metadata-only facade placeholders with real typed public contracts for `identity`, `authorization`, and `users` as part of this task.
+
+Wiring constraint: application services and orchestrators should receive the UnitOfWork from outer composition/injection and must not introduce a `UnitOfWorkFactory` layer or create their own sessions.
+<!-- SECTION:NOTES:END -->

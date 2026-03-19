@@ -4,6 +4,7 @@ title: Implement api competition and game configuration
 status: To Do
 assignee: []
 created_date: '2026-03-16 16:40'
+updated_date: '2026-03-18 21:09'
 labels:
   - api
   - season-setup
@@ -13,6 +14,7 @@ dependencies:
   - TASK-16.1
 references:
   - apps/api/src/palio/modules/season_setup/
+  - apps/api/src/palio/modules/season_setup/facade.py
 documentation:
   - docs/domain/game-catalog.md
   - docs/qna/product/season setup.md
@@ -35,3 +37,11 @@ Build the api slice of TASK-17 so admins can create and manage competitions and 
 - [ ] #2 Game configuration persistence and validation support seeded field-catalog selection and per-game points-table configuration with the documented defaults and structured validation errors.
 - [ ] #3 The task adds api unit and integration coverage, updates affected docs, and updates committed API contracts for competition and game configuration.
 <!-- AC:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Implementation note: extend the typed `season_setup` public facade created by TASK-16.1 instead of growing the current metadata-only alias or bypassing the module boundary.
+
+Keep transaction ownership outside repositories and helpers; this slice should consume the injected UnitOfWork rather than introducing a `UnitOfWorkFactory`.
+<!-- SECTION:NOTES:END -->
