@@ -6,7 +6,7 @@ from typing import Annotated
 import typer
 import yaml
 
-from palio.app.factory import create_app
+from palio.bootstrap.factory import create_app
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[5]
 DEFAULT_OUTPUT_PATH = REPOSITORY_ROOT / "docs" / "api" / "openapi.yaml"

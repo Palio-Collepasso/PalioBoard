@@ -26,8 +26,11 @@ The backend is expected to follow this package shape under `apps/api/src/palio/`
 
 ```text
 palio/
-├── api/                      # FastAPI routers, request/response DTO wiring
+├── api/                     # FastAPI routers, request/response DTO wiring
+├── app/                     # app-level orchestration contracts shared across modules
 ├── bootstrap/               # composition root, dependency wiring
+├── infrastructure/          # top-level implementations shared across modules
+│   └── db/                  # reusable concrete DB implementations
 ├── shared/                  # shared technical helpers only
 └── modules/
     ├── identity/
@@ -61,16 +64,19 @@ This is a target codemap. If the code has not reached this exact shape yet, keep
 | Layer | Owns | Should not own |
 |---|---|---|
 | `api/` | FastAPI routers, auth entry checks, request/response mapping, HTTP semantics | business workflows, DB queries with domain rules, projection logic |
-| `bootstrap/` | dependency wiring, composition root, app startup | domain logic, request handling |
+| `application/` | app-level orchestration contracts that are not owned by one module, such as the shared `UnitOfWork` interface | framework-specific implementations, SQLAlchemy session types, HTTP transport |
+| `bootstrap/` | dependency wiring, composition root, app startup, concrete runtime assembly such as `bootstrap/db` | domain logic, request handling, application-facing interfaces |
+| `infrastructure/` | top-level technical implementations shared across modules, such as reusable DB-backed adapters | business orchestration, application-facing contracts, HTTP transport |
 | module `application/` | use cases, orchestration, transaction sequencing, policy rechecks | HTTP transport, ORM model definitions as public contract |
 | module `domain/` | business rules, validation, state transition logic, value semantics | framework code, SQL shaping for screens |
 | module `infrastructure/` | repositories, explicit SQL queries, adapters, external systems | cross-module business orchestration |
-| `shared/` | low-level technical helpers that are truly generic | business rules disguised as utilities |
+| `shared/` | low-level technical helpers that are truly generic | business rules disguised as utilities, application-facing contracts |
 
 ## Transaction and session ownership
 
 - A multi-step business command is owned by an application/use-case orchestrator.
 - The orchestrator owns the unit of work and SQLAlchemy session.
+- The `UnitOfWork` interface belongs in the application layer; concrete DB-backed implementations may live in infrastructure packages such as `infrastructure/db`, while bootstrap keeps runtime wiring and factory assembly.
 - Repositories are session-bound; they do not create their own sessions.
 - Cross-module workflows should stay explicit in code. Do not hide them in signals, triggers, or implicit callbacks.
 

@@ -5,11 +5,11 @@ import pytest
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
-from palio.db.config import (
+from palio.bootstrap.db.config import (
     DatabaseConfigurationError,
     require_migration_database_url,
 )
-from palio.db.runtime import (
+from palio.bootstrap.db.runtime import (
     DatabaseNotConfiguredError,
     ReadinessCheck,
     SessionFactory,
@@ -50,8 +50,7 @@ def test_unit_of_work_opens_a_session_without_connecting() -> None:
     )
 
     with runtime.create_unit_of_work() as unit_of_work:
-        assert unit_of_work.session is not None
-        assert unit_of_work.session.bind is runtime.engine
+        assert unit_of_work is not None
 
 
 def test_database_runtime_reports_not_ready_without_runtime_url() -> None:

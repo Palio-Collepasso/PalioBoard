@@ -5,7 +5,7 @@ from fastapi import status
 from fastapi.testclient import TestClient
 from loguru import logger
 
-from palio.app import create_app
+from palio.bootstrap import create_app
 
 
 def test_app_boots_with_placeholder_surfaces() -> None:

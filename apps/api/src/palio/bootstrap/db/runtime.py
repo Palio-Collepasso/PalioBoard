@@ -6,7 +6,8 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, sessionmaker
 
-from palio.db.unit_of_work import SqlAlchemyUnitOfWork
+from palio.app.unit_of_work import UnitOfWork
+from palio.infrastructure.db.unit_of_work import SqlAlchemyUnitOfWork
 from palio.settings import APPLICATION_SCHEMA
 
 
@@ -19,7 +20,7 @@ type SessionFactory = sessionmaker[Session]
 
 @dataclass(frozen=True, slots=True)
 class ReadinessCheck:
-    """Represent the current api readiness status."""
+    """Represent the current API readiness status."""
 
     is_ready: bool
     reason: str
@@ -63,11 +64,11 @@ class DatabaseRuntime:
 
         return self.session_factory()
 
-    def create_unit_of_work(self) -> SqlAlchemyUnitOfWork:
+    def create_unit_of_work(self) -> UnitOfWork:
         """Create one session-bound Unit of Work.
 
         Returns:
-            A SQLAlchemy-backed Unit of Work.
+            An application Unit of Work backed by SQLAlchemy.
         """
         return SqlAlchemyUnitOfWork(self.create_session)
 

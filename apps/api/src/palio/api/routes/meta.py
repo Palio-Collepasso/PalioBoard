@@ -4,7 +4,7 @@
 from fastapi import APIRouter, status
 from fastapi.responses import JSONResponse
 
-from palio.app.bootstrap import ApplicationRuntime
+from palio.bootstrap.runtime import ApplicationRuntime
 
 
 def create_meta_router(runtime: ApplicationRuntime) -> APIRouter:

@@ -1,33 +1,13 @@
-"""Shared Unit of Work contract owned by application orchestration."""
+"""SQLAlchemy implementation of the application Unit of Work contract."""
 
 from collections.abc import Callable
-from typing import Protocol, Self
+from typing import Self
 
 from sqlalchemy.orm import Session
 
+from palio.app.unit_of_work import UnitOfWork
+
 type SessionFactory = Callable[[], Session]
-
-
-class UnitOfWork(Protocol):
-    """Session-bound transaction contract used by orchestrators."""
-
-    session: Session | None
-
-    def __enter__(self) -> Self:
-        """Open and return the active unit of work."""
-        ...
-
-    def __exit__(self, exc_type: object, exc: object, tb: object) -> None:
-        """Close the unit of work and handle rollback when needed."""
-        ...
-
-    def commit(self) -> None:
-        """Persist the current transaction."""
-        ...
-
-    def rollback(self) -> None:
-        """Discard the current transaction."""
-        ...
 
 
 class SqlAlchemyUnitOfWork(UnitOfWork):
@@ -40,33 +20,34 @@ class SqlAlchemyUnitOfWork(UnitOfWork):
     def __init__(self, session_factory: SessionFactory) -> None:
         """Store the session factory for later workflow-scoped sessions."""
         self._session_factory = session_factory
-        self.session: Session | None = None
+        self._session: Session | None = None
 
     def __enter__(self) -> Self:
         """Open a session at the start of the workflow."""
-        self.session = self._session_factory()
+        self._session = self._session_factory()
         return self
 
     def __exit__(self, exc_type: object, exc: object, tb: object) -> None:
         """Rollback on errors and always close the session."""
-        if self.session is None:
+        if self._session is None:
             return
 
         if exc_type is not None:
-            self.session.rollback()
+            self._session.rollback()
 
-        self.session.close()
-        self.session = None
+        self._session.close()
+        self._session = None
 
     def commit(self) -> None:
         """Commit the current transaction."""
-        self._require_session().commit()
+        self.session().commit()
 
     def rollback(self) -> None:
         """Rollback the current transaction."""
-        self._require_session().rollback()
+        self.session().rollback()
 
-    def _require_session(self) -> Session:
+    @property
+    def session(self) -> Session:
         """Return the active session or fail fast when misused.
 
         Returns:
@@ -75,9 +56,9 @@ class SqlAlchemyUnitOfWork(UnitOfWork):
         Raises:
             RuntimeError: When the Unit of Work is used outside its context.
         """
-        if self.session is None:
+        if self._session is None:
             raise RuntimeError(
                 "UnitOfWork has no active session. Use it within a with block."
             )
 
-        return self.session
+        return self._session

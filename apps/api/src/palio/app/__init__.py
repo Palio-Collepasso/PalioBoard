@@ -1,5 +1,5 @@
-"""FastAPI application composition root."""
+"""Application-layer contracts shared by use-case orchestration."""
 
-from palio.app.factory import create_app
+from palio.app.unit_of_work import UnitOfWork
 
-__all__ = ["create_app"]
+__all__ = ["UnitOfWork"]

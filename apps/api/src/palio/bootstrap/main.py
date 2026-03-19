@@ -1,6 +1,6 @@
 """ASGI entrypoint used by `fastapi dev`."""
 
-from palio.app.factory import create_app
+from palio.bootstrap.factory import create_app
 
 app = create_app()
 

@@ -2,7 +2,7 @@ from pathlib import Path
 
 import yaml
 
-from palio.app.export_openapi import export_openapi
+from palio.bootstrap.export_openapi import export_openapi
 
 
 def test_export_openapi_writes_current_contract(tmp_path: Path) -> None:

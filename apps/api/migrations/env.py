@@ -5,7 +5,7 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-from palio.db.config import require_migration_database_url
+from palio.bootstrap.db.config import require_migration_database_url
 from palio.settings import load_settings
 
 config = context.config
@@ -21,7 +21,7 @@ def _get_x_argument(name: str) -> str | None:
     """Read one Alembic `-x` argument by name.
 
     Args:
-        name: The argument key to read.
+        name (str): The argument key to read.
 
     Returns:
         The configured argument value when present.

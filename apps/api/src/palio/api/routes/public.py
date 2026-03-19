@@ -3,7 +3,7 @@
 
 from fastapi import APIRouter
 
-from palio.app.bootstrap import ApplicationRuntime
+from palio.bootstrap.runtime import ApplicationRuntime
 
 
 def create_public_router(runtime: ApplicationRuntime) -> APIRouter:

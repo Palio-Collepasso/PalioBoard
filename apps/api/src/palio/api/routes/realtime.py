@@ -3,7 +3,7 @@
 
 from fastapi import APIRouter, WebSocket
 
-from palio.app.bootstrap import ApplicationRuntime
+from palio.bootstrap.runtime import ApplicationRuntime
 
 
 def create_realtime_router(runtime: ApplicationRuntime) -> APIRouter:

@@ -1,8 +1,8 @@
-"""Manual application wiring for the api composition root."""
+"""Manual application wiring for the API composition root."""
 
 from dataclasses import dataclass
 
-from palio.db import DatabaseRuntime, build_database_runtime
+from palio.bootstrap.db import DatabaseRuntime, build_database_runtime
 from palio.modules.audit.facade import AuditFacade, build_audit_facade
 from palio.modules.authorization.facade import (
     AuthorizationFacade,
@@ -92,7 +92,7 @@ def build_module_facades() -> ModuleFacades:
 
 
 def build_runtime() -> ApplicationRuntime:
-    """Build the minimal api runtime used by the scaffold."""
+    """Build the minimal API runtime used by the scaffold."""
     settings = load_settings()
     return ApplicationRuntime(
         settings=settings,

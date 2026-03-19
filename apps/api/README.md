@@ -5,9 +5,9 @@ This directory is the canonical home for `apps/api` and api test harness.
 Current baseline:
 - `pyproject.toml` with runtime dependencies for the FastAPI app plus a dev dependency group for tests, typing, formatting, and hook tooling used by the repo `Makefile`
 - `alembic.ini` plus `migrations/` with the baseline revision that creates the empty `palio_board` application schema
-- `src/palio/app/` as the explicit composition root with Loguru JSON request logging, UUIDv7 request-id propagation, and the operational `/healthz`, `/readyz`, and `/version` endpoints
+- `src/palio/api/` for FastAPI routers and request middleware, with `src/palio/bootstrap/` as the explicit composition root and app/runtime assembly
 - `src/palio/settings.py` for the typed env-based runtime settings used by the app/bootstrap and DB helpers
-- `src/palio/db/` for the runtime/migration DB configuration, SQLAlchemy runtime assembly, readiness probing, and the session-bound Unit of Work baseline
+- `src/palio/bootstrap/db/` for runtime/migration DB configuration and runtime assembly, plus `src/palio/infrastructure/db/` for concrete reusable DB implementations such as the SQLAlchemy Unit of Work
 - `src/palio/shared/` and `src/palio/modules/` for cross-cutting technical primitives and the documented modular-monolith package layout
 - `tests/unit/` for fast api smoke/configuration checks and `tests/integration/` for real-Postgres migration/readiness coverage
 - `tests/support/postgres.py` for the Postgres-backed integration harness, which can reuse an existing local server or start a disposable Postgres test container using the same image/bootstrap settings as `infra/compose/docker-compose.yml`
@@ -18,12 +18,12 @@ Current local commands from this directory:
 - `uv run --group dev ruff format --check src tests`
 - `uv run --group dev ruff check src tests`
 - `uv run --group dev pyright`
-- `uv run fastapi dev src/palio/app/main.py`
+- `uv run fastapi dev src/palio/bootstrap/main.py`
 - `uv run --group dev pytest`
 - `uv run --group dev pytest tests/unit`
 - `uv run --group dev pytest tests/integration`
 - `PALIO_DB_MIGRATION_URL=postgresql+psycopg://... uv run alembic upgrade head`
-- `uv run --group dev python -m palio.app.export_openapi ../../docs/api/openapi.yaml`
+- `uv run --group dev python -m palio.bootstrap.export_openapi ../../docs/api/openapi.yaml`
 - `uv run python -m palio.shared.module_boundaries`
 
 Contract workflow baseline:
