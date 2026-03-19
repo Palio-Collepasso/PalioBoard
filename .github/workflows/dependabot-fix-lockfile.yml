@@ -3,11 +3,20 @@ name: Fix lockfile
 on:
   pull_request:
     branches: [ main ]
+    paths:
+      - "apps/web/**"
+
+permissions:
+  contents: write
 
 jobs:
   fix-lock:
     if: github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./apps/web
 
     steps:
       - uses: actions/checkout@v6
