@@ -19,6 +19,10 @@ Use these first before digging into the longer sections:
 - apply migrations: `make migrate`
 - backend dev server: `make api-dev`
 - frontend dev server: `make web-dev`
+- regenerate committed error artifacts: `make errors`
+- validate the composed API contract: `make api-contract`
+- run the full contract workflow: `make contracts`
+- run the standalone error-codegen test suite: `make test-error-codegen`
 - repo quality gates: `make lint`, `make typecheck`, `make test`, `make verify`
 - export OpenAPI: `make openapi-export`
 - verify contract drift: `make check-openapi`
@@ -51,11 +55,19 @@ Document at least these variables when they change:
 - run git hooks manually: `cd apps/api && uv run --group dev pre-commit run --all-files --hook-stage pre-commit`
 - pre-push equivalent: `cd apps/api && uv run --group dev pre-commit run --all-files --hook-stage pre-push`
 
+### Error codegen tool
+- bootstrap/update the tool environment: `cd tools/error_codegen && uv sync --group dev`
+- validate the catalog directly: `cd tools/error_codegen && uv run error-codegen validate ../../docs/api/errors/index.yaml`
+- run tool tests: `make test-error-codegen`
+
 ### Frontend
 - unit/component tests: `make test-web`
 - browser E2E: `make test-e2e`
 
 ### Repo-level verification
+- `make errors`
+- `make api-contract`
+- `make contracts`
 - `make format`
 - `make format-check`
 - `make lint`
@@ -82,8 +94,9 @@ Document at least these variables when they change:
 
 ### Verify a PR before review
 1. run the narrowest honest tests for the change
-2. run `make lint`, `make typecheck`, and `make check-openapi` when relevant
-3. run `make verify` before opening or updating the PR when the change is broad enough to justify it
+2. run `make errors` and/or `make api-contract` when the contract workflow changed
+3. run `make lint`, `make typecheck`, and `make check-openapi` when relevant
+4. run `make verify` before opening or updating the PR when the change is broad enough to justify it
 
 ## Verification checklist
 - [ ] `/healthz` responds
@@ -118,9 +131,10 @@ Check:
 ### `make check-openapi` fails
 Check:
 1. whether the backend endpoint/status shape changed
-2. whether `make openapi-export` was run after the change
-3. whether generated consumer types need regeneration
-4. `docs/api/README.md` for contract workflow expectations
+2. whether `make errors` was run after changing the error catalog
+3. whether `make openapi-export` or `make api-contract` was run after the change
+4. whether generated consumer types need regeneration
+5. `docs/api/README.md` for contract workflow expectations
 
 ## FAQ
 ### Which commands are the canonical entrypoints?

@@ -1,0 +1,71 @@
+# API Error Contract
+
+This document is generated from `docs/api/errors/index.yaml` and imported catalog files.
+
+## Contract summary
+
+The API returns errors as `application/problem+json`.
+
+Clients must treat these fields as stable:
+
+- `type`: stable problem type URI
+- `code`: stable symbolic application error code
+- `status`: HTTP status
+- `title`: short human-readable summary
+- `context`: structured machine-readable error context
+
+Clients must **not** branch on `title` or any free-text detail.
+
+## Source of truth
+
+- Error definitions: `docs/api/errors/*.yaml`
+- Endpoint-to-error mapping: `docs/api/openapi.yaml`
+- This document: generated from the catalog
+
+## Common wire shape
+
+```json
+{{ common_wire_shape_json }}
+```
+
+# Error Catalog
+
+The sections below are generated from the validated module-aligned catalog in import order.
+
+{% for section in module_sections %}
+## {{ section.title }}
+
+{% if section.entries %}
+{{ section.entries | join('\n\n') }}
+{% else %}
+_No error codes are currently defined in this module yet._
+{% endif %}
+
+{% endfor %}
+# Stability rules
+
+## Stable
+
+These are part of the client contract:
+
+* symbolic `code`
+* problem `type`
+* `recommended_http_status` as generator metadata
+* `context` field names and types
+
+## Not stable
+
+These may evolve without changing the error identity:
+
+* wording of `title`
+* explanatory prose in this document
+* ordering of fields in examples
+
+# For implementers
+When adding a new error:
+
+1. Add it to the correct catalog file in `docs/api/errors/`
+2. Validate the catalog
+3. Regenerate Python, TypeScript, OpenAPI, and docs artifacts
+4. Reference the error from the relevant OpenAPI endpoint definition
+5. Add or update tests for emitted error code and context

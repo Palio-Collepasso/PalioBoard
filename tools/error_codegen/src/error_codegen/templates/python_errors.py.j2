@@ -1,0 +1,54 @@
+"""Generated Python error-code metadata for the `{{ module_name }}` module."""
+
+from palio.shared.error_code import ErrorCodeMetadata
+
+MODULE_NAME = {{ module_name | python_literal }}
+
+{% for entry in entries %}
+{{ entry.code }} = {{ entry.code | python_literal }}
+{{ entry.code }}_METADATA = ErrorCodeMetadata(
+    code={{ entry.code }},
+    module_name=MODULE_NAME,
+    type_slug={{ entry.type_slug | python_literal }},
+    type_uri={{ entry.type_uri | python_literal }},
+    recommended_http_status={{ entry.recommended_http_status | python_literal }},
+    title={{ entry.title | python_literal }},
+    description={{ entry.description | python_literal }},
+    category={{ entry.category | python_literal }},
+    retry_policy={{ entry.retry_policy | python_literal }},
+    safe_to_expose={{ entry.safe_to_expose | python_literal }},
+    translation_key={{ entry.translation_key | python_literal }},
+    log_level={{ entry.log_level | python_literal }},
+    severity={{ entry.severity | python_literal }},
+{{ render_python_field("context_schema", entry.normalized_context_schema) }}
+    notes_for_operators={{ entry.notes_for_operators | python_literal }},
+)
+
+{% endfor %}
+ERROR_CODES: tuple[str, ...] = ({{ render_name_tuple(code_constant_names) }})
+ERRORS: tuple[ErrorCodeMetadata, ...] = ({{ render_name_tuple(metadata_constant_names) }})
+ERROR_BY_CODE: dict[str, ErrorCodeMetadata] = {
+{% for entry in entries %}
+    {{ entry.code }}: {{ entry.code }}_METADATA,
+{% endfor %}
+}
+ERROR_BY_TYPE_URI: dict[str, ErrorCodeMetadata] = {
+{% for entry in entries %}
+    {{ entry.code }}_METADATA.type_uri: {{ entry.code }}_METADATA,
+{% endfor %}
+}
+ERROR_BY_TRANSLATION_KEY: dict[str, ErrorCodeMetadata] = {
+{% for entry in entries %}
+    {{ entry.code }}_METADATA.translation_key: {{ entry.code }}_METADATA,
+{% endfor %}
+}
+
+def get_error(code: str) -> ErrorCodeMetadata | None:
+    """Return generated metadata for one catalog-defined error code."""
+    return ERROR_BY_CODE.get(code)
+
+__all__ = [
+{% for name in export_names %}
+    "{{ name }}",
+{% endfor %}
+]

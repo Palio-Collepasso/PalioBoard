@@ -1,1 +1,7 @@
 .env
+__pycache__/
+.venv/
+.pytest_cache/
+.ruff_cache/
+generated/
+error_codes_generated.py

@@ -1,0 +1,136 @@
+/**
+ * Generated from docs/api/errors/index.yaml and imported module fragments.
+ * Do not edit by hand.
+ */
+
+// Module order follows the committed catalog imports.
+export const ERROR_CATALOG_MODULES = {{ module_names_json }} as const;
+
+export type ErrorCatalogModuleName = (typeof ERROR_CATALOG_MODULES)[number];
+
+export const ERROR_CODES = {{ error_codes_json }} as const;
+
+export type ErrorCode = (typeof ERROR_CODES)[number];
+
+export type RetryPolicy =
+  | "never"
+  | "immediate"
+  | "after_refresh"
+  | "after_reauth"
+  | "after_delay";
+
+export type LogLevel =
+  | "DEBUG"
+  | "INFO"
+  | "WARNING"
+  | "ERROR"
+  | "CRITICAL";
+
+export type ErrorSeverity =
+  | "low"
+  | "medium"
+  | "high"
+  | "critical";
+
+export interface CatalogProblem<
+  Code extends ErrorCode = ErrorCode,
+  Context = unknown,
+> {
+  type: string;
+  code: Code;
+  status: number;
+  title: string;
+  context: Context;
+}
+
+export interface CatalogErrorMetadata<Code extends ErrorCode = ErrorCode> {
+  moduleName: ErrorCatalogModuleName;
+  code: Code;
+  type: string;
+  status: number;
+  title: string;
+  category: string;
+  retryPolicy: RetryPolicy;
+  safeToExpose: boolean;
+  translationKey: string;
+  description?: string;
+  logLevel?: LogLevel;
+  severity?: ErrorSeverity;
+  contextSchema: unknown;
+}
+
+{% for definition in shared_context_definitions %}
+export type {{ definition.alias_name }} = {{ definition.rendered_schema }};
+
+{% endfor %}
+{% for definition in error_context_definitions %}
+export type {{ definition.alias_name }} = {{ definition.rendered_schema }};
+
+{% endfor %}
+export interface ErrorContextByCode {
+{% for row in error_context_rows %}
+{{ row }}
+{% endfor %}
+}
+
+export interface ErrorMetadataByCode {
+{% for row in error_metadata_rows %}
+{{ row }}
+{% endfor %}
+}
+
+export const ERROR_METADATA_BY_CODE = {
+{% for entry in error_metadata_entries %}
+{{ entry }}
+{% endfor %}
+} as const satisfies Record<ErrorCode, CatalogErrorMetadata>;
+
+export const ERROR_CODES_BY_MODULE = {
+{% for entry in module_code_entries %}
+  {{ entry.module_name_json }}: {{ entry.module_codes_json }},
+{% endfor %}
+} as const satisfies Record<ErrorCatalogModuleName, readonly ErrorCode[]>;
+
+const ERROR_CODE_SET = new Set<string>(ERROR_CODES as readonly string[]);
+
+export function isCatalogErrorCode(code: string): code is ErrorCode {
+  return ERROR_CODE_SET.has(code);
+}
+
+export function getCatalogErrorMetadata(
+  code: ErrorCode,
+): ErrorMetadataByCode[ErrorCode] {
+  return ERROR_METADATA_BY_CODE[code];
+}
+
+export function matchesCatalogErrorCode(
+  problem: Pick<CatalogProblem, "code"> | null | undefined,
+  code: ErrorCode,
+): boolean {
+  return Boolean(problem && problem.code === code);
+}
+
+export function isCatalogProblem(value: unknown): value is CatalogProblem {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const record = value as Record<string, unknown>;
+  const code = record["code"];
+  return (
+    typeof record["type"] === "string" &&
+    typeof code === "string" &&
+    isCatalogErrorCode(code) &&
+    typeof record["title"] === "string" &&
+    typeof record["status"] === "number" &&
+    "context" in record
+  );
+}
+
+export type CatalogProblemByCode = {
+{% for entry in catalog_problem_entries %}
+{{ entry }}
+{% endfor %}
+};
+
+export type CatalogErrorContextByCode = ErrorContextByCode;
