@@ -54,7 +54,7 @@ format-check: ## Check api formatting
 
 lint: ## Run api lint checks
 	$(call require_file,$(API_DIR)/pyproject.toml,the api tooling)
-	cd $(API_DIR) && uv run --group dev ruff check src tests
+	cd $(API_DIR) && uv run --group dev ruff check --fix src tests
 
 typecheck: ## Run api and frontend type checks
 	$(call require_file,$(API_DIR)/pyproject.toml,the api tooling)

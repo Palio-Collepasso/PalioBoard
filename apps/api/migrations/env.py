@@ -5,7 +5,7 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-from palio.bootstrap.db.config import require_migration_database_url
+from palio.infrastructure.db.config import require_migration_database_url
 from palio.settings import load_settings
 
 config = context.config
@@ -26,13 +26,11 @@ def _get_x_argument(name: str) -> str | None:
     Returns:
         The configured argument value when present.
     """
-
     return context.get_x_argument(as_dictionary=True).get(name)
 
 
 def run_migrations_offline() -> None:
     """Run migrations without creating a DB connection."""
-
     context.configure(
         url=require_migration_database_url(
             settings.database.migration_url,
@@ -52,7 +50,6 @@ def run_migrations_offline() -> None:
 
 def run_migrations_online() -> None:
     """Run migrations with a live DB connection."""
-
     configuration = config.get_section(config.config_ini_section, {})
     configuration["sqlalchemy.url"] = require_migration_database_url(
         settings.database.migration_url,

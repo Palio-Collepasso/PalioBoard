@@ -64,19 +64,23 @@ This is a target codemap. If the code has not reached this exact shape yet, keep
 | Layer | Owns | Should not own |
 |---|---|---|
 | `api/` | FastAPI routers, auth entry checks, request/response mapping, HTTP semantics | business workflows, DB queries with domain rules, projection logic |
-| `application/` | app-level orchestration contracts that are not owned by one module, such as the shared `UnitOfWork` interface | framework-specific implementations, SQLAlchemy session types, HTTP transport |
-| `bootstrap/` | dependency wiring, composition root, app startup, concrete runtime assembly such as `bootstrap/db` | domain logic, request handling, application-facing interfaces |
-| `infrastructure/` | top-level technical implementations shared across modules, such as reusable DB-backed adapters | business orchestration, application-facing contracts, HTTP transport |
+| `app/` | app-level orchestration that coordinates use cases across modules | framework-specific implementations, SQLAlchemy session types, HTTP transport |
+| `bootstrap/` | dependency wiring, composition root, app startup, and request-scoped service assembly | domain logic, request handling, application-facing interfaces |
+| `infrastructure/` | top-level technical implementations shared across modules, such as DB configuration/runtime primitives and reusable DB-backed adapters | business orchestration, application-facing contracts, HTTP transport |
 | module `application/` | use cases, orchestration, transaction sequencing, policy rechecks | HTTP transport, ORM model definitions as public contract |
 | module `domain/` | business rules, validation, state transition logic, value semantics | framework code, SQL shaping for screens |
 | module `infrastructure/` | repositories, explicit SQL queries, adapters, external systems | cross-module business orchestration |
-| `shared/` | low-level technical helpers that are truly generic | business rules disguised as utilities, application-facing contracts |
+| `shared/` | low-level technical helpers and cross-module transaction contracts such as `shared/db/transaction.py` | business rules disguised as utilities, SQLAlchemy-specific implementations |
 
 ## Transaction and session ownership
 
 - A multi-step business command is owned by an application/use-case orchestrator.
 - The orchestrator owns the unit of work and SQLAlchemy session.
-- The `UnitOfWork` interface belongs in the application layer; concrete DB-backed implementations may live in infrastructure packages such as `infrastructure/db`, while bootstrap keeps runtime wiring and factory assembly.
+- The process-wide `ApplicationRuntime` should keep only long-lived startup wiring such as settings, the DB runtime, identity adapters, and app-level factories.
+- Transaction-bound module facades should be built per request or per use case from a long-lived factory, not stored as process-wide singletons on the runtime.
+- App and use-case code should depend on `Transaction`, `UnitOfWork`, and `UnitOfWorkFactory` from `shared/db/transaction.py`.
+- `SqlAlchemyTransaction` may expose `.session`, but only infrastructure or bootstrap wiring should touch it.
+- `DatabaseRuntime`, `SqlAlchemyTransaction`, and concrete DB-backed Unit of Work implementations may live in `infrastructure/db`, while bootstrap keeps runtime wiring that composes them into request-scoped services.
 - Repositories are session-bound; they do not create their own sessions.
 - Cross-module workflows should stay explicit in code. Do not hide them in signals, triggers, or implicit callbacks.
 
