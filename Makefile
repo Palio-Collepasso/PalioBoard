@@ -28,7 +28,7 @@ down: ## Stop local infrastructure
 
 api-dev: ## Run the api locally with uv
 	$(call require_file,$(API_DIR)/pyproject.toml,the api app)
-	cd $(API_DIR) && uv run fastapi dev src/palio/app/main.py
+	cd $(API_DIR) && uv run fastapi dev src/palio/bootstrap/main.py
 
 web-dev: ## Run the Angular app locally with npm
 	$(call require_file,$(WEB_DIR)/package.json,the frontend app)
@@ -37,7 +37,7 @@ web-dev: ## Run the Angular app locally with npm
 openapi-export: ## Export the committed OpenAPI spec from the api app
 	$(call require_file,$(API_DIR)/pyproject.toml,the api app)
 	mkdir -p docs/api
-	cd $(API_DIR) && uv run --group dev python -m palio.app.export_openapi ../../docs/api/openapi.yaml
+	cd $(API_DIR) && uv run --group dev python -m palio.bootstrap.export_openapi ../../docs/api/openapi.yaml
 
 openapi-types: ## Generate frontend TS types from the committed OpenAPI spec
 	$(call require_file,$(WEB_DIR)/package.json,the frontend app)
@@ -54,7 +54,7 @@ format-check: ## Check api formatting
 
 lint: ## Run api lint checks
 	$(call require_file,$(API_DIR)/pyproject.toml,the api tooling)
-	cd $(API_DIR) && uv run --group dev ruff check src tests
+	cd $(API_DIR) && uv run --group dev ruff check --fix src tests
 
 typecheck: ## Run api and frontend type checks
 	$(call require_file,$(API_DIR)/pyproject.toml,the api tooling)

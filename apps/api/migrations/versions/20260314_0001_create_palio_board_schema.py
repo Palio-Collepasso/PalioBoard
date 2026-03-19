@@ -11,11 +11,9 @@ depends_on = None
 
 def upgrade() -> None:
     """Create the empty application schema."""
-
     op.execute(f'CREATE SCHEMA IF NOT EXISTS "{APPLICATION_SCHEMA}"')
 
 
 def downgrade() -> None:
     """Drop the empty application schema."""
-
     op.execute(f'DROP SCHEMA IF EXISTS "{APPLICATION_SCHEMA}" CASCADE')

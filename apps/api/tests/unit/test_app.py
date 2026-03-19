@@ -1,15 +1,18 @@
 import json
 from uuid import UUID
 
+import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
 from loguru import logger
 
-from palio.app import create_app
+from palio.bootstrap import create_app
+from palio.bootstrap.export_openapi import build_placeholder_runtime
+from palio.settings import DatabaseNotConfiguredError
 
 
 def test_app_boots_with_placeholder_surfaces() -> None:
-    with TestClient(create_app()) as client:
+    with TestClient(create_app(runtime=build_placeholder_runtime())) as client:
         health = client.get("/healthz")
         assert health.status_code == status.HTTP_200_OK
         assert health.json()["status"] == "ok"
@@ -62,7 +65,7 @@ def test_app_boots_with_placeholder_surfaces() -> None:
 def test_request_id_header_is_propagated_and_logged() -> None:
     emitted_messages: list[str] = []
 
-    with TestClient(create_app()) as client:
+    with TestClient(create_app(runtime=build_placeholder_runtime())) as client:
         sink_id = logger.add(
             lambda message: emitted_messages.append(str(message)),
             serialize=True,
@@ -90,7 +93,7 @@ def test_request_id_header_is_propagated_and_logged() -> None:
 def test_request_logging_uses_loguru_json_payload_shape() -> None:
     emitted_messages: list[str] = []
 
-    with TestClient(create_app()) as client:
+    with TestClient(create_app(runtime=build_placeholder_runtime())) as client:
         sink_id = logger.add(
             lambda message: emitted_messages.append(str(message)),
             serialize=True,
@@ -109,3 +112,8 @@ def test_request_logging_uses_loguru_json_payload_shape() -> None:
     assert payload["record"]["extra"]["method"] == "GET"
     assert payload["record"]["extra"]["path"] == "/healthz"
     assert payload["record"]["extra"]["status_code"] == status.HTTP_200_OK
+
+
+def test_app_startup_requires_runtime_database_url() -> None:
+    with pytest.raises(DatabaseNotConfiguredError):
+        create_app()

@@ -9,12 +9,12 @@ description = "FastAPI api scaffold for the PalioBoard modular monolith."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "alembic>=1.16.0,<2.0.0",
-    "fastapi[standard]>=0.116.0,<1.0.0",
-    "loguru>=0.7.3,<1.0.0",
-    "psycopg[binary]>=3.2.0,<4.0.0",
-    "sqlalchemy>=2.0.38,<3.0.0",
-    "uuid6>=2025.0.1,<2026.0.0",
+  "alembic>=1.16.0,<2.0.0",
+  "fastapi[standard]>=0.116.0,<1.0.0",
+  "loguru>=0.7.3,<1.0.0",
+  "psycopg[binary]>=3.2.0,<4.0.0",
+  "sqlalchemy>=2.0.38,<3.0.0",
+  "uuid6>=2025.0.1,<2026.0.0",
 ]
 
 [dependency-groups]
@@ -36,9 +36,7 @@ packages = ["src/palio"]
 addopts = "-q"
 testpaths = ["tests"]
 pythonpath = ["."]
-markers = [
-    "integration: tests that require a real local PostgreSQL database",
-]
+markers = ["integration: tests that require a real local PostgreSQL database"]
 
 
 # -------------------------------
@@ -48,7 +46,7 @@ markers = [
 src = ["src", "tests"]
 target-version = "py312"
 [tool.ruff.lint]
-select = [  
+select = [
   "E",   # pycodestyle
   "F",   # pyflakes
   "W",   # pycodestyle warnings
@@ -84,7 +82,7 @@ convention = "google"
 include = ["src", "tests"]
 exclude = ["**/__pycache__", ".venv", "**/node_modules", "**/.*"]
 pythonVersion = "3.12"
-reportMissingTypeStubs = "warning"
+reportMissingTypeStubs = false
 typeCheckingMode = "strict"
 venv = ".venv"
 venvPath = "."

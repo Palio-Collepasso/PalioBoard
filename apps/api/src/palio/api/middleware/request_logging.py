@@ -7,7 +7,7 @@ from fastapi import Request
 from loguru import logger
 from starlette.responses import Response
 
-from palio.app.observability.request_context import get_request_id
+from palio.api.middleware.request_context import get_request_id
 
 type RequestHandler = Callable[[Request], Awaitable[Response]]
 
