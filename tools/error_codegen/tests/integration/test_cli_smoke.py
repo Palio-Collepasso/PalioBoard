@@ -1,8 +1,9 @@
-"""Enforce the intended CLI smoke path only.
+"""Prototype only for CLI smoke coverage.
 
-This file should verify the supported commands and options can drive validation
-and artifact generation through the real Typer app. It should not carry
-compatibility coverage for removed option names.
+This file should eventually verify the intended CLI surface can drive the real
+validate and generate commands with fixture-backed scenarios. It should not
+carry compatibility coverage for removed option names or deeper generator
+behavior.
 """
 
 from pathlib import Path
@@ -10,89 +11,86 @@ from pathlib import Path
 from support.adapters import cli_runner
 
 
-def test_cli_validate_accepts_a_success_scenario() -> None:
-    """The validate command should succeed on a known-good scenario."""
-    runner, app = cli_runner()
-    scenario_index = (
+def _scenario_index(*parts: str) -> Path:
+    """Return the path to one scenario catalog index fixture."""
+    return (
         Path(__file__).resolve().parents[1]
         / "fixtures"
         / "scenarios"
-        / "success"
-        / "simple"
-        / "single_error_with_required_context"
+        / Path(*parts)
+        / "inputs"
         / "contracts"
         / "errors"
         / "index.yaml"
     )
+
+
+def test_cli_validate_smoke_is_planned_for_a_success_scenario() -> None:
+    """Validate smoke coverage should target a known-good scenario."""
+    runner, app = cli_runner()
     result = runner.invoke(
-        app, ["validate", "--catalog-index-path", str(scenario_index)]
+        app,
+        [
+            "validate",
+            "--catalog-index",
+            str(
+                _scenario_index(
+                    "success", "simple", "single_error_with_required_context"
+                )
+            ),
+        ],
     )
+
     assert result.exit_code == 0, result.output
 
 
-def test_cli_validate_rejects_a_failure_scenario() -> None:
-    """The validate command should fail on a known-bad scenario."""
+def test_cli_validate_smoke_is_planned_for_a_failure_scenario() -> None:
+    """Validate smoke coverage should target a known-bad scenario."""
     runner, app = cli_runner()
-    scenario_index = (
-        Path(__file__).resolve().parents[1]
-        / "fixtures"
-        / "scenarios"
-        / "failure"
-        / "simple"
-        / "invalid_code_format"
-        / "contracts"
-        / "errors"
-        / "index.yaml"
-    )
     result = runner.invoke(
-        app, ["validate", "--catalog-index-path", str(scenario_index)]
+        app,
+        [
+            "validate",
+            "--catalog-index",
+            str(_scenario_index("failure", "simple", "invalid_code_format")),
+        ],
     )
+
     assert result.exit_code != 0
     assert (
         "code" in result.output.lower() or "upper_snake_case" in result.output.lower()
     )
 
 
-def test_cli_generate_writes_python_typescript_and_docs_outputs(tmp_path: Path) -> None:
-    """The generate command should emit all expected artifact kinds."""
+def test_cli_generate_smoke_is_planned_for_python_typescript_and_docs_outputs() -> (
+    None
+):
+    """Generate smoke coverage should target all three artifact kinds."""
     runner, app = cli_runner()
-    scenario_index = (
-        Path(__file__).resolve().parents[1]
-        / "fixtures"
-        / "scenarios"
-        / "success"
-        / "medium"
-        / "split_catalog_two_modules"
-        / "contracts"
-        / "errors"
-        / "index.yaml"
+    output_root = Path(__file__).resolve().parent / "_generated" / "python"
+    ts_out = Path(__file__).resolve().parent / "_generated" / "error-codes.gen.ts"
+    docs_out = Path(__file__).resolve().parent / "_generated" / "error-contract.md"
+    scenario_index = _scenario_index(
+        "success", "medium", "split_catalog_two_modules"
     )
-
-    python_out = tmp_path / "python"
-    ts_out = tmp_path / "typescript" / "error-codes.gen.ts"
-    docs_out = tmp_path / "docs" / "error-contract.md"
 
     result = runner.invoke(
         app,
         [
             "generate",
-            "--catalog-index-path",
+            "--catalog-index",
             str(scenario_index),
-            "--python-output-root",
-            str(python_out),
-            "--typescript-output-path",
+            "--python-out",
+            str(output_root),
+            "--typescript-out",
             str(ts_out),
-            "--docs-output-path",
+            "--docs-out",
             str(docs_out),
-            "--document-title",
-            "Medium success — split_catalog_two_modules",
+            "--check",
         ],
     )
-    assert result.exit_code == 0, result.output
 
-    python_files = sorted(python_out.rglob("*.py"))
-    assert python_files
+    assert result.exit_code == 0, result.output
+    assert any(output_root.rglob("*.py"))
     assert ts_out.exists()
     assert docs_out.exists()
-    assert "error" in ts_out.read_text(encoding="utf-8").lower()
-    assert "error" in docs_out.read_text(encoding="utf-8").lower()

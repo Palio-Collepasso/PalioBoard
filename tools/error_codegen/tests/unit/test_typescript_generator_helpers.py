@@ -1,132 +1,222 @@
-"""Enforce TypeScript generator helper behavior and metadata shape.
+"""Enforce TypeScript generator helper behavior for the target architecture.
 
-This file should cover helper rendering behavior, exported metadata shape, and
-context typing or nested-schema handling. It should not enforce exact full-file
-formatting when invariant checks are sufficient.
+This file should only cover the frontend metadata contract:
+- exported catalog entries contain `code`, `typeUri`, `title`, `httpStatus`,
+  and `translationKey`
+- context keys are exposed for interpolation in authored order
+- nested fields are preserved without accidental flattening unless intentional
+
+It should not enforce exact full-file formatting, CLI behavior, or API runtime
+behavior.
 """
 
-import importlib
 from types import SimpleNamespace
-from typing import Any
+
+from error_codegen.generators.typescript import (
+    _context_alias_name,
+    _render_literal,
+    _render_schema_type,
+    _shared_context_alias_name,
+    generate_typescript_error_artifact,
+)
+from support.sample_catalog import build_sample_catalog
 
 
-def _import_typescript_generator_module() -> Any:
-    """Import the TypeScript generator module using the repo-style path first."""
-    candidates = [
-        "tools.error_codegen.generators.typescript",
-        "error_codegen.generators.typescript",
-    ]
-    last_error: Exception | None = None
-    for name in candidates:
-        try:
-            return importlib.import_module(name)
-        except Exception as error:  # pragma: no cover
-            last_error = error
-    raise AssertionError(
-        f"Unable to import the TypeScript generator module. Last error: {last_error}"
-    )
+def _extract_balanced_block(source: str, start_marker: str) -> str:
+    """Return the balanced block that starts at ``start_marker``."""
+    start = source.index(start_marker)
+    brace_start = source.index("{", start)
+
+    depth = 0
+    for index in range(brace_start, len(source)):
+        character = source[index]
+        if character == "{":
+            depth += 1
+        elif character == "}":
+            depth -= 1
+            if depth == 0:
+                return source[start : index + 1]
+
+    raise AssertionError(f"Unbalanced block starting at {start_marker!r}.")
 
 
-def _resolve_attr(module: Any, candidates: list[str]) -> Any:
-    """Resolve the first available attribute from a module."""
-    for name in candidates:
-        if hasattr(module, name):
-            return getattr(module, name)
-    raise AssertionError(f"Expected one of {candidates!r} in {module.__name__}.")
-
-
-def _fake_entry(code: str, *, module_name: str = "event_operations") -> Any:
-    """Create a fake validated entry with the fields used by the TS generator."""
-    slug = code.lower().replace("_", "-")
-    return SimpleNamespace(
-        module_name=module_name,
-        code=code,
-        type_uri=f"https://api.palioboard.local/problems/{slug}",
-        recommended_http_status=409,
-        http_status=409,
-        title=code.replace("_", " ").title(),
-        category="business_rule",
-        retry_policy="never",
-        safe_to_expose=True,
-        translation_key=f"errors.{code.lower()}",
-        normalized_context_schema={
-            "type": "object",
-            "properties": {},
-            "additionalProperties": False,
-        },
-        description=None,
-        log_level=None,
-        severity=None,
-    )
+def _assert_in_order(source: str, tokens: list[str]) -> None:
+    """Assert that all tokens appear in the given order."""
+    cursor = -1
+    for token in tokens:
+        position = source.index(token)
+        assert position > cursor, token
+        cursor = position
 
 
 def test_render_literal_handles_scalar_values() -> None:
     """Literal rendering should preserve TypeScript-compatible scalars."""
-    module = _import_typescript_generator_module()
-    render_literal = _resolve_attr(module, ["_render_literal"])
-
-    assert render_literal("abc") == '"abc"'
-    assert render_literal(True) == "true"
-    assert render_literal(False) == "false"
-    assert render_literal(None) == "null"
-    assert render_literal(7) == "7"
+    assert _render_literal("abc") == '"abc"'
+    assert _render_literal(True) == "true"
+    assert _render_literal(False) == "false"
+    assert _render_literal(None) == "null"
+    assert _render_literal(7) == "7"
 
 
 def test_alias_name_helpers_generate_stable_context_type_names() -> None:
-    """Alias helpers should derive stable exported type names from codes and shared schemas."""
-    module = _import_typescript_generator_module()
-    shared_alias_name = _resolve_attr(module, ["_shared_context_alias_name"])
-    context_alias_name = _resolve_attr(module, ["_context_alias_name"])
-
-    assert shared_alias_name("uuid_ref") == "SharedContextUuidRef"
-    assert context_alias_name("JOLLY_ALREADY_USED") == "JollyAlreadyUsedContext"
+    """Alias helpers should derive stable exported type names."""
+    assert _shared_context_alias_name("uuid_ref") == "SharedContextUuidRef"
+    assert _context_alias_name("JOLLY_ALREADY_USED") == "JollyAlreadyUsedContext"
 
 
-def test_render_schema_type_handles_nested_object_schema() -> None:
-    """Schema rendering should preserve required-vs-optional object fields."""
-    module = _import_typescript_generator_module()
-    render_schema_type = _resolve_attr(module, ["_render_schema_type"])
-
+def test_render_schema_type_preserves_nested_object_fields() -> None:
+    """Schema rendering should preserve nested object structure and field order."""
     schema = {
         "type": "object",
         "additionalProperties": False,
         "properties": {
-            "team_id": {"type": "string"},
-            "previous_game_id": {"type": "string"},
+            "game_id": {"type": "string"},
+            "existing_result": {
+                "type": "object",
+                "additionalProperties": False,
+                "properties": {
+                    "team_id": {"type": "string"},
+                    "placement": {"type": "number"},
+                },
+                "required": ["team_id"],
+            },
+            "incoming_result": {
+                "type": "object",
+                "additionalProperties": False,
+                "properties": {
+                    "team_id": {"type": "string"},
+                    "placement": {"type": "number"},
+                },
+                "required": ["team_id"],
+            },
         },
-        "required": ["team_id"],
+        "required": ["game_id", "existing_result", "incoming_result"],
     }
 
-    rendered = render_schema_type(schema, {}, path=())
+    rendered = _render_schema_type(schema, {}, path=())
 
-    assert '"team_id": string;' in rendered
-    assert '"previous_game_id"?: string;' in rendered
+    _assert_in_order(
+        rendered,
+        [
+            '"game_id": string;',
+            '"existing_result": {',
+            '"team_id": string;',
+            '"placement": number;',
+            '"incoming_result": {',
+        ],
+    )
+    assert "existing_result_team_id" not in rendered
+    assert "incoming_result_team_id" not in rendered
 
 
-def test_generate_typescript_artifact_contains_codes_translation_keys_and_modules() -> (
-    None
-):
-    """Full TS generation should include codes, translation keys, and module ownership."""
-    module = _import_typescript_generator_module()
-    generate_artifact = _resolve_attr(
-        module,
-        ["generate_typescript_error_artifact", "render_typescript_error_artifact"],
+def test_generate_typescript_artifact_exports_catalog_metadata_contract() -> None:
+    """Generated TS should expose the frontend catalog contract and metadata keys."""
+    rendered = generate_typescript_error_artifact(build_sample_catalog())
+
+    assert "export type ApiErrorCatalogEntry = {" in rendered
+    api_entry_block = _extract_balanced_block(
+        rendered, "export type ApiErrorCatalogEntry ="
+    )
+    _assert_in_order(
+        api_entry_block,
+        [
+            "code: string;",
+            "typeUri: string;",
+            "title: string;",
+            "httpStatus: number;",
+            "translationKey: string;",
+        ],
+    )
+    assert "ERROR_METADATA_BY_CODE" not in rendered
+    assert "ERROR_CODES_BY_MODULE" not in rendered
+    assert "ERROR_CATALOG_MODULES" not in rendered
+    assert "export const ERROR_CATALOG = {" in rendered
+    assert "export type ErrorCode = keyof typeof ERROR_CATALOG;" in rendered
+
+
+def test_generate_typescript_artifact_exposes_context_keys_for_interpolation() -> None:
+    """Generated TS should keep context keys visible in authored order."""
+    catalog = build_sample_catalog()
+    rendered = generate_typescript_error_artifact(catalog)
+    sample_entry = catalog.errors["JOLLY_ALREADY_USED"]
+    context_block = _extract_balanced_block(
+        rendered, "export type JollyAlreadyUsedContext ="
     )
 
-    fake_catalog = SimpleNamespace(
-        module_names=("event_operations", "tournaments"),
+    _assert_in_order(
+        context_block,
+        [
+            '"team_id": SharedContextUuidRef;',
+            '"game_id": SharedContextUuidRef;',
+            '"previous_game_id"?: SharedContextUuidRef;',
+        ],
+    )
+    assert "export interface ErrorContextByCode {" in rendered
+    assert (
+        "export type ErrorContext<TCode extends ErrorCode> = "
+        "ErrorContextByCode[TCode];"
+        in rendered
+    )
+    for field_name in sample_entry.resolved_context_schema["properties"]:
+        assert field_name in context_block
+
+
+def test_generate_typescript_artifact_does_not_flatten_nested_fields_incorrectly(
+) -> None:
+    """Generated TS should keep nested object structure intact in the artifact."""
+    nested_schema = {
+        "type": "object",
+        "additionalProperties": False,
+        "properties": {
+            "game_id": {"type": "string"},
+            "existing_result": {
+                "type": "object",
+                "additionalProperties": False,
+                "properties": {
+                    "team_id": {"type": "string"},
+                    "placement": {"type": "number"},
+                },
+                "required": ["team_id", "placement"],
+            },
+        },
+        "required": ["game_id", "existing_result"],
+    }
+    entry = SimpleNamespace(
+        module_name="event_operations",
+        code="PLACEMENT_CONFLICT",
+        type_uri="https://api.palioboard.local/problems/placement-conflict",
+        http_status=409,
+        title="Placement conflict",
+        category="business_rule",
+        retry_policy="never",
+        safe_to_expose=True,
+        translation_key="errors.placementConflict",
+        normalized_context_schema=nested_schema,
+        description=None,
+        log_level=None,
+        severity=None,
+    )
+    catalog = SimpleNamespace(
+        module_names=("event_operations",),
         shared_context_schemas={},
-        errors_for_module=lambda name: (
-            (_fake_entry("JOLLY_ALREADY_USED", module_name="event_operations"),)
-            if name == "event_operations"
-            else (_fake_entry("TOURNAMENT_LOCKED", module_name="tournaments"),)
+        errors_for_module=lambda module_name: (
+            (entry,) if module_name == "event_operations" else ()
         ),
     )
 
-    output = generate_artifact(fake_catalog)
+    rendered = generate_typescript_error_artifact(catalog)
+    context_block = _extract_balanced_block(
+        rendered, "export type PlacementConflictContext ="
+    )
 
-    assert "JOLLY_ALREADY_USED" in output
-    assert "TOURNAMENT_LOCKED" in output
-    assert "errors.jolly_already_used" in output
-    assert "event_operations" in output
-    assert "tournaments" in output
+    _assert_in_order(
+        context_block,
+        [
+            '"game_id": string;',
+            '"existing_result": {',
+            '"team_id": string;',
+            '"placement": number;',
+        ],
+    )
+    assert "existing_result_team_id" not in context_block
+    assert "existing_result_placement" not in context_block
