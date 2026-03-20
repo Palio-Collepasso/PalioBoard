@@ -1,102 +1,87 @@
-"""Enforce docs generator helper behavior for section injection.
+"""Docs generator helper tests.
 
-This file should cover replacing only the generated Error Catalog section,
-preserving surrounding handwritten content, and idempotence or missing-heading
-failure behavior. It should not depend on broad scenario traversal.
+This file should enforce the section-injection contract only:
+preserve handwritten content before and after `# Error Catalog` byte-for-byte,
+replace only that section, be idempotent on rerun, and fail clearly when the
+heading is missing.
+It should not assert exact full-document snapshots or scenario traversal.
 """
 
-from __future__ import annotations
+import pytest
 
-import importlib
-from types import SimpleNamespace
-from typing import Any
-
-
-def _import_docs_generator_module() -> Any:
-    """Import the docs generator module using the repo-style path first."""
-    candidates = ['tools.error_codegen.generators.docs', 'error_codegen.generators.docs']
-    last_error: Exception | None = None
-    for name in candidates:
-        try:
-            return importlib.import_module(name)
-        except Exception as error:  # pragma: no cover
-            last_error = error
-    raise AssertionError(f'Unable to import the docs generator module. Last error: {last_error}')
+from error_codegen.generators.docs import (
+    ERROR_CATALOG_HEADING,
+    inject_error_catalog_section,
+    render_error_catalog_section,
+)
+from support.sample_catalog import build_sample_catalog
 
 
-def _resolve_attr(module: Any, candidates: list[str]) -> Any:
-    """Resolve the first available attribute from a module."""
-    for name in candidates:
-        if hasattr(module, name):
-            return getattr(module, name)
-    raise AssertionError(f'Expected one of {candidates!r} in {module.__name__}.')
-
-
-def _fake_catalog() -> Any:
-    """Create a minimal fake catalog with no shared schemas."""
-    return SimpleNamespace(shared_context_schemas={})
-
-
-def _fake_entry() -> Any:
-    """Create a fake error entry with context and example data."""
-    return SimpleNamespace(
-        code='JOLLY_ALREADY_USED',
-        type_uri='https://api.palioboard.local/problems/jolly-already-used',
-        category='business_rule',
-        http_status=409,
-        recommended_http_status=409,
-        title='Jolly already used',
-        translation_key='errors.jollyAlreadyUsed',
-        safe_to_expose=True,
-        description='The team has already spent its Jolly in another game.',
-        retry_policy='never',
-        normalized_context_schema={
-            'type': 'object',
-            'additionalProperties': False,
-            'properties': {
-                'team_id': {'type': 'string', 'format': 'uuid', 'description': 'Owning team id.'},
-                'previous_game_id': {'type': 'string'},
-            },
-            'required': ['team_id'],
-        },
-        example={'detail': None, 'context': {'team_id': 'team-001', 'previous_game_id': 'game-002'}},
+def _base_document() -> str:
+    """Build a document with handwritten prefix and suffix around the catalog."""
+    return (
+        "Preamble line 1\n"
+        "Preamble line 2\n"
+        "\n"
+        f"{ERROR_CATALOG_HEADING}\n"
+        "Old generated content that should be replaced.\n"
+        "\n"
+        "# Appendix\n"
+        "Appendix body.\n"
     )
 
 
-def test_render_markdown_table_aligns_right_aligned_columns() -> None:
-    """Markdown table rendering should right-align selected columns."""
-    module = _import_docs_generator_module()
-    render_table = _resolve_attr(module, ['_render_markdown_table'])
-
-    table = render_table(
-        ['Field', 'Required'],
-        [['`team_id`', 'yes'], ['`previous_game_id`', 'no']],
-        right_aligned_columns={1},
+def _split_error_catalog_document(document: str) -> tuple[str, str, str]:
+    """Split a document into prefix, catalog section, and suffix."""
+    heading_start = document.index(ERROR_CATALOG_HEADING)
+    next_heading_index = document.find("\n# ", heading_start + len(ERROR_CATALOG_HEADING))
+    if next_heading_index == -1:
+        next_heading_index = len(document)
+    return (
+        document[:heading_start],
+        document[heading_start:next_heading_index],
+        document[next_heading_index:],
     )
 
-    assert '| Field              | Required |' in table
-    assert '| ------------------ | -------: |' in table
+
+def test_render_error_catalog_section_is_section_only() -> None:
+    """The section renderer should emit the generated catalog section only."""
+    rendered = render_error_catalog_section(build_sample_catalog())
+
+    assert rendered.startswith(f"{ERROR_CATALOG_HEADING}\n")
+    assert "Preamble line 1" not in rendered
+    assert "Appendix body" not in rendered
+    assert "## Event Operations" in rendered
+    assert "### JOLLY_ALREADY_USED" in rendered
 
 
-def test_describe_schema_type_prefers_format_for_strings() -> None:
-    """String schema descriptions should surface special formats like UUID."""
-    module = _import_docs_generator_module()
-    describe_type = _resolve_attr(module, ['_describe_schema_type'])
+def test_inject_error_catalog_section_preserves_handwritten_prefix_and_suffix() -> (
+    None
+):
+    """Injection should keep handwritten content unchanged and replace only the catalog section."""
+    section = render_error_catalog_section(build_sample_catalog())
 
-    assert describe_type('string', {'format': 'uuid'}) == 'uuid'
-    assert describe_type('string', {'format': 'date-time'}) == 'string (date-time)'
-    assert describe_type('integer', {}) == 'integer'
+    rendered = inject_error_catalog_section(_base_document(), section)
+    prefix, actual_section, suffix = _split_error_catalog_document(rendered)
+    expected_prefix, _, expected_suffix = _split_error_catalog_document(_base_document())
+
+    assert prefix == expected_prefix
+    assert actual_section == f"{section}\n"
+    assert suffix == expected_suffix
+    assert "Old generated content" not in rendered
 
 
-def test_render_error_entry_includes_context_table_and_example() -> None:
-    """Rendered entry docs should include the schema table and JSON example."""
-    module = _import_docs_generator_module()
-    render_error_entry = _resolve_attr(module, ['render_error_entry'])
+def test_inject_error_catalog_section_is_idempotent() -> None:
+    """Reinserting the same section should not change the rendered document."""
+    section = render_error_catalog_section(build_sample_catalog())
+    rendered = inject_error_catalog_section(_base_document(), section)
 
-    rendered = render_error_entry(_fake_catalog(), _fake_entry())
+    assert inject_error_catalog_section(rendered, section) == rendered
 
-    assert '### JOLLY_ALREADY_USED' in rendered
-    assert '#### Context schema' in rendered
-    assert '`team_id`' in rendered
-    assert '#### Example' in rendered
-    assert '"previous_game_id": "game-002"' in rendered
+
+def test_inject_error_catalog_section_rejects_missing_heading() -> None:
+    """Documents without `# Error Catalog` should fail clearly."""
+    section = render_error_catalog_section(build_sample_catalog())
+
+    with pytest.raises(ValueError, match="`# Error Catalog` heading"):
+        inject_error_catalog_section("Intro only\n\n# Appendix\nTail\n", section)

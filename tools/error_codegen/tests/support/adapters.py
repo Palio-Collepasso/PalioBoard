@@ -8,9 +8,9 @@ from __future__ import annotations
 
 import importlib
 import inspect
+from collections.abc import Callable
 from pathlib import Path
 from types import ModuleType
-from typing import Any
 
 from typer.testing import CliRunner
 
@@ -35,12 +35,13 @@ def import_module_from_candidates(candidates: list[str]) -> ModuleType:
             last_error = error
     raise AssertionError(
         "Unable to import any of the expected tool modules: "
-        f"{candidates!r}. Update the tool-side test adapters to match the final repo paths. "
+        f"{candidates!r}. Update the tool-side test adapters to match "
+        "the final repo paths. "
         f"Last error: {last_error}"
     )
 
 
-def resolve_attr(module: ModuleType, candidates: list[str]) -> Any:
+def resolve_attr(module: ModuleType, candidates: list[str]) -> object:
     """Resolve the first available attribute from a module.
 
     Args:
@@ -61,7 +62,9 @@ def resolve_attr(module: ModuleType, candidates: list[str]) -> Any:
     )
 
 
-def call_with_known_params(function: Any, /, *args: Any, **kwargs: Any) -> Any:
+def call_with_known_params(
+    function: Callable[..., object], /, *args: object, **kwargs: object
+) -> object:
     """Call a function using only supported keyword arguments.
 
     This keeps tests resilient to small signature changes during refactors.
@@ -83,7 +86,7 @@ def call_with_known_params(function: Any, /, *args: Any, **kwargs: Any) -> Any:
     return function(*args, **accepted_kwargs)
 
 
-def load_catalog(index_path: Path) -> Any:
+def load_catalog(index_path: Path) -> object:
     """Load a catalog from its ``index.yaml`` path.
 
     Args:
@@ -126,7 +129,7 @@ def catalog_validation_error_type() -> type[Exception]:
     return error_type
 
 
-def build_python_artifacts(catalog: Any) -> dict[str, str]:
+def build_python_artifacts(catalog: object) -> dict[str, str]:
     """Build generated Python definition artifacts keyed by relative path.
 
     Args:
@@ -158,11 +161,16 @@ def build_python_artifacts(catalog: Any) -> dict[str, str]:
         if hasattr(artifact, "relative_path") and hasattr(artifact, "source"):
             normalized[str(artifact.relative_path)] = str(artifact.source)
             continue
-        if hasattr(artifact, "module_name") and hasattr(artifact, "source"):
-            normalized[f"{artifact.module_name}/error_defs_gen.py"] = str(artifact.source)
+        if hasattr(artifact, "output_path") and hasattr(artifact, "content"):
+            normalized[str(artifact.output_path)] = str(artifact.content)
             continue
         if hasattr(artifact, "output_path") and hasattr(artifact, "source"):
             normalized[str(artifact.output_path)] = str(artifact.source)
+            continue
+        if hasattr(artifact, "module_name") and hasattr(artifact, "source"):
+            normalized[
+                f"{artifact.module_name}/error_defs_gen.py"
+            ] = str(artifact.source)
             continue
         raise AssertionError(
             "Unrecognized Python artifact shape. Update the tool-side test adapters to "
@@ -171,7 +179,7 @@ def build_python_artifacts(catalog: Any) -> dict[str, str]:
     return normalized
 
 
-def render_typescript_artifact(catalog: Any) -> str:
+def render_typescript_artifact(catalog: object) -> str:
     """Render the merged TypeScript error artifact.
 
     Args:
@@ -196,7 +204,7 @@ def render_typescript_artifact(catalog: Any) -> str:
     return str(function(catalog)).strip()
 
 
-def render_docs_artifact(catalog: Any, *, title: str) -> str:
+def render_docs_artifact(catalog: object, *, title: str) -> str:
     """Render the Markdown error-contract document.
 
     Args:
@@ -222,7 +230,7 @@ def render_docs_artifact(catalog: Any, *, title: str) -> str:
     return str(rendered).strip()
 
 
-def cli_runner() -> tuple[CliRunner, Any]:
+def cli_runner() -> tuple[CliRunner, object]:
     """Return a ``CliRunner`` and the Typer application object.
 
     Returns:
