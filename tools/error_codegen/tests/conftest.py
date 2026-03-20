@@ -1,5 +1,7 @@
 """Pytest fixtures for the error_codegen tool test suite."""
 
+# ruff: noqa: E402
+
 import os
 import sys
 from pathlib import Path
@@ -7,8 +9,10 @@ from pathlib import Path
 import pytest
 
 TESTS_ROOT = Path(__file__).resolve().parent
-if str(TESTS_ROOT) not in sys.path:
-    sys.path.insert(0, str(TESTS_ROOT))
+API_SRC_ROOT = TESTS_ROOT.parents[2] / "apps" / "api" / "src"
+for path in (API_SRC_ROOT, TESTS_ROOT):
+    if str(path) not in sys.path:
+        sys.path.insert(0, str(path))
 
 from support.scenarios import Scenario, failure_scenarios, success_scenarios
 

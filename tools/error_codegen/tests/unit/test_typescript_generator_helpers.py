@@ -6,8 +6,9 @@ This file should only cover the frontend metadata contract:
 - context keys are exposed for interpolation in authored order
 - nested fields are preserved without accidental flattening unless intentional
 
-It should not enforce exact full-file formatting, CLI behavior, or API runtime
-behavior.
+It should use the shared pure helpers from `support.text_helpers` instead of
+duplicating token/block extraction locally. It should not enforce exact
+full-file formatting, CLI behavior, or API runtime behavior.
 """
 
 from types import SimpleNamespace
@@ -20,33 +21,7 @@ from error_codegen.generators.typescript import (
     generate_typescript_error_artifact,
 )
 from support.sample_catalog import build_sample_catalog
-
-
-def _extract_balanced_block(source: str, start_marker: str) -> str:
-    """Return the balanced block that starts at ``start_marker``."""
-    start = source.index(start_marker)
-    brace_start = source.index("{", start)
-
-    depth = 0
-    for index in range(brace_start, len(source)):
-        character = source[index]
-        if character == "{":
-            depth += 1
-        elif character == "}":
-            depth -= 1
-            if depth == 0:
-                return source[start : index + 1]
-
-    raise AssertionError(f"Unbalanced block starting at {start_marker!r}.")
-
-
-def _assert_in_order(source: str, tokens: list[str]) -> None:
-    """Assert that all tokens appear in the given order."""
-    cursor = -1
-    for token in tokens:
-        position = source.index(token)
-        assert position > cursor, token
-        cursor = position
+from support.text_helpers import assert_tokens_in_order, extract_balanced_block
 
 
 def test_render_literal_handles_scalar_values() -> None:
@@ -95,7 +70,7 @@ def test_render_schema_type_preserves_nested_object_fields() -> None:
 
     rendered = _render_schema_type(schema, {}, path=())
 
-    _assert_in_order(
+    assert_tokens_in_order(
         rendered,
         [
             '"game_id": string;',
@@ -114,10 +89,10 @@ def test_generate_typescript_artifact_exports_catalog_metadata_contract() -> Non
     rendered = generate_typescript_error_artifact(build_sample_catalog())
 
     assert "export type ApiErrorCatalogEntry = {" in rendered
-    api_entry_block = _extract_balanced_block(
+    api_entry_block = extract_balanced_block(
         rendered, "export type ApiErrorCatalogEntry ="
     )
-    _assert_in_order(
+    assert_tokens_in_order(
         api_entry_block,
         [
             "code: string;",
@@ -139,11 +114,11 @@ def test_generate_typescript_artifact_exposes_context_keys_for_interpolation() -
     catalog = build_sample_catalog()
     rendered = generate_typescript_error_artifact(catalog)
     sample_entry = catalog.errors["JOLLY_ALREADY_USED"]
-    context_block = _extract_balanced_block(
+    context_block = extract_balanced_block(
         rendered, "export type JollyAlreadyUsedContext ="
     )
 
-    _assert_in_order(
+    assert_tokens_in_order(
         context_block,
         [
             '"team_id": SharedContextUuidRef;',
@@ -154,15 +129,15 @@ def test_generate_typescript_artifact_exposes_context_keys_for_interpolation() -
     assert "export interface ErrorContextByCode {" in rendered
     assert (
         "export type ErrorContext<TCode extends ErrorCode> = "
-        "ErrorContextByCode[TCode];"
-        in rendered
+        "ErrorContextByCode[TCode];" in rendered
     )
     for field_name in sample_entry.resolved_context_schema["properties"]:
         assert field_name in context_block
 
 
-def test_generate_typescript_artifact_does_not_flatten_nested_fields_incorrectly(
-) -> None:
+def test_generate_typescript_artifact_does_not_flatten_nested_fields_incorrectly() -> (
+    None
+):
     """Generated TS should keep nested object structure intact in the artifact."""
     nested_schema = {
         "type": "object",
@@ -205,11 +180,11 @@ def test_generate_typescript_artifact_does_not_flatten_nested_fields_incorrectly
     )
 
     rendered = generate_typescript_error_artifact(catalog)
-    context_block = _extract_balanced_block(
+    context_block = extract_balanced_block(
         rendered, "export type PlacementConflictContext ="
     )
 
-    _assert_in_order(
+    assert_tokens_in_order(
         context_block,
         [
             '"game_id": string;',

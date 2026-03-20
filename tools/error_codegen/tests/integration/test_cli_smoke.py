@@ -3,9 +3,11 @@
 This file should eventually verify the intended CLI surface can drive the real
 validate and generate commands with fixture-backed scenarios. It should not
 carry compatibility coverage for removed option names or deeper generator
-behavior.
+behavior. The final version should keep generated smoke artifacts in temporary
+paths so `tools/error_codegen/tests/integration/_generated/` is not left behind.
 """
 
+import tempfile
 from pathlib import Path
 
 from support.adapters import cli_runner
@@ -62,35 +64,34 @@ def test_cli_validate_smoke_is_planned_for_a_failure_scenario() -> None:
     )
 
 
-def test_cli_generate_smoke_is_planned_for_python_typescript_and_docs_outputs() -> (
-    None
-):
+def test_cli_generate_smoke_is_planned_for_python_typescript_and_docs_outputs() -> None:
     """Generate smoke coverage should target all three artifact kinds."""
     runner, app = cli_runner()
-    output_root = Path(__file__).resolve().parent / "_generated" / "python"
-    ts_out = Path(__file__).resolve().parent / "_generated" / "error-codes.gen.ts"
-    docs_out = Path(__file__).resolve().parent / "_generated" / "error-contract.md"
-    scenario_index = _scenario_index(
-        "success", "medium", "split_catalog_two_modules"
-    )
+    scenario_index = _scenario_index("success", "medium", "split_catalog_two_modules")
 
-    result = runner.invoke(
-        app,
-        [
-            "generate",
-            "--catalog-index",
-            str(scenario_index),
-            "--python-out",
-            str(output_root),
-            "--typescript-out",
-            str(ts_out),
-            "--docs-out",
-            str(docs_out),
-            "--check",
-        ],
-    )
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        temp_root = Path(tmp_dir)
+        output_root = temp_root / "python"
+        ts_out = temp_root / "error-codes.gen.ts"
+        docs_out = temp_root / "error-contract.md"
 
-    assert result.exit_code == 0, result.output
-    assert any(output_root.rglob("*.py"))
-    assert ts_out.exists()
-    assert docs_out.exists()
+        result = runner.invoke(
+            app,
+            [
+                "generate",
+                "--catalog-index",
+                str(scenario_index),
+                "--python-out",
+                str(output_root),
+                "--typescript-out",
+                str(ts_out),
+                "--docs-out",
+                str(docs_out),
+                "--check",
+            ],
+        )
+
+        assert result.exit_code == 0, result.output
+        assert any(output_root.rglob("*.py"))
+        assert ts_out.exists()
+        assert docs_out.exists()

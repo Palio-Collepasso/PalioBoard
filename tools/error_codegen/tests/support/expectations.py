@@ -108,51 +108,6 @@ def expected_failure_markers(scenario_name: str) -> list[str]:
     return markers_by_scenario.get(scenario_name, ["catalog"])
 
 
-def expected_runtime_payloads(index_path: Path) -> list[dict[str, Any]]:
-    """Build expected runtime Problem Details payloads from raw catalog entries.
-
-    Temporary compatibility helper. The final runtime assertions should move to
-    API test support and stop depending on tool-owned expectations.
-    """
-    try:
-        index_document = read_yaml(index_path)
-        base_type_uri = str(index_document["base_type_uri"]).rstrip("/") + "/"
-
-        payloads: list[dict[str, Any]] = []
-        for entry in collect_raw_error_entries(index_path):
-            payloads.append(
-                {
-                    "type": f"{base_type_uri}{entry.type_slug}",
-                    "code": entry.code,
-                    "title": entry.title,
-                    "status": entry.http_status,
-                    "context": entry.example_context or {},
-                }
-            )
-        return payloads
-    except Exception:
-        from support.adapters import load_catalog
-
-        try:
-            catalog = load_catalog(index_path)
-        except Exception:
-            return []
-        payloads: list[dict[str, Any]] = []
-        for entry in catalog.errors.values():
-            example = entry.example if isinstance(entry.example, dict) else {}
-            context = example.get("context", {}) if isinstance(example, dict) else {}
-            payloads.append(
-                {
-                    "type": entry.type_uri,
-                    "code": entry.code,
-                    "title": entry.title,
-                    "status": entry.http_status,
-                    "context": context if isinstance(context, dict) else {},
-                }
-            )
-        return payloads
-
-
 def expected_codes_by_module(index_path: Path) -> dict[str, tuple[str, ...]]:
     """Return expected symbolic codes grouped by owning module."""
     grouped: dict[str, list[str]] = {}
@@ -195,11 +150,3 @@ def expected_context_fields_by_code(
             optional=optional_names,
         )
     return dict(sorted(expectations.items()))
-
-
-def generated_python_expectations(index_path: Path) -> dict[str, list[RawErrorEntry]]:
-    """Group raw error entries by module for Python generation assertions."""
-    grouped: dict[str, list[RawErrorEntry]] = {}
-    for entry in collect_raw_error_entries(index_path):
-        grouped.setdefault(entry.module, []).append(entry)
-    return grouped

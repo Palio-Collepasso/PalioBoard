@@ -4,7 +4,9 @@ This file should enforce the section-injection contract only:
 preserve handwritten content before and after `# Error Catalog` byte-for-byte,
 replace only that section, be idempotent on rerun, and fail clearly when the
 heading is missing.
-It should not assert exact full-document snapshots or scenario traversal.
+It should use the shared pure helpers from `support.text_helpers` instead of
+duplicating section-splitting logic locally, and it should not assert exact
+full-document snapshots or scenario traversal.
 """
 
 import pytest
@@ -15,6 +17,7 @@ from error_codegen.generators.docs import (
     render_error_catalog_section,
 )
 from support.sample_catalog import build_sample_catalog
+from support.text_helpers import split_markdown_sections
 
 
 def _base_document() -> str:
@@ -31,19 +34,6 @@ def _base_document() -> str:
     )
 
 
-def _split_error_catalog_document(document: str) -> tuple[str, str, str]:
-    """Split a document into prefix, catalog section, and suffix."""
-    heading_start = document.index(ERROR_CATALOG_HEADING)
-    next_heading_index = document.find("\n# ", heading_start + len(ERROR_CATALOG_HEADING))
-    if next_heading_index == -1:
-        next_heading_index = len(document)
-    return (
-        document[:heading_start],
-        document[heading_start:next_heading_index],
-        document[next_heading_index:],
-    )
-
-
 def test_render_error_catalog_section_is_section_only() -> None:
     """The section renderer should emit the generated catalog section only."""
     rendered = render_error_catalog_section(build_sample_catalog())
@@ -55,15 +45,18 @@ def test_render_error_catalog_section_is_section_only() -> None:
     assert "### JOLLY_ALREADY_USED" in rendered
 
 
-def test_inject_error_catalog_section_preserves_handwritten_prefix_and_suffix() -> (
-    None
-):
-    """Injection should keep handwritten content unchanged and replace only the catalog section."""
+def test_inject_error_catalog_section_preserves_handwritten_prefix_and_suffix() -> None:
+    """Injection should keep handwritten content unchanged and replace only the
+    catalog section."""
     section = render_error_catalog_section(build_sample_catalog())
 
     rendered = inject_error_catalog_section(_base_document(), section)
-    prefix, actual_section, suffix = _split_error_catalog_document(rendered)
-    expected_prefix, _, expected_suffix = _split_error_catalog_document(_base_document())
+    prefix, actual_section, suffix = split_markdown_sections(
+        rendered, ERROR_CATALOG_HEADING
+    )
+    expected_prefix, _, expected_suffix = split_markdown_sections(
+        _base_document(), ERROR_CATALOG_HEADING
+    )
 
     assert prefix == expected_prefix
     assert actual_section == f"{section}\n"

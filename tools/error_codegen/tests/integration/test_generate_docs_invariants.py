@@ -4,8 +4,12 @@ This file should exercise the real generator path against fixture-backed
 scenarios. The required guarantees are:
 preserve content before and after `# Error Catalog` byte-for-byte, replace only
 that section, and remain idempotent across reruns.
-It should not use exact full-document snapshots as the primary assertion.
+It should use the shared pure helpers from `support.text_helpers` instead of
+duplicating markdown-splitting logic locally, and it should not use exact
+full-document snapshots as the primary assertion.
 """
+
+# ruff: noqa: I001
 
 from pathlib import Path
 
@@ -15,6 +19,7 @@ from error_codegen.generators.docs import ERROR_CATALOG_HEADING, render_error_co
 from support.adapters import load_catalog
 from support.expectations import collect_raw_error_entries
 from support.scenarios import Scenario, failure_scenarios, success_scenarios
+from support.text_helpers import split_markdown_sections
 
 
 SCENARIOS_ROOT = Path(__file__).resolve().parents[1] / "fixtures" / "scenarios"
@@ -30,19 +35,6 @@ MISSING_HEADING_SCENARIOS = [
 BASE_CATALOG_SCENARIO = next(iter(success_scenarios(SCENARIOS_ROOT)))
 
 
-def _split_document(document: str) -> tuple[str, str, str]:
-    """Split a markdown document into prefix, catalog section, and suffix."""
-    heading_start = document.index(ERROR_CATALOG_HEADING)
-    next_heading_index = document.find("\n# ", heading_start + len(ERROR_CATALOG_HEADING))
-    if next_heading_index == -1:
-        next_heading_index = len(document)
-    return (
-        document[:heading_start],
-        document[heading_start:next_heading_index],
-        document[next_heading_index:],
-    )
-
-
 @pytest.mark.parametrize("scenario", SUCCESS_SCENARIOS)
 def test_generate_docs_preserves_handwritten_content_before_and_after_section(
     scenario: Scenario,
@@ -54,8 +46,12 @@ def test_generate_docs_preserves_handwritten_content_before_and_after_section(
         scenario.root / "expected" / "docs" / "api" / "error-contract.md"
     ).read_text(encoding="utf-8")
 
-    actual_prefix, actual_section, actual_suffix = _split_document(rendered)
-    expected_prefix, _, expected_suffix = _split_document(expected_document)
+    actual_prefix, actual_section, actual_suffix = split_markdown_sections(
+        rendered, ERROR_CATALOG_HEADING
+    )
+    expected_prefix, _, expected_suffix = split_markdown_sections(
+        expected_document, ERROR_CATALOG_HEADING
+    )
 
     assert actual_prefix == expected_prefix
     assert actual_suffix == expected_suffix
@@ -96,20 +92,22 @@ def test_generate_docs_keeps_section_ownership_local_to_the_catalog(
     catalog = load_catalog(scenario.index_path)
     rendered = render_error_contract(catalog)
 
-    prefix, section, suffix = _split_document(rendered)
+    prefix, section, suffix = split_markdown_sections(rendered, ERROR_CATALOG_HEADING)
 
     assert "# Error Catalog" not in prefix
     assert "# Error Catalog" in section
     expected_document = (
         scenario.root / "expected" / "docs" / "api" / "error-contract.md"
     ).read_text(encoding="utf-8")
-    _, _, expected_suffix = _split_document(expected_document)
+    _, _, expected_suffix = split_markdown_sections(
+        expected_document, ERROR_CATALOG_HEADING
+    )
     assert suffix == expected_suffix
 
 
 @pytest.mark.parametrize("scenario", MISSING_HEADING_SCENARIOS)
 def test_generate_docs_fails_when_heading_is_missing(scenario: Scenario) -> None:
-    """Generation should fail clearly when the target document lacks `# Error Catalog`."""
+    """Generation should fail clearly when the target document lacks the heading."""
     catalog = load_catalog(BASE_CATALOG_SCENARIO.index_path)
     target_document = (
         scenario.root / "inputs" / "docs" / "api" / "error-contract.md"
