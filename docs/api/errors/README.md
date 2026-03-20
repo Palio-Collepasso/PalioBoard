@@ -1,7 +1,7 @@
 # Error Catalog Guide
 
 ## Purpose
-This directory is the authoritative source of truth for API problem types.
+This directory is the authoritative source of truth for endpoint-independent API problem types.
 
 The catalog is endpoint-independent:
 - it defines what an error is
@@ -44,13 +44,33 @@ The toolchain derives:
 - `code` from the `errors` map key
 - `type` from `base_type_uri + type_slug`, unless overridden
 - the default `translation_key`, unless overridden
-- local per-module backend artifacts at `apps/api/src/palio/modules/<module>/error_defs_gen.py`
-  consumed by handwritten module `errors.py` classes
+- generated backend domain errors and API transport artifacts from the catalog
 - local merged frontend artifacts under `apps/web/src/app/shared/api/generated/`
 - generated human-readable docs such as `docs/api/error-contract.md`
 
 Frontend message templates remain handwritten and frontend-owned.
 They consume stable `code + context` from API problem responses.
+
+## Target generated and handwritten split
+The intended architecture is:
+
+- generated domain errors under `apps/api/src/palio/modules/<module>/errors_gen.py`
+- handwritten module-owned error wrappers or overrides under `apps/api/src/palio/modules/<module>/errors.py`
+- generated API problem specs under `apps/api/src/palio/api/modules/<module>/errors/specs_gen.py`
+- generated domain-error-to-problem mappings under `apps/api/src/palio/api/modules/<module>/errors/mapping_gen.py`
+- handwritten shared API helpers under `apps/api/src/palio/api/errors/`
+- generated `# Error Catalog` section content injected into `docs/api/error-contract.md`
+- frontend-owned templates rendering user-facing copy from stable `code + context`
+
+Generated domain errors must not know:
+- HTTP status
+- problem type URIs
+- FastAPI
+- response envelope structure
+
+Generated API problem specs and mappings must not own domain behavior.
+
+The docs generator must replace only the `# Error Catalog` section body and preserve the rest of `docs/api/error-contract.md`.
 
 ## Working rules
 - Keep the catalog endpoint-independent.
@@ -59,8 +79,12 @@ They consume stable `code + context` from API problem responses.
 - Keep one top-level fragment file per backend module under `apps/api/src/palio/modules/`.
 - Keep context schemas minimal and stable.
 - Keep handwritten runtime exception classes in the owning backend module.
+- Keep generated backend and API artifacts module-owned; do not centralize them in one registry file.
 - Keep frontend copy out of the catalog; frontend templates render from `code + context`.
 - Prefer shared context schemas in `index.yaml` when the same shape recurs.
+
+## Testing
+Test the catalog tool primarily under `tools/error_codegen/tests/`. Use broad scenario coverage there for validation, generation, docs injection, deterministic output, and CLI behavior. Keep API tests focused on runtime behavior under `apps/api/tests/`: handler behavior, real endpoint flows, and serialized `application/problem+json` responses. API tests may reuse a small curated subset of catalog-derived examples for consistency checks, but they should not iterate the full tool scenario tree by default.
 
 ## Adding or changing an error
 1. Pick the fragment file that matches the owning backend module.
@@ -98,8 +122,10 @@ The catalog validator must also enforce rules that JSON Schema alone does not ex
 - uniqueness of derived `type` URIs across imported files
 - uniqueness of `type_slug` across imported files
 - alignment between imported fragment files and backend module ownership
+- ownership coherence between fragment files and their module-scoped error entries
 - `example.context` conforms to `context_schema`
 - shared-context references resolve without leaving the catalog
+- public/exposure metadata stays coherent with frontend/runtime expectations
 
 ## Current status
 The catalog structure is committed here even if some fragment files are still intentionally small.

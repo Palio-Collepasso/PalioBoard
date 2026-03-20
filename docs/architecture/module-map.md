@@ -72,6 +72,24 @@ This is a target codemap. If the code has not reached this exact shape yet, keep
 | module `infrastructure/` | repositories, explicit SQL queries, adapters, external systems | cross-module business orchestration |
 | `shared/` | low-level technical helpers and cross-module transaction contracts such as `shared/db/transaction.py` | business rules disguised as utilities, SQLAlchemy-specific implementations |
 
+## Error handling
+
+| Path | Owns | Must not own |
+|---|---|---|
+| `palio/shared/errors` | shared base exception primitives and low-level context-validation helpers | FastAPI handlers, API problem DTOs, generated catalog transport mappings |
+| `palio/modules/<module>/errors_gen.py` | generated module-scoped domain errors | HTTP status, problem type URIs, FastAPI, response-envelope knowledge |
+| `palio/modules/<module>/errors.py` | handwritten module-scoped wrappers, aliases, or special-case exceptions | generated transport metadata or generic cross-module handler code |
+| `palio/api/errors/` | handwritten API transport helpers and FastAPI exception handlers | domain behavior or module-owned domain exceptions |
+| `palio/api/modules/<module>/errors/specs_gen.py` | generated API problem specs | domain behavior or runtime context-carrying exception classes |
+| `palio/api/modules/<module>/errors/mapping_gen.py` | generated mappings from generated domain error type to generated API problem spec | handwritten business logic or endpoint-specific routing |
+
+Keep the split strict:
+
+- domain errors carry runtime context values
+- generated API problem specs carry transport metadata
+- FastAPI handlers serialize `application/problem+json`
+- frontend rendering remains outside the backend and consumes stable `code + context`
+
 ## Transaction and session ownership
 
 - A multi-step business command is owned by an application/use-case orchestrator.

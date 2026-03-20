@@ -1,0 +1,16 @@
+module: teams
+errors:
+  TEAM_NOT_FOUND:
+    code: TEAM_NOT_FOUND
+    type_slug: TeamNotFound
+    http_status: 404
+    title: Team not found
+    translation_key: errors.teamNotFound
+    context_schema:
+      type: object
+      additionalProperties: false
+      properties:
+        team_id: { type: string, format: uuid }
+      required: [team_id]
+    example_context:
+      team_id: "01956c9f-6f7e-7b42-a4b0-2d21d920c001"

@@ -1,3 +1,8 @@
+"""Path helpers for error_codegen test fixtures and snapshots.
+
+Keep file-system plumbing here only for the tool suite.
+"""
+
 import shutil
 import sys
 from importlib import util

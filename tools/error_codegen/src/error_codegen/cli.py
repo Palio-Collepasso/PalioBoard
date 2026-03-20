@@ -20,23 +20,25 @@ from error_codegen import (
 app = typer.Typer(
     add_completion=False,
     no_args_is_help=True,
-    help="Validate and generate API error-catalog artifacts.",
+    help=(
+        "Validate the error catalog and generate shared error artifacts.\n\n"
+        "The catalog is the single source of truth for:\n"
+        "- error identifiers\n"
+        "- HTTP transport metadata\n"
+        "- safe-to-expose context schema\n\n"
+        "Generated artifacts include:\n"
+        "- Python module-local error definitions\n"
+        "- frontend TypeScript error metadata\n"
+        "- Markdown error contract documentation"
+    ),
 )
 
-CATALOG_ARGUMENT = typer.Argument(
-    help="Path to the root error catalog index.yaml file.",
-    dir_okay=False,
-    resolve_path=True,
+CATALOG_OPTION = typer.Option(
+    "--catalog-index",
+    metavar="PATH",
+    show_default="contracts/errors/index.yaml",
+    help="Path to the root catalog index.yaml.",
 )
-SCHEMA_OPTION = typer.Option(
-    "--schema",
-    dir_okay=False,
-    resolve_path=True,
-    help="Path to the JSON Schema that validates the catalog format.",
-)
-
-CatalogArgumentPath = Annotated[Path, CATALOG_ARGUMENT]
-SchemaOptionPath = Annotated[Path, SCHEMA_OPTION]
 
 
 def run_cli[T](
@@ -52,72 +54,116 @@ def run_cli[T](
         raise typer.Exit(code=1) from error
 
 
-@app.command("validate")
+@app.command(
+    "validate",
+    help=(
+        "Validate the error catalog.\n\n"
+        "This command checks:\n"
+        "- YAML/schema structure\n"
+        "- per-entry semantic rules\n"
+        "- cross-catalog invariants\n"
+        "- context schema consistency"
+    ),
+    short_help="Validate the error catalog.",
+)
 def validate_command(
-    catalog: CatalogArgumentPath = DEFAULT_CATALOG_INDEX_PATH,
-    schema: SchemaOptionPath = DEFAULT_SCHEMA_PATH,
+    catalog_index: Annotated[str, CATALOG_OPTION] = str(DEFAULT_CATALOG_INDEX_PATH),
+    _json: Annotated[
+        bool,
+        typer.Option(
+            "--json",
+            help="Output validation results as JSON.",
+        ),
+    ] = False,
+    _fail_fast: Annotated[
+        bool,
+        typer.Option(
+            "--fail-fast/--no-fail-fast",
+            help="Stop at the first validation error.",
+        ),
+    ] = False,
 ) -> None:
-    """Validate the catalog and print a concise summary.
+    """Validate the error catalog.
 
-    It performs:
-    - catalog schema validation
-    - semantic validation
-    - duplicate checks
-    - example/context validation
+    This command checks:
+    - YAML/schema structure
+    - per-entry semantic rules
+    - cross-catalog invariants
+    - context schema consistency
     """
     typer.echo(
         run_cli(
-            lambda: validate_error_catalog(catalog_path=catalog, schema_path=schema),
+            lambda: validate_error_catalog(
+                catalog_path=Path(catalog_index),
+                schema_path=DEFAULT_SCHEMA_PATH,
+            ),
             handled_errors=(CatalogValidationError,),
         )
     )
 
 
-@app.command("generate")
+@app.command(
+    "generate",
+    help=(
+        "Generate all shared error artifacts from the catalog.\n\n"
+        "Generated outputs:\n"
+        "- Python module-local error definitions\n"
+        "- TypeScript frontend error metadata\n"
+        "- Markdown error contract documentation"
+    ),
+    short_help="Generate Python, TypeScript, and Markdown artifacts.",
+)
 def generate_command(
-    catalog: CatalogArgumentPath = DEFAULT_CATALOG_INDEX_PATH,
-    schema: SchemaOptionPath = DEFAULT_SCHEMA_PATH,
+    catalog_index: Annotated[str, CATALOG_OPTION] = str(DEFAULT_CATALOG_INDEX_PATH),
     output_root: Annotated[
-        Path,
+        str,
         typer.Option(
-            "--output-root",
-            file_okay=False,
-            resolve_path=True,
-            help="Directory that receives generated backend module files.",
+            "--python-out",
+            metavar="PATH",
+            show_default="apps/api/app/modules",
+            help="Output directory for generated Python module files.",
         ),
-    ] = DEFAULT_OUTPUT_ROOT,
+    ] = str(DEFAULT_OUTPUT_ROOT),
     ts_output: Annotated[
-        Path,
+        str,
         typer.Option(
-            "--ts-output",
-            dir_okay=False,
-            resolve_path=True,
-            help="Output path for the generated TypeScript file.",
+            "--typescript-out",
+            metavar="PATH",
+            show_default="apps/web/src/shared/api/error-codes.gen.ts",
+            help="Output file for generated TypeScript artifact.",
         ),
-    ] = DEFAULT_TS_OUTPUT_PATH,
+    ] = str(DEFAULT_TS_OUTPUT_PATH),
     docs_output: Annotated[
-        Path,
+        str,
         typer.Option(
-            "--docs-output",
-            dir_okay=False,
-            resolve_path=True,
-            help="Output path for the generated error-contract markdown file.",
+            "--docs-out",
+            metavar="PATH",
+            show_default="docs/api/error-contract.md",
+            help="Output file for generated Markdown documentation.",
         ),
-    ] = DEFAULT_DOCS_OUTPUT_PATH,
+    ] = str(DEFAULT_DOCS_OUTPUT_PATH),
+    _check: Annotated[
+        bool,
+        typer.Option(
+            "--check/--no-check",
+            help="Validate the catalog before generating artifacts.",
+        ),
+    ] = True,
 ) -> None:
-    """Generate artifacts.
+    """Generate all shared error artifacts from the catalog.
 
-    - Python per-module files
-    - TypeScript artifact
-    - docs
+    Generated outputs:
+    - Python module-local error definitions
+    - TypeScript frontend error metadata
+    - Markdown error contract documentation
     """
     written_paths = run_cli(
         lambda: generate_error_artifacts(
-            catalog_path=catalog,
-            schema_path=schema,
-            python_output_root=output_root,
-            typescript_output_path=ts_output,
-            docs_output_path=docs_output,
+            catalog_path=Path(catalog_index),
+            schema_path=DEFAULT_SCHEMA_PATH,
+            python_output_root=Path(output_root),
+            typescript_output_path=Path(ts_output),
+            docs_output_path=Path(docs_output),
         ),
         handled_errors=(CatalogValidationError,),
     )

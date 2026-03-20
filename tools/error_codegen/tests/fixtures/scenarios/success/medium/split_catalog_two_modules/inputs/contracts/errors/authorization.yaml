@@ -1,0 +1,16 @@
+module: authorization
+errors:
+  MISSING_CAPABILITY:
+    code: MISSING_CAPABILITY
+    type_slug: missing-capability
+    http_status: 403
+    title: Missing capability
+    translation_key: errors.missingCapability
+    context_schema:
+      type: object
+      additionalProperties: false
+      properties:
+        capability: { type: string }
+      required: [capability]
+    example_context:
+      capability: "games.complete"

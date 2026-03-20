@@ -1,0 +1,3 @@
+ERROR contracts/errors/event_operations.yaml :: errors.JOLLY_ALREADY_USED.example_context
+  example_context is invalid against context_schema
+  missing required property: previous_game_id

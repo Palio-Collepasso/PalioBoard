@@ -1,0 +1,14 @@
+module: event_operations
+errors:
+  GAME_NOT_IN_PROGRESS:
+    code: GAME_NOT_IN_PROGRESS
+    type_slug: state-conflict
+    http_status: 409
+    title: Game not in progress
+    translation_key: errors.gameNotInProgress
+    context_schema:
+      type: object
+      additionalProperties: false
+      properties: {}
+      required: []
+    example_context: {}

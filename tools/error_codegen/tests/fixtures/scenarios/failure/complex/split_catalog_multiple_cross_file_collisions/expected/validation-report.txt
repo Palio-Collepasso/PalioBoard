@@ -1,0 +1,9 @@
+ERROR merged catalog :: code
+  duplicate code detected: STATE_CONFLICT
+  first seen in module event_operations, duplicated in module teams
+ERROR merged catalog :: type_slug
+  duplicate type_slug detected: state-conflict
+  first seen in module event_operations, duplicated in module results
+ERROR contracts/errors/teams.yaml :: errors.STATE_CONFLICT.example_context
+  example_context is invalid against context_schema
+  team_id must match format uuid

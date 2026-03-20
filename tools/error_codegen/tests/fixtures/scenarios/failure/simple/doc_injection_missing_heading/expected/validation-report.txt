@@ -1,0 +1,3 @@
+ERROR docs/api/error-contract.md
+  missing required heading: # Error Catalog
+  cannot inject generated catalog section

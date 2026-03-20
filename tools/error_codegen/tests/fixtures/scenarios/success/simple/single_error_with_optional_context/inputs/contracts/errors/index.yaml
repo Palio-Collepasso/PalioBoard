@@ -1,0 +1,5 @@
+catalog_version: 1
+namespace: palioboard
+base_type_uri: https://api.palioboard.local/problems/
+includes:
+- teams.yaml

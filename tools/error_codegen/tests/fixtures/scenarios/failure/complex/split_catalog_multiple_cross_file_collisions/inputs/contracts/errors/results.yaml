@@ -1,0 +1,14 @@
+module: results
+errors:
+  RESULT_CONFLICT:
+    code: RESULT_CONFLICT
+    type_slug: state-conflict
+    http_status: 409
+    title: Result conflict
+    translation_key: errors.resultConflict
+    context_schema:
+      type: object
+      additionalProperties: false
+      properties: {}
+      required: []
+    example_context: {}

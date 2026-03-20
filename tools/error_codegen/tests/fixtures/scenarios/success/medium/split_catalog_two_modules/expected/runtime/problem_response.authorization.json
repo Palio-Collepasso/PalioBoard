@@ -1,0 +1,9 @@
+{
+  "type": "https://api.palioboard.local/problems/missing-capability",
+  "code": "MISSING_CAPABILITY",
+  "title": "Missing capability",
+  "status": 403,
+  "context": {
+    "capability": "games.complete"
+  }
+}

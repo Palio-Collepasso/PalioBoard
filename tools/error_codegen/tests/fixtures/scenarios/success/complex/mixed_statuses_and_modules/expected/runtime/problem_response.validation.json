@@ -1,0 +1,10 @@
+{
+  "type": "https://api.palioboard.local/problems/invalid-entry-payload",
+  "code": "INVALID_ENTRY_PAYLOAD",
+  "title": "Invalid entry payload",
+  "status": 400,
+  "context": {
+    "field": "placement",
+    "reason": "must be between 1 and 12"
+  }
+}

@@ -1,0 +1,14 @@
+module: event_operations
+errors:
+  JOLLY_ALREADY_USED:
+    code: JOLLY_ALREADY_USED
+    type_slug: jolly-already-used
+    http_status: 409
+    title: Jolly already used
+    translation_key: errors.jollyAlreadyUsed
+    context_schema:
+      type: object
+      additionalProperties: false
+      properties: {}
+      required: []
+    example_context: {}

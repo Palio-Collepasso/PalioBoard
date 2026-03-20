@@ -1,0 +1,36 @@
+module: results
+errors:
+  PLACEMENT_CONFLICT:
+    code: PLACEMENT_CONFLICT
+    type_slug: placement-conflict
+    http_status: 409
+    title: Placement conflict
+    translation_key: errors.placementConflict
+    context_schema:
+      type: object
+      additionalProperties: false
+      properties:
+        game_id: { type: string, format: uuid }
+        existing_result:
+          type: object
+          additionalProperties: false
+          properties:
+            team_id: { type: string, format: uuid }
+            placement: { type: integer }
+          required: [team_id, placement]
+        incoming_result:
+          type: object
+          additionalProperties: false
+          properties:
+            team_id: { type: string, format: uuid }
+            placement: { type: integer }
+          required: [team_id, placement]
+      required: [game_id, existing_result, incoming_result]
+    example_context:
+      game_id: "01956ca0-0c77-7b98-a328-39c9f8a31002"
+      existing_result:
+        team_id: "01956c9f-6f7e-7b42-a4b0-2d21d920c001"
+        placement: 1
+      incoming_result:
+        team_id: "01956c9f-6f7e-7b42-a4b0-2d21d920c002"
+        placement: 1

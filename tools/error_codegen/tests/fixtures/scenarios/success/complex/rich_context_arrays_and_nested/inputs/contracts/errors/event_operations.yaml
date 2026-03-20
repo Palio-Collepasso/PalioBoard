@@ -1,0 +1,36 @@
+module: event_operations
+errors:
+  LIVE_CYCLE_MISMATCH:
+    code: LIVE_CYCLE_MISMATCH
+    type_slug: live-cycle-mismatch
+    http_status: 409
+    title: Live cycle mismatch
+    translation_key: errors.liveCycleMismatch
+    context_schema:
+      type: object
+      additionalProperties: false
+      properties:
+        game_id: { type: string, format: uuid }
+        expected:
+          type: object
+          additionalProperties: false
+          properties:
+            state: { type: string }
+            live_cycle: { type: integer, minimum: 1 }
+          required: [state, live_cycle]
+        actual:
+          type: object
+          additionalProperties: false
+          properties:
+            state: { type: string }
+            live_cycle: { type: integer, minimum: 1 }
+          required: [state, live_cycle]
+      required: [game_id, expected, actual]
+    example_context:
+      game_id: "01956ca0-0c77-7b98-a328-39c9f8a31002"
+      expected:
+        state: "in_progress"
+        live_cycle: 3
+      actual:
+        state: "draft"
+        live_cycle: 2

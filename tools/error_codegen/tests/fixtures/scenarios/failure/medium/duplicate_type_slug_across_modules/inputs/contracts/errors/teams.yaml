@@ -1,0 +1,14 @@
+module: teams
+errors:
+  TEAM_STATE_CONFLICT:
+    code: TEAM_STATE_CONFLICT
+    type_slug: state-conflict
+    http_status: 409
+    title: Team state conflict
+    translation_key: errors.teamStateConflict
+    context_schema:
+      type: object
+      additionalProperties: false
+      properties: {}
+      required: []
+    example_context: {}

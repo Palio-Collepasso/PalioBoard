@@ -1,0 +1,3 @@
+ERROR contracts/errors/results.yaml :: errors.PLACEMENT_CONFLICT.example_context
+  example_context is invalid against context_schema
+  missing required property: existing_result.placement

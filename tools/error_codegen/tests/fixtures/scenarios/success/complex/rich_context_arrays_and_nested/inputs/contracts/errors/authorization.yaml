@@ -1,0 +1,23 @@
+module: authorization
+errors:
+  MISSING_ANY_CAPABILITY:
+    code: MISSING_ANY_CAPABILITY
+    type_slug: missing-any-capability
+    http_status: 403
+    title: Missing any capability
+    translation_key: errors.missingAnyCapability
+    context_schema:
+      type: object
+      additionalProperties: false
+      properties:
+        required_any:
+          type: array
+          items: { type: string }
+          minItems: 1
+        granted:
+          type: array
+          items: { type: string }
+      required: [required_any, granted]
+    example_context:
+      required_any: ["games.complete", "games.reopen"]
+      granted: ["games.read"]

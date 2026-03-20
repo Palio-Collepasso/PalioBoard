@@ -1,0 +1,2 @@
+ERROR contracts/errors/validation.yaml :: errors.INVALID_ENTRY_PAYLOAD.http_status
+  http_status must be between 400 and 599

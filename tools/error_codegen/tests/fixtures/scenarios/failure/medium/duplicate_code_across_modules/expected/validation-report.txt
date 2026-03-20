@@ -1,0 +1,3 @@
+ERROR merged catalog :: code
+  duplicate code detected: JOLLY_ALREADY_USED
+  first seen in module event_operations, duplicated in module results

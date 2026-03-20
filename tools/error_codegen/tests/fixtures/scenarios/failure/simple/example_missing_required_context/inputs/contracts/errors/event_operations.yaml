@@ -1,0 +1,17 @@
+module: event_operations
+errors:
+  JOLLY_ALREADY_USED:
+    code: JOLLY_ALREADY_USED
+    type_slug: jolly-already-used
+    http_status: 409
+    title: Jolly already used
+    translation_key: errors.jollyAlreadyUsed
+    context_schema:
+      type: object
+      additionalProperties: false
+      properties:
+        team_id: { type: string, format: uuid }
+        previous_game_id: { type: string, format: uuid }
+      required: [team_id, previous_game_id]
+    example_context:
+      team_id: "01956c9f-6f7e-7b42-a4b0-2d21d920c001"

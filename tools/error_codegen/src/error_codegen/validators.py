@@ -31,17 +31,9 @@ def validate_import_alignment(
     imports: list[str],
     *,
     catalog_path: Path = DEFAULT_CATALOG_INDEX_PATH,
-    modules_root: Path = DEFAULT_MODULES_ROOT,
     issues: list[CatalogValidationIssue],
 ) -> None:
-    """Validate that imported fragment files match backend module ownership."""
-    backend_modules = {
-        module_dir.name
-        for module_dir in modules_root.iterdir()
-        if module_dir.is_dir() and not module_dir.name.startswith("__")
-    }
-    imported_modules = {Path(import_name).stem for import_name in imports}
-
+    """Validate that imported fragment files use the supported flat layout."""
     for import_name in imports:
         import_path = Path(import_name)
         if import_path.parent != Path("."):
@@ -54,26 +46,6 @@ def validate_import_alignment(
                     ),
                 )
             )
-
-    for missing_module in sorted(backend_modules - imported_modules):
-        issues.append(
-            CatalogValidationIssue(
-                location=display_path(catalog_path),
-                message=(
-                    "Missing catalog fragment import for backend module "
-                    f"`{missing_module}`."
-                ),
-            )
-        )
-    for extra_module in sorted(imported_modules - backend_modules):
-        issues.append(
-            CatalogValidationIssue(
-                location=display_path(catalog_path),
-                message=(
-                    f"Catalog import `{extra_module}` does not match a backend module."
-                ),
-            )
-        )
 
 
 def normalize_context_schema(schema: object) -> object:

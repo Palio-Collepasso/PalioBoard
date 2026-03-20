@@ -1,0 +1,4 @@
+ERROR contracts/errors/authorization.yaml :: errors.MISSING_CAPABILITY
+  catalog key must match entry code exactly
+ERROR contracts/errors/authorization.yaml :: errors.MISSING_CAPABILITY.translation_key
+  translation_key is required

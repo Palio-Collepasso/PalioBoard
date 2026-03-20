@@ -1,0 +1,18 @@
+module: validation
+errors:
+  INVALID_ENTRY_PAYLOAD:
+    code: INVALID_ENTRY_PAYLOAD
+    type_slug: invalid-entry-payload
+    http_status: 200
+    title: Invalid entry payload
+    translation_key: errors.invalidEntryPayload
+    context_schema:
+      type: object
+      additionalProperties: false
+      properties:
+        field: { type: string }
+        reason: { type: string }
+      required: [field, reason]
+    example_context:
+      field: "placement"
+      reason: "must be between 1 and 12"

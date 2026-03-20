@@ -1,0 +1,14 @@
+module: results
+errors:
+  JOLLY_ALREADY_USED:
+    code: JOLLY_ALREADY_USED
+    type_slug: jolly-already-used-in-results
+    http_status: 409
+    title: Jolly already used in results
+    translation_key: errors.jollyAlreadyUsedResults
+    context_schema:
+      type: object
+      additionalProperties: false
+      properties: {}
+      required: []
+    example_context: {}

@@ -1,0 +1,14 @@
+module: live_games
+errors:
+  GAME_ALREADY_CLOSED:
+    code: GAME_ALREADY_CLOSED
+    type_slug: game-already-closed
+    http_status: 409
+    title: Game already closed
+    translation_key: errors.gameAlreadyClosed
+    context_schema:
+      type: object
+      additionalProperties: false
+      properties: {}
+      required: []
+    example_context: {}

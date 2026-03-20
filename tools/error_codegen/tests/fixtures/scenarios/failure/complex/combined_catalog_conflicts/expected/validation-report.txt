@@ -1,0 +1,13 @@
+ERROR contracts/errors/event_operations.yaml :: errors.JollyAlreadyUsed.code
+  code must be UPPER_SNAKE_CASE
+ERROR contracts/errors/event_operations.yaml :: errors.JollyAlreadyUsed
+  catalog key must match entry code exactly
+ERROR contracts/errors/event_operations.yaml :: errors.JollyAlreadyUsed.http_status
+  http_status must be between 400 and 599
+ERROR contracts/errors/event_operations.yaml :: errors.JollyAlreadyUsed.example_context
+  example_context is invalid against context_schema
+  missing required property: previous_game_id
+ERROR merged catalog :: type_slug
+  duplicate type_slug detected: shared-conflict
+ERROR contracts/errors/authorization.yaml :: errors.MISSING_CAPABILITY.translation_key
+  translation_key is required

@@ -1,3 +1,9 @@
+"""Synthetic catalog builders used by tool-side generator tests.
+
+These fixtures are model-only and should not pull in FastAPI or API runtime
+helpers.
+"""
+
 from pathlib import Path
 from typing import Any
 

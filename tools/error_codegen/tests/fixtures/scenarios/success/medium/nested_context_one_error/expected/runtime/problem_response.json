@@ -1,0 +1,17 @@
+{
+  "type": "https://api.palioboard.local/problems/placement-conflict",
+  "code": "PLACEMENT_CONFLICT",
+  "title": "Placement conflict",
+  "status": 409,
+  "context": {
+    "game_id": "01956ca0-0c77-7b98-a328-39c9f8a31002",
+    "existing_result": {
+      "team_id": "01956c9f-6f7e-7b42-a4b0-2d21d920c001",
+      "placement": 1
+    },
+    "incoming_result": {
+      "team_id": "01956c9f-6f7e-7b42-a4b0-2d21d920c002",
+      "placement": 1
+    }
+  }
+}

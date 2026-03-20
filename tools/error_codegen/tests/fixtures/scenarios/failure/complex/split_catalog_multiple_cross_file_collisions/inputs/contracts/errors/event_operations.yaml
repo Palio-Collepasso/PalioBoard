@@ -1,0 +1,14 @@
+module: event_operations
+errors:
+  STATE_CONFLICT:
+    code: STATE_CONFLICT
+    type_slug: state-conflict
+    http_status: 409
+    title: State conflict
+    translation_key: errors.stateConflict
+    context_schema:
+      type: object
+      additionalProperties: false
+      properties: {}
+      required: []
+    example_context: {}

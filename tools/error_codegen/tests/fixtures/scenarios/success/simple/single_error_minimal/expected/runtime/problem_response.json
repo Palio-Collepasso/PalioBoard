@@ -1,0 +1,6 @@
+{
+  "type": "https://api.palioboard.local/problems/game-already-closed",
+  "code": "GAME_ALREADY_CLOSED",
+  "title": "Game already closed",
+  "status": 409
+}

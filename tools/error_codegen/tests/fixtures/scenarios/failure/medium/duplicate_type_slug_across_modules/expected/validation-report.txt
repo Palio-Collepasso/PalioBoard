@@ -1,0 +1,3 @@
+ERROR merged catalog :: type_slug
+  duplicate type_slug detected: state-conflict
+  first seen in module event_operations, duplicated in module teams

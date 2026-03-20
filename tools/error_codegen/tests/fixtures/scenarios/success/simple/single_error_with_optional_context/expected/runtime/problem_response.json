@@ -1,0 +1,10 @@
+{
+  "type": "https://api.palioboard.local/problems/team-not-found",
+  "code": "TEAM_NOT_FOUND",
+  "title": "Team not found",
+  "status": 404,
+  "context": {
+    "team_id": "01956c9f-6f7e-7b42-a4b0-2d21d920c001",
+    "source": "route"
+  }
+}

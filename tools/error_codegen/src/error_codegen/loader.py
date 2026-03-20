@@ -49,6 +49,7 @@ def load_error_catalog(
     raw_catalog_document = _load_yaml_document(catalog_path, issues)
     if raw_catalog_document is None:
         raise CatalogValidationError(sort_issues(issues))
+    raw_catalog_document = _normalize_root_catalog_document(raw_catalog_document)
 
     _schema_errors(raw_catalog_document, catalog_path, index_validator, issues)
     if issues:
@@ -92,10 +93,13 @@ def load_error_catalog(
         raw_fragment_document = _load_yaml_document(fragment_path, issues)
         if raw_fragment_document is None:
             continue
+        normalized_fragment_document = _normalize_fragment_catalog_document(
+            raw_fragment_document
+        )
 
         schema_issue_count = len(issues)
         _schema_errors(
-            raw_fragment_document,
+            normalized_fragment_document,
             fragment_path,
             fragment_validator,
             issues,
@@ -105,14 +109,17 @@ def load_error_catalog(
 
         fragment_document = _parse_document(
             FragmentCatalogDocument,
-            raw_fragment_document,
+            normalized_fragment_document,
             source_path=fragment_path,
             issues=issues,
         )
         if fragment_document is None:
             continue
 
-        module_name = Path(relative_import_path).stem
+        module_name = _module_name_for_fragment(
+            raw_fragment_document,
+            relative_import_path=relative_import_path,
+        )
         entries: list[ErrorCatalogEntry] = []
         for code, parsed_entry in fragment_document.errors.items():
             if code in merged_errors:
@@ -252,6 +259,78 @@ def load_error_catalog(
 
 def _load_schema(schema_path: Path) -> dict[str, Any]:
     return json.loads(schema_path.read_text(encoding="utf-8"))
+
+
+def _normalize_root_catalog_document(document: object) -> object:
+    """Normalize compatible root-catalog aliases before schema validation."""
+    if not isinstance(document, dict):
+        return document
+
+    normalized = dict(document)
+    if "includes" in normalized and "imports" not in normalized:
+        normalized["imports"] = normalized.pop("includes")
+    normalized.setdefault(
+        "schema_dialect",
+        "https://json-schema.org/draft/2020-12/schema",
+    )
+    normalized.setdefault("default_media_type", "application/problem+json")
+    return normalized
+
+
+def _normalize_fragment_catalog_document(document: object) -> object:
+    """Normalize compatible fragment aliases before schema validation."""
+    if not isinstance(document, dict):
+        return document
+
+    normalized = dict(document)
+    normalized.pop("module", None)
+
+    raw_errors = normalized.get("errors")
+    if not isinstance(raw_errors, dict):
+        return normalized
+
+    normalized_errors: dict[str, object] = {}
+    for code, payload in raw_errors.items():
+        if not isinstance(payload, dict):
+            normalized_errors[code] = payload
+            continue
+
+        normalized_payload = dict(payload)
+        normalized_payload.pop("code", None)
+        if (
+            "translation_key" in normalized_payload
+            and "translation_key_override" not in normalized_payload
+        ):
+            normalized_payload["translation_key_override"] = normalized_payload.pop(
+                "translation_key"
+            )
+        if (
+            "example_context" in normalized_payload
+            and "example" not in normalized_payload
+        ):
+            normalized_payload["example"] = {
+                "context": normalized_payload.pop("example_context")
+            }
+        normalized_payload.setdefault("category", "domain")
+        normalized_payload.setdefault("retry_policy", "never")
+        normalized_payload.setdefault("safe_to_expose", True)
+        normalized_errors[code] = normalized_payload
+
+    normalized["errors"] = normalized_errors
+    return normalized
+
+
+def _module_name_for_fragment(
+    document: object,
+    *,
+    relative_import_path: str,
+) -> str:
+    """Return the owning module name for one fragment."""
+    if isinstance(document, dict):
+        module_name = document.get("module")
+        if isinstance(module_name, str) and module_name:
+            return module_name
+    return Path(relative_import_path).stem
 
 
 def _build_fragment_schema(schema: dict[str, Any]) -> dict[str, Any]:

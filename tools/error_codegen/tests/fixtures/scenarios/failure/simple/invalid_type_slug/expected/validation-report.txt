@@ -1,0 +1,2 @@
+ERROR contracts/errors/teams.yaml :: errors.TEAM_NOT_FOUND.type_slug
+  type_slug must be kebab-case

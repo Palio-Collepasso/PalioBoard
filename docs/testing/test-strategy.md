@@ -36,6 +36,10 @@ The highest-risk failures are:
 | E2E | release-critical browser-visible flows only | web/app owner or full-stack owner | flows listed in `docs/testing/critical-e2e-flows.md` |
 | Manual verification | deploy/rollback or operator checks not yet worth permanent automation | change owner | release smoke, rollback confirmation |
 
+## Error catalog note
+
+Error-catalog-specific test layout and ownership rules live in `docs/api/errors/README.md`. Repo-wide requirement: catalog validation rules need unit coverage, and API error tests should focus on runtime behavior instead of broad catalog-scenario traversal.
+
 ## Change-type matrix
 | Change type | Unit | Integration | API contract | E2E | Manual |
 |---|---|---|---|---|---|
@@ -58,6 +62,8 @@ The highest-risk failures are:
 - Official state, audit writes, and projection side effects should be tested together when they share one transaction.
 - Browser E2E must stay small and only cover release-critical flows.
 - Static checks complement behavioral tests; they do not replace them.
+- Error-catalog validation rules must have unit coverage in addition to scenario-driven integration coverage.
+- Error-catalog API runtime tests should focus on runtime exception handling and endpoint behavior, not full catalog-scenario traversal.
 
 ## Review checklist
 - [ ] The chosen test depth matches the change-type matrix.

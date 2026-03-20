@@ -1,0 +1,5 @@
+from .event_operations_mapping_gen import ERROR_TO_PROBLEM as EVENT_OPERATIONS_ERROR_TO_PROBLEM
+
+ERROR_TO_PROBLEM = {
+    **EVENT_OPERATIONS_ERROR_TO_PROBLEM,
+}

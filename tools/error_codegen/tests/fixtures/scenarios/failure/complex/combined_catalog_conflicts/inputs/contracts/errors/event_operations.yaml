@@ -1,0 +1,30 @@
+module: event_operations
+errors:
+  JollyAlreadyUsed:
+    code: JollyAlreadyUsed
+    type_slug: jolly-already-used
+    http_status: 200
+    title: Jolly already used
+    translation_key: errors.jollyAlreadyUsed
+    context_schema:
+      type: object
+      additionalProperties: false
+      properties:
+        team_id: { type: string, format: uuid }
+        previous_game_id: { type: string, format: uuid }
+      required: [team_id, previous_game_id]
+    example_context:
+      team_id: "01956c9f-6f7e-7b42-a4b0-2d21d920c001"
+
+  GAME_NOT_IN_PROGRESS:
+    code: GAME_NOT_IN_PROGRESS
+    type_slug: shared-conflict
+    http_status: 409
+    title: Game not in progress
+    translation_key: errors.sharedConflict
+    context_schema:
+      type: object
+      additionalProperties: false
+      properties: {}
+      required: []
+    example_context: {}

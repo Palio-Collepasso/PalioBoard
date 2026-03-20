@@ -1,0 +1,18 @@
+module: event_operations
+errors:
+  GAME_NOT_IN_PROGRESS:
+    code: GAME_NOT_IN_PROGRESS
+    type_slug: game-not-in-progress
+    http_status: 409
+    title: Game not in progress
+    translation_key: errors.gameNotInProgress
+    context_schema:
+      type: object
+      additionalProperties: false
+      properties:
+        game_id: { type: string, format: uuid }
+        current_state: { type: string }
+      required: [game_id, current_state]
+    example_context:
+      game_id: "01956ca0-0c77-7b98-a328-39c9f8a31002"
+      current_state: "draft"

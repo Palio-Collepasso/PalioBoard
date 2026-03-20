@@ -1,0 +1,17 @@
+{
+  "type": "https://api.palioboard.local/problems/live-cycle-mismatch",
+  "code": "LIVE_CYCLE_MISMATCH",
+  "title": "Live cycle mismatch",
+  "status": 409,
+  "context": {
+    "game_id": "01956ca0-0c77-7b98-a328-39c9f8a31002",
+    "expected": {
+      "state": "in_progress",
+      "live_cycle": 3
+    },
+    "actual": {
+      "state": "draft",
+      "live_cycle": 2
+    }
+  }
+}
