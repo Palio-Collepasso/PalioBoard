@@ -1,10 +1,8 @@
-
 """Enforce that failure scenarios fail for the expected reason family.
 
 This file should cover broad scenario-driven validation failures only. It should
 not replace precise unit coverage for individual validator rules.
 """
-
 
 from pathlib import Path
 
@@ -17,11 +15,13 @@ from support.scenarios import Scenario, failure_scenarios
 
 FAILURE_SCENARIOS = [
     pytest.param(scenario, id=scenario.id)
-    for scenario in failure_scenarios(Path(__file__).resolve().parents[1] / 'fixtures' / 'scenarios')
+    for scenario in failure_scenarios(
+        Path(__file__).resolve().parents[1] / "fixtures" / "scenarios"
+    )
 ]
 
 
-@pytest.mark.parametrize('scenario', FAILURE_SCENARIOS)
+@pytest.mark.parametrize("scenario", FAILURE_SCENARIOS)
 def test_failure_catalogs_raise_validation_errors_with_expected_markers(
     scenario: Scenario,
 ) -> None:

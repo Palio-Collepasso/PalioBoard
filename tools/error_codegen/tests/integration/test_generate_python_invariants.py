@@ -54,8 +54,8 @@ def test_python_generation_writes_one_domain_file_per_module(
 
     for path in generated:
         module_name = _module_name_from_generated_path(path)
-        assert Path(path).as_posix().endswith(
-            f"palio/modules/{module_name}/errors_gen.py"
+        assert (
+            Path(path).as_posix().endswith(f"palio/modules/{module_name}/errors_gen.py")
         )
 
 

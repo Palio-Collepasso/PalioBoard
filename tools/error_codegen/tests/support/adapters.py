@@ -79,9 +79,7 @@ def call_with_known_params(
     """
     signature = inspect.signature(function)
     accepted_kwargs = {
-        name: value
-        for name, value in kwargs.items()
-        if name in signature.parameters
+        name: value for name, value in kwargs.items() if name in signature.parameters
     }
     return function(*args, **accepted_kwargs)
 
@@ -168,9 +166,9 @@ def build_python_artifacts(catalog: object) -> dict[str, str]:
             normalized[str(artifact.output_path)] = str(artifact.source)
             continue
         if hasattr(artifact, "module_name") and hasattr(artifact, "source"):
-            normalized[
-                f"{artifact.module_name}/error_defs_gen.py"
-            ] = str(artifact.source)
+            normalized[f"{artifact.module_name}/error_defs_gen.py"] = str(
+                artifact.source
+            )
             continue
         raise AssertionError(
             "Unrecognized Python artifact shape. Update the tool-side test adapters to "

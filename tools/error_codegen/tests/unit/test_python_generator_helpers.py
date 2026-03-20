@@ -175,8 +175,9 @@ def test_render_module_source_emits_one_dataclass_domain_error_per_entry() -> No
         } == set(optional_names)
 
 
-def test_render_module_source_keeps_http_and_runtime_metadata_out_of_domain_classes(
-) -> None:
+def test_render_module_source_keeps_http_and_runtime_metadata_out_of_domain_classes() -> (
+    None
+):
     """Rendered Python should not leak transport or runtime concerns."""
     module = _import_python_generator_module()
     render_module_source = _resolve_attr(module, ["_render_module_source"])

@@ -128,7 +128,9 @@ team_id: team-001
     assert tuple(catalog.errors) == ("JOLLY_ALREADY_USED",)
 
 
-def test_validate_import_alignment_rejects_nested_fragment_paths(tmp_path: Path) -> None:
+def test_validate_import_alignment_rejects_nested_fragment_paths(
+    tmp_path: Path,
+) -> None:
     """Imported fragments should stay on the supported flat path layout."""
     issues: list[CatalogValidationIssue] = []
 
@@ -164,9 +166,7 @@ def test_resolve_context_schema_references_inlines_shared_schemas() -> None:
         {
             "type": "object",
             "additionalProperties": False,
-            "properties": {
-                "team_id": {"$ref": "#/shared_context_schemas/UuidRef"}
-            },
+            "properties": {"team_id": {"$ref": "#/shared_context_schemas/UuidRef"}},
             "required": ["team_id"],
         },
         shared_context_schemas={
@@ -191,9 +191,7 @@ def test_validate_context_references_rejects_unknown_shared_refs() -> None:
         {
             "type": "object",
             "additionalProperties": False,
-            "properties": {
-                "team_id": {"$ref": "#/shared_context_schemas/MissingRef"}
-            },
+            "properties": {"team_id": {"$ref": "#/shared_context_schemas/MissingRef"}},
         },
         shared_context_schemas={},
         fragment_path=Path("docs/api/errors/event_operations.yaml"),

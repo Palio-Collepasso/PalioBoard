@@ -33,13 +33,14 @@ class Scenario:
         return self.contracts_root / "index.yaml"
 
 
-
 def _discover(base_root: Path, outcome: str) -> list[Scenario]:
     """Discover scenarios below one outcome root."""
     base = base_root / outcome
     discovered: list[Scenario] = []
     for level_dir in sorted(path for path in base.iterdir() if path.is_dir()):
-        for scenario_dir in sorted(path for path in level_dir.iterdir() if path.is_dir()):
+        for scenario_dir in sorted(
+            path for path in level_dir.iterdir() if path.is_dir()
+        ):
             discovered.append(
                 Scenario(
                     outcome=outcome,
@@ -51,11 +52,9 @@ def _discover(base_root: Path, outcome: str) -> list[Scenario]:
     return discovered
 
 
-
 def success_scenarios(base_root: Path) -> list[Scenario]:
     """Return all success scenarios."""
     return _discover(base_root, "success")
-
 
 
 def failure_scenarios(base_root: Path) -> list[Scenario]:
