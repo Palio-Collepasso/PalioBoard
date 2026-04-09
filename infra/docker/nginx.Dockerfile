@@ -9,7 +9,7 @@ RUN npm ci
 COPY apps/web /app/apps/web
 RUN npm run build
 
-FROM nginx:1.29.7-alpine3.23-slim
+FROM nginx:1.29.8-alpine3.23-slim
 
 COPY infra/nginx/default.conf /etc/nginx/conf.d/default.conf
 RUN rm -rf /usr/share/nginx/html/*
